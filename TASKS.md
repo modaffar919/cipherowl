@@ -32,12 +32,12 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔴 | Install Rust toolchain and cross-compile targets | `cipherowl-2qj` | P0 · حرج |
-| 🔴 | Run flutter pub get and resolve all dependencies | `cipherowl-8k3` | P0 · حرج |
-| 🔴 | Install Flutter SDK and configure PATH | `cipherowl-6hi` | P0 · حرج |
-| 🔴 | Create app_localizations.dart - COMPILE BLOCKER | `cipherowl-4ho` | P0 · حرج |
+| ✅ | ~~Install Rust toolchain and cross-compile targets~~ | `cipherowl-2qj` | P0 · حرج |
+| ✅ | ~~Run flutter pub get and resolve all dependencies~~ | `cipherowl-8k3` | P0 · حرج |
+| ✅ | ~~Install Flutter SDK and configure PATH~~ | `cipherowl-6hi` | P0 · حرج |
+| ✅ | ~~Create app_localizations.dart - COMPILE BLOCKER~~ | `cipherowl-4ho` | P0 · حرج |
 | 🔴 | Verify full project compiles with flutter build | `cipherowl-9bz` | P0 · حرج |
-| 🔴 | Configure Android build.gradle minSdk24 NDK signing | `cipherowl-1kg` | P0 · حرج |
+| ✅ | ~~Configure Android build.gradle minSdk24 NDK signing~~ | `cipherowl-1kg` | P0 · حرج |
 | 🟠 | Create l10n ARB files for Arabic and English | `cipherowl-zis` | P1 · عالي |
 | 🟠 | Configure release signing Android and iOS | `cipherowl-j7j` | P1 · عالي |
 | 🟠 | Configure iOS Xcode project and Info.plist permissions | `cipherowl-ag6` | P1 · عالي |
