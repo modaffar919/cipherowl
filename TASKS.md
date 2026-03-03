@@ -1,6 +1,6 @@
-﻿# مهام مشروع CipherOwl — لوحة التتبع الكاملة
+﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-04 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 11 &nbsp;|&nbsp; ⬜ مفتوحة: 106
+> **آخر تحديث:** 2026-03-04 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 17 &nbsp;|&nbsp; 🔴 مفتوحة: 100
 
 ---
 
@@ -10,19 +10,19 @@
 |----------|----------|---------|
 | 🔴 P0 · حرج | 27 | 7 |
 | 🟠 P1 · عالي | 45 | 4 |
-| 🟡 P2 · متوسط | 28 | 0 |
+| 🔵 P2 · متوسط | 28 | 0 |
 | ⬜ P3 · منخفض | 6 | 0 |
 
 ---
 
-## 🗺️ المسار الحرج
+## 🔥 المسار الحرج
 
 
 ---
 
-## 📋 المهام التفصيلية حسب EPIC
+## 🗂 المهام التفصيلية حسب EPIC
 
-### 🔴 EPIC-1 — أساسيات المشروع ونظام البناء
+### 🏗️ EPIC-1 — أساسيات المشروع ونظام البناء
 
 | | |
 |---|---|
@@ -36,7 +36,7 @@
 | ✅ | ~~Run flutter pub get and resolve all dependencies~~ | `cipherowl-8k3` | P0 · حرج |
 | ✅ | ~~Install Flutter SDK and configure PATH~~ | `cipherowl-6hi` | P0 · حرج |
 | ✅ | ~~Create app_localizations.dart - COMPILE BLOCKER~~ | `cipherowl-4ho` | P0 · حرج |
-| 🔴 | Verify full project compiles with flutter build | `cipherowl-9bz` | P0 · حرج |
+| ✅ | ~~Verify full project compiles with flutter build~~ | `cipherowl-9bz` | P0 · حرج |
 | ✅ | ~~Configure Android build.gradle minSdk24 NDK signing~~ | `cipherowl-1kg` | P0 · حرج |
 | 🟠 | Create l10n ARB files for Arabic and English | `cipherowl-zis` | P1 · عالي |
 | 🟠 | Configure release signing Android and iOS | `cipherowl-j7j` | P1 · عالي |
@@ -56,7 +56,7 @@
 
 ---
 
-### 🔴 EPIC-2 — نواة التشفير بلغة Rust
+### 🔐 EPIC-2 — نواة التشفير بلغة Rust
 
 | | |
 |---|---|
@@ -76,14 +76,14 @@
 | 🟠 | Implement X25519 ECDH key exchange for sharing | `cipherowl-dgh` | P1 · عالي |
 | 🟠 | Create GeneratorBloc for password generation | `cipherowl-lup` | P1 · عالي |
 | 🟠 | Implement zxcvbn password strength analysis in Rust native | `cipherowl-9j7` | P1 · عالي |
-| 🟡 | Animated password strength meter with zxcvbn | `cipherowl-xw9` | P2 · متوسط |
-| 🟡 | Implement PBKDF2 fallback 600K iterations | `cipherowl-1za` | P2 · متوسط |
-| 🟡 | Implement Ed25519 digital signatures for data integrity | `cipherowl-nmp` | P2 · متوسط |
-| 🟡 | Implement X25519 encrypted item sharing | `cipherowl-a5f` | P2 · متوسط |
+| 🔵 | Animated password strength meter with zxcvbn | `cipherowl-xw9` | P2 · متوسط |
+| 🔵 | Implement PBKDF2 fallback 600K iterations | `cipherowl-1za` | P2 · متوسط |
+| 🔵 | Implement Ed25519 digital signatures for data integrity | `cipherowl-nmp` | P2 · متوسط |
+| 🔵 | Implement X25519 encrypted item sharing | `cipherowl-a5f` | P2 · متوسط |
 
 ---
 
-### 🔴 EPIC-3 — قاعدة البيانات المحلية Drift+SQLCipher
+### 🗄️ EPIC-3 — قاعدة البيانات المحلية Drift+SQLCipher
 
 | | |
 |---|---|
@@ -97,11 +97,11 @@
 | 🔴 | Run Drift code generation with build_runner | `cipherowl-jv1` | P0 · حرج |
 | 🔴 | Create Drift DAOs VaultDao SettingsDao SecurityLogDao | `cipherowl-073` | P0 · حرج |
 | 🟠 | Implement database migration strategy | `cipherowl-4ed` | P1 · عالي |
-| 🟡 | Add database backup and restore functionality | `cipherowl-8xg` | P2 · متوسط |
+| 🔵 | Add database backup and restore functionality | `cipherowl-8xg` | P2 · متوسط |
 
 ---
 
-### 🔴 EPIC-4 — طبقة إدارة الحالة BLoC
+### ⚡ EPIC-4 — طبقة إدارة الحالة BLoC
 
 | | |
 |---|---|
@@ -120,11 +120,11 @@
 | 🟠 | Create Domain entities and use cases layer | `cipherowl-ekw` | P1 · عالي |
 | 🟠 | Create Repository layer for Clean Architecture data abstraction | `cipherowl-yay` | P1 · عالي |
 | 🟠 | Write unit tests for all BLoCs 90pct coverage | `cipherowl-dla` | P1 · عالي |
-| 🟡 | Create GamificationBloc XP levels badges streaks | `cipherowl-yot` | P2 · متوسط |
+| 🔵 | Create GamificationBloc XP levels badges streaks | `cipherowl-yot` | P2 · متوسط |
 
 ---
 
-### 🟠 EPIC-5 — الخلفية السحابية Supabase
+### ☁️ EPIC-5 — الخلفية السحابية Supabase
 
 | | |
 |---|---|
@@ -139,12 +139,12 @@
 | 🟠 | Create Supabase project and update config keys | `cipherowl-zig` | P1 · عالي |
 | 🟠 | Create Supabase SQL schema profiles encrypted_vaults | `cipherowl-6i8` | P1 · عالي |
 | 🟠 | Implement Supabase Auth email and social login | `cipherowl-op4` | P1 · عالي |
-| 🟡 | Create Edge Functions breach check and notifications | `cipherowl-rhy` | P2 · متوسط |
-| 🟡 | Implement FIDO2 WebAuthn credential registration | `cipherowl-9rp` | P2 · متوسط |
+| 🔵 | Create Edge Functions breach check and notifications | `cipherowl-rhy` | P2 · متوسط |
+| 🔵 | Implement FIDO2 WebAuthn credential registration | `cipherowl-9rp` | P2 · متوسط |
 
 ---
 
-### 🟠 EPIC-6 — المراقبة البيومترية Face-Track
+### 👁️ EPIC-6 — المراقبة البيومترية Face-Track
 
 | | |
 |---|---|
@@ -163,7 +163,7 @@
 
 ---
 
-### 🟡 EPIC-7 — مصادقة FIDO2/WebAuthn
+### 🛡️ EPIC-7 — مصادقة FIDO2/WebAuthn
 
 | | |
 |---|---|
@@ -173,13 +173,13 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟡 | Implement intruder snapshot on 3 failed attempts | `cipherowl-div` | P2 · متوسط |
-| 🟡 | Implement duress password with fake vault | `cipherowl-dq0` | P2 · متوسط |
-| 🟡 | Implement FIDO2 WebAuthn authentication flow | `cipherowl-b7k` | P2 · متوسط |
+| 🔵 | Implement intruder snapshot on 3 failed attempts | `cipherowl-div` | P2 · متوسط |
+| 🔵 | Implement duress password with fake vault | `cipherowl-dq0` | P2 · متوسط |
+| 🔵 | Implement FIDO2 WebAuthn authentication flow | `cipherowl-b7k` | P2 · متوسط |
 
 ---
 
-### 🟠 EPIC-8 — نظام TOTP المصادقة الثنائية
+### 🔑 EPIC-8 — نظام TOTP المصادقة الثنائية
 
 | | |
 |---|---|
@@ -196,7 +196,7 @@
 
 ---
 
-### 🟡 EPIC-9 — الرسوم المتحركة Rive/Lottie
+### ✨ EPIC-9 — الرسوم المتحركة Rive/Lottie
 
 | | |
 |---|---|
@@ -206,14 +206,14 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟡 | Create Rive owl mascot animations states | `cipherowl-e0k` | P2 · متوسط |
-| 🟡 | Implement Hero and custom page transitions | `cipherowl-zaq` | P2 · متوسط |
-| 🟡 | Replace OnboardingScreen emoji placeholders with Rive animations | `cipherowl-n0p` | P2 · متوسط |
-| 🟡 | Create Lottie transition animations | `cipherowl-at2` | P2 · متوسط |
+| 🔵 | Create Rive owl mascot animations states | `cipherowl-e0k` | P2 · متوسط |
+| 🔵 | Implement Hero and custom page transitions | `cipherowl-zaq` | P2 · متوسط |
+| 🔵 | Replace OnboardingScreen emoji placeholders with Rive animations | `cipherowl-n0p` | P2 · متوسط |
+| 🔵 | Create Lottie transition animations | `cipherowl-at2` | P2 · متوسط |
 
 ---
 
-### 🟠 EPIC-10 — مركز الأمان والويب المظلم
+### 🔍 EPIC-10 — مركز الأمان والويب المظلم
 
 | | |
 |---|---|
@@ -229,7 +229,7 @@
 
 ---
 
-### 🟠 EPIC-11 — خدمة الإكمال التلقائي
+### ⌨️ EPIC-11 — خدمة الإكمال التلقائي
 
 | | |
 |---|---|
@@ -245,7 +245,7 @@
 
 ---
 
-### 🟡 EPIC-12 — المشاركة المشفرة والمؤسسات
+### 🤝 EPIC-12 — المشاركة المشفرة والمؤسسات
 
 | | |
 |---|---|
@@ -255,13 +255,13 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟡 | Build organization team vault with roles | `cipherowl-obe` | P2 · متوسط |
+| 🔵 | Build organization team vault with roles | `cipherowl-obe` | P2 · متوسط |
 | ⬜ | Implement admin dashboard for enterprise | `cipherowl-4i7` | P3 · منخفض |
 | ⬜ | Implement enterprise SSO SAML OIDC and LDAP AD integration | `cipherowl-5ft` | P3 · منخفض |
 
 ---
 
-### 🟡 EPIC-13 — Firebase والإشعارات
+### 🔔 EPIC-13 — Firebase والإشعارات
 
 | | |
 |---|---|
@@ -271,13 +271,13 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟡 | Configure Firebase project and config files | `cipherowl-wnk` | P2 · متوسط |
-| 🟡 | Implement push notifications for security alerts | `cipherowl-6mm` | P2 · متوسط |
-| 🟡 | Implement in-app notification center | `cipherowl-2p5` | P2 · متوسط |
+| 🔵 | Configure Firebase project and config files | `cipherowl-wnk` | P2 · متوسط |
+| 🔵 | Implement push notifications for security alerts | `cipherowl-6mm` | P2 · متوسط |
+| 🔵 | Implement in-app notification center | `cipherowl-2p5` | P2 · متوسط |
 
 ---
 
-### 🟡 EPIC-14 — أكاديمية الأمان والتلعيب
+### 🎓 EPIC-14 — أكاديمية الأمان والتلعيب
 
 | | |
 |---|---|
@@ -287,14 +287,14 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟡 | Create academy content 10 threat modules AR EN | `cipherowl-kj5` | P2 · متوسط |
-| 🟡 | Implement quiz system with scoring and XP | `cipherowl-rmq` | P2 · متوسط |
-| 🟡 | Build badge achievement system 25 badges | `cipherowl-p7t` | P2 · متوسط |
+| 🔵 | Create academy content 10 threat modules AR EN | `cipherowl-kj5` | P2 · متوسط |
+| 🔵 | Implement quiz system with scoring and XP | `cipherowl-rmq` | P2 · متوسط |
+| 🔵 | Build badge achievement system 25 badges | `cipherowl-p7t` | P2 · متوسط |
 | ⬜ | Daily security challenges and streaks | `cipherowl-7dw` | P3 · منخفض |
 
 ---
 
-### 🟠 EPIC-15 — الاختبارات وضمان الجودة
+### 🧪 EPIC-15 — الاختبارات وضمان الجودة
 
 | | |
 |---|---|
@@ -310,7 +310,7 @@
 
 ---
 
-### 🟠 EPIC-16 — النشر ومتاجر التطبيقات
+### 🚀 EPIC-16 — النشر ومتاجر التطبيقات
 
 | | |
 |---|---|
@@ -322,11 +322,11 @@
 |:------:|--------|:--:|:--------:|
 | 🔴 | Graduation project report and presentation | `cipherowl-179` | P0 · حرج |
 | 🟠 | App Store listing screenshots description AR EN | `cipherowl-jf1` | P1 · عالي |
-| 🟡 | CI/CD pipeline GitHub Actions build test deploy | `cipherowl-jsl` | P2 · متوسط |
+| 🔵 | CI/CD pipeline GitHub Actions build test deploy | `cipherowl-jsl` | P2 · متوسط |
 
 ---
 
-## ⬜ مهام غير مصنفة (4)
+## ? مهام غير مصنفة (4)
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
@@ -338,3 +338,4 @@
 ---
 
 *تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01*
+
