@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Secure Sharing Screen — share vault items via X25519 encrypted link
 class SharingScreen extends StatefulWidget {
@@ -219,3 +219,4 @@ class _OptionSwitch extends StatelessWidget {
     ],
   );
 }
+

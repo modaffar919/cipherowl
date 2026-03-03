@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Vault List — main vault screen showing all password entries
 class VaultListScreen extends StatefulWidget {
@@ -151,7 +151,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
       // ── FAB ─────────────────────────────────────────
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(AppConstants.routeVaultAdd),
+        onPressed: () => context.go(AppConstants.routeAddItem),
         backgroundColor: AppConstants.primaryCyan,
         foregroundColor: AppConstants.backgroundDark,
         icon: const Icon(Icons.add),
@@ -251,3 +251,5 @@ class _VaultCard extends StatelessWidget {
     );
   }
 }
+
+

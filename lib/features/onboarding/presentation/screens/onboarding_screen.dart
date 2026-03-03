@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Onboarding - shown only on first install (3 pages)
 class OnboardingScreen extends StatefulWidget {
@@ -178,3 +178,4 @@ class _OnboardPage extends StatelessWidget {
     );
   }
 }
+

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
-import '../../../shared/widgets/cipherowl_logo.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/shared/widgets/cipherowl_logo.dart';
 
 /// Splash Screen — shows animated CipherOwl logo then navigates
 class SplashScreen extends StatefulWidget {
@@ -293,3 +293,4 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

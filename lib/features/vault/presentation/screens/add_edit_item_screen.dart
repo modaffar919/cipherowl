@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Add or Edit an existing vault item
 class AddEditItemScreen extends StatefulWidget {
@@ -213,3 +213,4 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
 
   String? _required(String? v) => (v == null || v.isEmpty) ? 'هذا الحقل مطلوب' : null;
 }
+

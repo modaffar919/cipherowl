@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 import 'vault_list_screen.dart';
 import '../../../security_center/presentation/screens/security_center_screen.dart';
 import '../../../generator/presentation/generator_screen.dart';
@@ -20,7 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   static const _destinations = [
-    _NavItem(icon: Icons.lock_outline, activeIcon: Icons.lock, labelAr: 'الخزنة', route: AppConstants.routeVault),
+    _NavItem(icon: Icons.lock_outline, activeIcon: Icons.lock, labelAr: 'الخزنة', route: AppConstants.routeVaultList),
     _NavItem(icon: Icons.security_outlined, activeIcon: Icons.security, labelAr: 'الأمان', route: AppConstants.routeSecurityCenter),
     _NavItem(icon: Icons.casino_outlined, activeIcon: Icons.casino, labelAr: 'المولّد', route: AppConstants.routeGenerator),
     _NavItem(icon: Icons.school_outlined, activeIcon: Icons.school, labelAr: 'الأكاديمية', route: AppConstants.routeAcademy),
@@ -135,3 +135,5 @@ class _CipherBottomNav extends StatelessWidget {
     );
   }
 }
+
+

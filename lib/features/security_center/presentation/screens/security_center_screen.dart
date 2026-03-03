@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Security Center — interactive shield showing security score
 class SecurityCenterScreen extends StatefulWidget {
@@ -294,3 +294,4 @@ class _RecommendCard extends StatelessWidget {
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// First-time setup — creates master password + recovery key
 class SetupScreen extends StatefulWidget {
@@ -305,3 +305,4 @@ class _SetupPage4 extends StatelessWidget {
     );
   }
 }
+

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
-import '../../../shared/widgets/cipherowl_logo.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/shared/widgets/cipherowl_logo.dart';
 
 /// Lock Screen — primary vault entry point after cold start
 class LockScreen extends StatefulWidget {
@@ -298,7 +298,7 @@ class _LockScreenState extends State<LockScreen>
             const SizedBox(width: 24),
             // FIDO2 Key
             _AuthOptionButton(
-              icon: Icons.security_key,
+              icon: Icons.key,
               labelAr: 'المفتاح',
               labelEn: 'Key',
               color: AppConstants.accentGold,
@@ -414,3 +414,4 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
 }
+

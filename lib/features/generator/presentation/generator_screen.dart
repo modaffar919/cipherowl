@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Password & Passphrase Generator
 class GeneratorScreen extends StatefulWidget {
@@ -356,3 +356,4 @@ class _IconBtn extends StatelessWidget {
     ),
   );
 }
+

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Vault Item Detail Screen
 class VaultItemDetailScreen extends StatelessWidget {
@@ -72,7 +72,7 @@ class VaultItemDetailScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(backgroundColor: AppConstants.errorRed),
             onPressed: () {
               Navigator.pop(context);
-              context.go(AppConstants.routeVault);
+              context.go(AppConstants.routeVaultList);
             },
             child: const Text('حذف', style: TextStyle(color: Colors.white)),
           ),
@@ -305,3 +305,5 @@ class _StatTile extends StatelessWidget {
     );
   }
 }
+
+

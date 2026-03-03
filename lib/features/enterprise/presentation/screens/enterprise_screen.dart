@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Enterprise Screen — LDAP, SSO, Group Management
 class EnterpriseScreen extends StatelessWidget {
@@ -155,3 +155,4 @@ class _FeatureCard extends StatelessWidget {
     ),
   );
 }
+

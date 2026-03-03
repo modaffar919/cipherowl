@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/splash_screen.dart';
@@ -133,3 +134,4 @@ class _ErrorScreen extends StatelessWidget {
     body: Center(child: Text('404 - Page not found', style: TextStyle(color: Colors.white))),
   );
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Face-Track Setup — enroll user face embeddings via MobileFaceNet
 class FaceSetupScreen extends StatefulWidget {
@@ -224,3 +224,4 @@ class _FeatureTile extends StatelessWidget {
     ]),
   );
 }
+

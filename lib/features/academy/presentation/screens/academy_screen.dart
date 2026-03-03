@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/app_constants.dart';
+import 'package:cipherowl/core/constants/app_constants.dart';
 
 /// Threat Academy — 10 security education cards with quiz
 class AcademyScreen extends StatelessWidget {
@@ -157,3 +157,4 @@ class _ThreatDetail extends StatelessWidget {
     );
   }
 }
+
