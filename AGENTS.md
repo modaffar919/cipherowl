@@ -1,4 +1,10 @@
-# Agent Instructions
+# Agent Instructions — CipherOwl Password Manager
+
+## Project Overview
+CipherOwl is a military-grade password manager graduation project. Flutter/Dart UI + Rust crypto core + Supabase cloud backend. Features: Face-Track continuous biometric, TOTP 2FA, security gamification, zero-knowledge sync.
+
+**Tech Stack**: Flutter 3.x, Rust (FFI via flutter_rust_bridge), Drift+SQLCipher, Supabase, BLoC, Google ML Kit, MobileFaceNet TFLite  
+**Languages**: Arabic (primary) + English
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
@@ -108,6 +114,55 @@ bd automatically syncs with git:
 - Exports to `.beads/issues.jsonl` after changes (5s debounce)
 - Imports from JSONL when newer (e.g., after `git pull`)
 - No manual export/import needed!
+
+## Architecture Rules
+1. **ALL cryptography in Rust** — never implement crypto in Dart
+2. **Zero-knowledge** — encrypt client-side before Supabase upload
+3. **BLoC pattern strictly** — no state management in widgets
+4. **Arabic-first** — all UI strings need Arabic translations
+5. **Secure memory** — use mlock/zeroize for sensitive data in Rust
+
+## File Structure
+```
+lib/
+  main.dart, app.dart
+  core/constants/ theme/ router/
+  features/auth/ vault/ generator/ settings/ security/ academy/ onboarding/
+  shared/widgets/
+native/smartvault_core/        # Rust crate (to be created)
+```
+
+## Task Structure — 16 EPICs, 80 Tasks
+| # | EPIC | Priority | Independent? |
+|---|------|----------|-------------|
+| 1 | Project Foundation & Build System | P0 | Start here |
+| 2 | Rust Cryptography Core | P0 | After EPIC-1 |
+| 3 | Local Database (Drift+SQLCipher) | P0 | After EPIC-2 |
+| 4 | State Management BLoC Layer | P0 | After EPIC-3 |
+| 5 | Supabase Cloud Backend | P1 | After EPIC-1 (parallel with 2) |
+| 6 | Face-Track Biometric | P1 | After EPIC-4 |
+| 7 | FIDO2/WebAuthn Auth | P2 | After EPIC-4 |
+| 8 | TOTP 2FA System | P1 | After EPIC-2 |
+| 9 | Animations (Rive/Lottie) | P2 | After EPIC-4 |
+| 10 | Security Center & Dark Web | P1 | After EPIC-4 |
+| 11 | Autofill Service | P1 | After EPIC-4 |
+| 12 | Encrypted Sharing & Enterprise | P2 | After EPIC-2+5 |
+| 13 | Firebase & Push Notifications | P2 | After EPIC-1 |
+| 14 | Security Academy & Gamification | P2 | Content anytime |
+| 15 | Testing & QA | P1 | After EPIC-4 |
+| 16 | Deployment & Release | P1 | After EPIC-15 |
+
+## Critical Path
+```
+EPIC-1 → EPIC-2 → EPIC-3 → EPIC-4 → EPIC-15 → EPIC-16
+       → EPIC-5 ↗ (parallel)
+```
+
+## Concurrent Work
+- EPICs are independent work units — multiple team members can work on different EPICs
+- Within an EPIC, follow dependency chain (check `bd ready`)
+- EPIC-14 (academy content) has zero code dependencies
+- After EPIC-1, teams can split: Rust crypto (EPIC-2) + Supabase (EPIC-5) in parallel
 
 ### Important Rules
 
