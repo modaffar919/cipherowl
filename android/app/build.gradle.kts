@@ -87,12 +87,17 @@ val rustBuild by tasks.registering {
         val androidHome = System.getenv("ANDROID_HOME")
             ?: "${System.getProperty("user.home")}/AppData/Local/Android/Sdk"
         val ndkHome = "$androidHome/ndk/$ndkVersion"
-        val cargoNdk = if (System.getProperty("os.name").lowercase().contains("windows")) {
-            // cargo-ndk on PATH (installed via `cargo install cargo-ndk`)
-            "cargo-ndk"
+        // Resolve cargo-ndk — prefer absolute path on Windows so Gradle's
+        // subprocess inherits the correct PATH even if .cargo\bin is not in
+        // the system-wide PATH (common on Windows developer machines).
+        val userHome = System.getProperty("user.home")
+        val cargoNdkAbs = if (System.getProperty("os.name").lowercase().contains("windows")) {
+            val candidate = file("$userHome/.cargo/bin/cargo-ndk.exe")
+            if (candidate.exists()) candidate.absolutePath else "cargo-ndk"
         } else {
             "cargo-ndk"
         }
+        val cargoNdk = cargoNdkAbs
 
         // Check if cargo-ndk is available
         val hasCargoNdk = try {

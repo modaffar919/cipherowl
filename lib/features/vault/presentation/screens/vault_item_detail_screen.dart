@@ -1,10 +1,12 @@
-﻿import 'dart:typed_data';
+﻿import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:otp/otp.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
@@ -28,17 +30,70 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
   bool _passwordVisible = false;
   bool _isDecrypting = false;
 
+  // TOTP
+  String? _totpSecret; // decrypted Base32 secret
+  String _totpCode = '------';
+  int _totpSecondsLeft = 30;
+  Timer? _totpTimer;
+  bool _isLoadingTotp = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadEntry();
   }
 
+  @override
+  void dispose() {
+    _totpTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _initTotp(VaultEntry entry) async {
+    if (entry.encryptedTotpSecret == null) return;
+    if (_totpSecret != null) return; // already loaded
+    setState(() => _isLoadingTotp = true);
+    try {
+      final crypto = context.read<VaultCryptoService>();
+      final secret = await crypto.decrypt(entry.encryptedTotpSecret!);
+      if (!mounted) return;
+      setState(() {
+        _totpSecret = secret;
+        _isLoadingTotp = false;
+      });
+      _refreshTotp();
+      _totpTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) _refreshTotp();
+      });
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingTotp = false);
+    }
+  }
+
+  void _refreshTotp() {
+    final secret = _totpSecret;
+    if (secret == null) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final secsLeft = 30 - (now ~/ 1000) % 30;
+    try {
+      final code = OTP.generateTOTPCodeString(
+        secret, now,
+        length: 6, interval: 30, algorithm: Algorithm.SHA1, isGoogle: true,
+      );
+      if (mounted) setState(() { _totpCode = code; _totpSecondsLeft = secsLeft; });
+    } catch (_) {
+      if (mounted) setState(() => _totpCode = 'خطأ');
+    }
+  }
+
   void _loadEntry() {
     final state = context.read<VaultBloc>().state;
     if (state is VaultLoaded) {
       final found = state.allItems.where((i) => i.id == widget.itemId).firstOrNull;
-      if (found != null) setState(() => _entry = found);
+      if (found != null) {
+        setState(() => _entry = found);
+        if (found.encryptedTotpSecret != null) _initTotp(found);
+      }
     }
   }
 
@@ -249,6 +304,8 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
           if (entry.url != null && entry.url!.isNotEmpty)
             _FieldCard(label: 'الموقع الإلكتروني', value: entry.url!, copyable: true),
 
+          if (entry.encryptedTotpSecret != null) _buildTotpCard(),
+
           const SizedBox(height: 24),
 
           // Security info
@@ -257,6 +314,71 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
           const SizedBox(height: 80),
         ],
       ),
+    );
+  }
+
+  Widget _buildTotpCard() {
+    final frac = _totpSecondsLeft / 30.0;
+    final danger = _totpSecondsLeft <= 5;
+    final codeColor = danger ? AppConstants.errorRed : AppConstants.primaryCyan;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppConstants.cardDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppConstants.borderDark),
+      ),
+      child: Row(children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('رمز TOTP (2FA)', style: TextStyle(color: Colors.white54, fontSize: 11)),
+          const SizedBox(height: 6),
+          _isLoadingTotp
+              ? const SizedBox(height: 22, width: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppConstants.primaryCyan))
+              : Text(
+                  // Show formatted as "123 456"
+                  _totpCode.length == 6
+                      ? '${_totpCode.substring(0, 3)} ${_totpCode.substring(3)}'
+                      : _totpCode,
+                  style: TextStyle(
+                    color: codeColor,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 4,
+                    fontFamily: 'SpaceMono',
+                  ),
+                ),
+        ])),
+        Column(children: [
+          SizedBox(
+            width: 36, height: 36,
+            child: Stack(alignment: Alignment.center, children: [
+              CircularProgressIndicator(
+                value: frac,
+                strokeWidth: 3,
+                backgroundColor: AppConstants.borderDark,
+                color: codeColor,
+              ),
+              Text(
+                '$_totpSecondsLeft',
+                style: TextStyle(color: codeColor, fontSize: 11, fontWeight: FontWeight.w600),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 4),
+          IconButton(
+            icon: const Icon(Icons.copy, color: Colors.white38, size: 18),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: _totpCode));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم نسخ رمز TOTP'), duration: Duration(seconds: 2)),
+              );
+            },
+          ),
+        ]),
+      ]),
     );
   }
 

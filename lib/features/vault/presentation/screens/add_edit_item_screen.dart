@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zxcvbn/zxcvbn.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
@@ -265,8 +266,8 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             ),
           ),
           onChanged: (v) {
-            // TODO: zxcvbn strength
-            setState(() => _strength = (v.length / 20).clamp(0.0, 1.0));
+            final score = v.isEmpty ? 0 : (Zxcvbn().evaluate(v).score ?? 0);
+            setState(() => _strength = score / 4.0);
           },
         ),
         const SizedBox(height: 6),
