@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 45 &nbsp;|&nbsp; 🔴 مفتوحة: 72
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 45 &nbsp;|&nbsp; 🔴 مفتوحة: 72 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -26,7 +26,7 @@
 
 | | |
 |---|---|
-| 🔴 | `cipherowl-d5g` |
+| ✅ | `cipherowl-d5g` |
 | **الأولوية** | P0 · حرج |
 | **التقدم** | ████████████████████ 21/21 ✅ |
 
@@ -66,13 +66,13 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| ✅ | Implement AES-256-GCM encrypt and decrypt | `cipherowl-bcz` | P0 · حرج |
-| ✅ | Scaffold Rust crate with Cargo.toml and deps | `cipherowl-d4r` | P0 · حرج |
-| ✅ | Implement Argon2id key derivation t3 m65536 p4 | `cipherowl-gqr` | P0 · حرج |
-| ✅ | Implement secure memory with mlock and zeroize | `cipherowl-6bh` | P0 · حرج |
+| ✅ | ~~Implement AES-256-GCM encrypt and decrypt~~ | `cipherowl-bcz` | P0 · حرج |
+| ✅ | ~~Scaffold Rust crate with Cargo.toml and deps~~ | `cipherowl-d4r` | P0 · حرج |
+| ✅ | ~~Implement Argon2id key derivation t3 m65536 p4~~ | `cipherowl-gqr` | P0 · حرج |
+| ✅ | ~~Implement secure memory with mlock and zeroize~~ | `cipherowl-6bh` | P0 · حرج |
 | ✅ | ~~Configure SQLCipher encryption for Drift database~~ | `cipherowl-5d9` | P0 · حرج |
 | ✅ | ~~Write Rust unit tests with NIST and IETF vectors~~ | `cipherowl-0i5` | P0 · حرج |
-| ✅ | Configure flutter_rust_bridge FFI bindings | `cipherowl-p6g` | P0 · حرج |
+| ✅ | ~~Configure flutter_rust_bridge FFI bindings~~ | `cipherowl-p6g` | P0 · حرج |
 | ✅ | ~~Implement X25519 ECDH key exchange for sharing~~ | `cipherowl-dgh` | P1 · عالي |
 | ✅ | ~~Create GeneratorBloc for password generation~~ | `cipherowl-lup` | P1 · عالي |
 | ✅ | ~~Implement zxcvbn password strength analysis in Rust native~~ | `cipherowl-9j7` | P1 · عالي |
@@ -93,7 +93,7 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| ✅ | Create Drift database schema VaultItems SecurityLogs UserSettings | `cipherowl-nlo` | P0 · حرج |
+| ✅ | ~~Create Drift database schema VaultItems SecurityLogs UserSettings~~ | `cipherowl-nlo` | P0 · حرج |
 | ✅ | ~~Run Drift code generation with build_runner~~ | `cipherowl-jv1` | P0 · حرج |
 | ✅ | ~~Create Drift DAOs VaultDao SettingsDao SecurityLogDao~~ | `cipherowl-073` | P0 · حرج |
 | 🟠 | Implement database migration strategy | `cipherowl-4ed` | P1 · عالي |
