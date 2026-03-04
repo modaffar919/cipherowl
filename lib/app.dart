@@ -10,6 +10,7 @@ import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/settings/data/repositories/settings_repository.dart';
 import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -22,12 +23,14 @@ class CipherOwlApp extends StatelessWidget {
     // db is already created and encrypted — passed from main().
     final vaultRepo = VaultRepository(db);
     final vaultCrypto = VaultCryptoService();
+    final settingsRepo = SettingsRepository(db);
 
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<SmartVaultDatabase>.value(value: db),
         RepositoryProvider<VaultRepository>.value(value: vaultRepo),
         RepositoryProvider<VaultCryptoService>.value(value: vaultCrypto),
+        RepositoryProvider<SettingsRepository>.value(value: settingsRepo),
       ],
       child: MultiBlocProvider(
       providers: [

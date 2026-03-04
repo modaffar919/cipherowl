@@ -1,7 +1,11 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
+import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
 /// Security Center — interactive shield showing security score
 class SecurityCenterScreen extends StatefulWidget {
@@ -15,16 +19,98 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
   late final AnimationController _pulseCtrl;
   late final AnimationController _rotCtrl;
 
-  // TODO: Load from SecurityScoreService
-  static const _score = 87;
-  static const _layers = [
-    _SecurityLayer('كلمات المرور', 25, 22, Icons.lock),
-    _SecurityLayer('المصادقة الثنائية', 20, 20, Icons.security),
-    _SecurityLayer('Face-Track', 15, 15, Icons.face),
-    _SecurityLayer('التحديثات', 15, 12, Icons.update),
-    _SecurityLayer('التشفير', 15, 15, Icons.shield),
-    _SecurityLayer('المشاركة الآمنة', 10, 3, Icons.share),
-  ];
+  // Computed from real vault data in build()
+  static int _computeScore(List<VaultEntry> items) {
+    if (items.isEmpty) return 100; // empty vault = no weak passwords
+    final total = items.length;
+
+    // Password strength (50 pts): % with strengthScore >= 3
+    final scored = items.where((i) => i.strengthScore >= 0);
+    final strong = scored.where((i) => i.strengthScore >= 3).length;
+    final pwdPts = scored.isEmpty ? 40 : (strong / scored.length * 50).round();
+
+    // 2FA (20 pts): % with totp category
+    final with2fa = items.where((i) => i.category == VaultCategory.totp || i.encryptedTotpSecret != null).length;
+    final totpPts = total == 0 ? 0 : (with2fa / total * 20).round();
+
+    // Updates (15 pts): % updated in last 90 days
+    final cutoff = DateTime.now().subtract(const Duration(days: 90));
+    final fresh = items.where((i) => i.updatedAt.isAfter(cutoff)).length;
+    final updatePts = total == 0 ? 15 : (fresh / total * 15).round();
+
+    // Encryption always 15 (AES-256-GCM active)
+    const encPts = 15;
+
+    return (pwdPts + totpPts + updatePts + encPts).clamp(0, 100);
+  }
+
+  static List<_SecurityLayer> _buildLayers(List<VaultEntry> items) {
+    final total = items.length;
+    final cutoff = DateTime.now().subtract(const Duration(days: 90));
+
+    final scored = items.where((i) => i.strengthScore >= 0).toList();
+    final strong = scored.where((i) => i.strengthScore >= 3).length;
+    final with2fa = items.where((i) =>
+        i.category == VaultCategory.totp || i.encryptedTotpSecret != null).length;
+    final fresh = items.where((i) => i.updatedAt.isAfter(cutoff)).length;
+
+    return [
+      _SecurityLayer('كلمات المرور', 50,
+          scored.isEmpty ? 40 : (strong / scored.length * 50).round(), Icons.lock),
+      _SecurityLayer('المصادقة الثنائية', 20,
+          total == 0 ? 0 : (with2fa / total * 20).round(), Icons.security),
+      _SecurityLayer('التحديثات', 15,
+          total == 0 ? 15 : (fresh / total * 15).round(), Icons.update),
+      const _SecurityLayer('التشفير', 15, 15, Icons.shield),
+      const _SecurityLayer('المشاركة الآمنة', 10, 3, Icons.share),
+    ];
+  }
+
+  static List<_RecommendData> _buildRecommendations(List<VaultEntry> items) {
+    final recs = <_RecommendData>[];
+    final weak = items.where((i) => i.strengthScore >= 0 && i.strengthScore <= 1);
+    if (weak.isNotEmpty) {
+      recs.add(_RecommendData(
+        icon: Icons.lock_outline,
+        title: 'كلمات مرور ضعيفة (${weak.length})',
+        body: 'استخدم مولّد كلمات المرور لتحسينها',
+        xp: 20,
+        color: AppConstants.errorRed,
+      ));
+    }
+    final with2fa = items.where((i) =>
+        i.category == VaultCategory.totp || i.encryptedTotpSecret != null).length;
+    if (with2fa < items.length && items.isNotEmpty) {
+      recs.add(_RecommendData(
+        icon: Icons.security,
+        title: 'فعّل المصادقة الثنائية',
+        body: '${items.length - with2fa} حسابات بدون 2FA',
+        xp: 30,
+        color: AppConstants.warningAmber,
+      ));
+    }
+    final cutoff = DateTime.now().subtract(const Duration(days: 365));
+    final old = items.where((i) => i.updatedAt.isBefore(cutoff)).length;
+    if (old > 0) {
+      recs.add(_RecommendData(
+        icon: Icons.update,
+        title: 'حدّث كلمات المرور القديمة',
+        body: '$old حسابات لم تُحدَّث منذ أكثر من سنة',
+        xp: 25,
+        color: AppConstants.primaryCyan,
+      ));
+    }
+    if (recs.isEmpty) {
+      recs.add(_RecommendData(
+        icon: Icons.verified_user,
+        title: 'أمان ممتاز!',
+        body: 'خزنتك محمية بالكامل 🛡️',
+        xp: 50,
+        color: AppConstants.successGreen,
+      ));
+    }
+    return recs;
+  }
 
   @override
   void initState() {
@@ -42,79 +128,107 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppConstants.backgroundDark,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: AppConstants.backgroundDark,
-            pinned: true,
-            title: const Text('مركز الأمان', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            centerTitle: false,
-          ),
+    return BlocBuilder<VaultBloc, VaultState>(
+      builder: (context, state) {
+        final items = state is VaultLoaded ? state.allItems : <VaultEntry>[];
+        final score = _computeScore(items);
+        final layers = _buildLayers(items);
+        final recommendations = _buildRecommendations(items);
 
-          // Shield Score
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _SecurityShield(score: _score, pulse: _pulseCtrl, rotation: _rotCtrl),
-                  const SizedBox(height: 8),
-                  const Text('درجة الأمان الكلية', style: TextStyle(color: Colors.white60, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Text(
-                    _score >= 80 ? 'ممتاز! خزنتك محمية جيداً 🛡️' : _score >= 50 ? 'جيد — يمكن تحسينه' : 'تحذير: مستوى الحماية منخفض',
+        return Scaffold(
+          backgroundColor: AppConstants.backgroundDark,
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                backgroundColor: AppConstants.backgroundDark,
+                pinned: true,
+                title: const Text('مركز الأمان',
                     style: TextStyle(
-                      color: _score >= 80 ? AppConstants.successGreen : _score >= 50 ? AppConstants.warningAmber : AppConstants.errorRed,
-                      fontSize: 14, fontWeight: FontWeight.w500,
+                        color: Colors.white, fontWeight: FontWeight.w700)),
+                centerTitle: false,
+              ),
+
+              // Shield Score
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(children: [
+                    _SecurityShield(
+                        score: score,
+                        pulse: _pulseCtrl,
+                        rotation: _rotCtrl),
+                    const SizedBox(height: 8),
+                    const Text('درجة الأمان الكلية',
+                        style: TextStyle(color: Colors.white60, fontSize: 14)),
+                    const SizedBox(height: 4),
+                    Text(
+                      score >= 80
+                          ? 'ممتاز! خزنتك محمية جيداً 🛡️'
+                          : score >= 50
+                              ? 'جيد — يمكن تحسينه'
+                              : 'تحذير: مستوى الحماية منخفض',
+                      style: TextStyle(
+                        color: score >= 80
+                            ? AppConstants.successGreen
+                            : score >= 50
+                                ? AppConstants.warningAmber
+                                : AppConstants.errorRed,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                    if (items.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          '${items.length} حساب محفوظ',
+                          style: const TextStyle(
+                              color: Colors.white38, fontSize: 12),
+                        ),
+                      ),
+                  ]),
+                ),
               ),
-            ),
-          ),
 
-          // Security Layers
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => _LayerCard(layer: _layers[i]),
-                childCount: _layers.length,
+              // Security Layers
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) => _LayerCard(layer: layers[i]),
+                    childCount: layers.length,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          // Recommendations
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('التوصيات', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 12),
-                  _RecommendCard(
-                    icon: Icons.share,
-                    title: 'فعّل المشاركة الآمنة',
-                    body: 'شارك كلمات مرور مؤمنة مع أفراد عائلتك',
-                    xp: 25,
-                    color: AppConstants.accentGold,
+              // Recommendations
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('التوصيات',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 12),
+                      ...recommendations.map((r) => _RecommendCard(
+                            icon: r.icon,
+                            title: r.title,
+                            body: r.body,
+                            xp: r.xp,
+                            color: r.color,
+                          )),
+                    ],
                   ),
-                  _RecommendCard(
-                    icon: Icons.update,
-                    title: 'حدّث كلمات المرور القديمة',
-                    body: '3 حسابات لم تُحدَّث منذ أكثر من سنة',
-                    xp: 30,
-                    color: AppConstants.warningAmber,
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -251,6 +365,15 @@ class _LayerCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _RecommendData {
+  final IconData icon;
+  final String title;
+  final String body;
+  final int xp;
+  final Color color;
+  const _RecommendData({required this.icon, required this.title, required this.body, required this.xp, required this.color});
 }
 
 class _RecommendCard extends StatelessWidget {
