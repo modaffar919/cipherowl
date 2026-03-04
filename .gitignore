@@ -15,7 +15,7 @@ build/
 doc/api/
 .dart_tool/
 .packages
-pubspec.lock
+# pubspec.lock intentionally tracked (app, not package)
 
 # ── Rust ─────────────────────────────────────────────────────
 native/smartvault_core/target/
@@ -35,6 +35,8 @@ android/app/google-services.json
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 android/key.jks
+android/*.jks
+android/*.p12
 android/key.properties
 
 # ── iOS ──────────────────────────────────────────────────────
