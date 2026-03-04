@@ -10,7 +10,9 @@ import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/security_center/presentation/bloc/security_bloc.dart';
 import 'features/settings/data/repositories/settings_repository.dart';
+import 'features/settings/presentation/bloc/settings_bloc.dart';
 import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -42,6 +44,15 @@ class CipherOwlApp extends StatelessWidget {
         ),
         BlocProvider<VaultBloc>(
           create: (_) => VaultBloc(repository: vaultRepo),
+          lazy: true,
+        ),
+        BlocProvider<SettingsBloc>(
+          create: (_) => SettingsBloc(repository: settingsRepo)
+            ..add(const SettingsStarted()),
+          lazy: false,
+        ),
+        BlocProvider<SecurityBloc>(
+          create: (_) => SecurityBloc(),
           lazy: true,
         ),
       ],

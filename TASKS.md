@@ -107,7 +107,7 @@
 |---|---|
 | ✅ | `cipherowl-76s` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ██████████░░░░░░░░░░ 5/10 |
+| **التقدم** | ██████████████░░░░░░ 7/10 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
@@ -115,8 +115,8 @@
 | ✅ | ~~Create VaultBloc with CRUD search filter categories~~ | `cipherowl-gtb` | P0 · حرج |
 | ✅ | ~~Wire all BLoCs to 15 screens replace demo data~~ | `cipherowl-ztk` | P0 · حرج |
 | 🟠 | Wire security_center_screen to real calculated data | `cipherowl-2tp` | P1 · عالي |
-| 🟠 | Create SettingsBloc for all app settings | `cipherowl-1zi` | P1 · عالي |
-| 🟠 | Create SecurityBloc score layers recommendations | `cipherowl-yly` | P1 · عالي |
+| ✅ | ~~Create SettingsBloc for all app settings~~ | `cipherowl-1zi` | P1 · عالي |
+| ✅ | ~~Create SecurityBloc score layers recommendations~~ | `cipherowl-yly` | P1 · عالي |
 | ✅ | ~~Create Domain entities and use cases layer~~ | `cipherowl-ekw` | P1 · عالي |
 | ✅ | ~~Create Repository layer for Clean Architecture data abstraction~~ | `cipherowl-yay` | P1 · عالي |
 | 🟠 | Write unit tests for all BLoCs 90pct coverage | `cipherowl-dla` | P1 · عالي |

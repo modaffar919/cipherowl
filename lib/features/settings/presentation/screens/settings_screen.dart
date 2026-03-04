@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cipherowl/features/settings/data/repositories/settings_repository.dart';
+import 'package:cipherowl/features/settings/presentation/bloc/settings_bloc.dart';
 
 /// Settings screen � all toggles persist to SQLCipher via [SettingsRepository].
 class SettingsScreen extends StatefulWidget {
@@ -30,16 +31,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) setState(() { _settings = s; _loading = false; });
   }
 
-  // ?? Helpers ???????????????????????????????????????????????????????????????
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
-  Future<void> _toggle(
+  /// Toggles a setting: dispatches to [SettingsBloc] AND updates local state
+  /// for immediate UI feedback (optimistic update).
+  void _toggle(
     bool current,
-    Future<void> Function(bool) save,
+    SettingsEvent Function() makeEvent,
     AppSettings Function(bool) update,
-  ) async {
+  ) {
     final next = !current;
     setState(() => _settings = update(next));
-    await save(next);
+    context.read<SettingsBloc>().add(makeEvent());
   }
 
   // ?? Build ?????????????????????????????????????????????????????????????????
@@ -78,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.faceTrack,
                   onChanged: () => _toggle(
                     _settings.faceTrack,
-                    _repo.setFaceTrack,
+                    () => const SettingsFaceTrackToggled(),
                     (b) => _settings.copyWith(faceTrack: b),
                   ),
                 ),
@@ -90,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.biometric,
                   onChanged: () => _toggle(
                     _settings.biometric,
-                    _repo.setBiometric,
+                    () => const SettingsBiometricToggled(),
                     (b) => _settings.copyWith(biometric: b),
                   ),
                 ),
@@ -102,7 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.duressMode,
                   onChanged: () => _toggle(
                     _settings.duressMode,
-                    _repo.setDuressMode,
+                    () => const SettingsDuressModeToggled(),
                     (b) => _settings.copyWith(duressMode: b),
                   ),
                 ),
@@ -126,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.darkWebMonitor,
                   onChanged: () => _toggle(
                     _settings.darkWebMonitor,
-                    _repo.setDarkWebMonitor,
+                    () => const SettingsDarkWebToggled(),
                     (b) => _settings.copyWith(darkWebMonitor: b),
                   ),
                 ),
@@ -138,7 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _settings.autoFill,
                   onChanged: () => _toggle(
                     _settings.autoFill,
-                    _repo.setAutoFill,
+                    () => const SettingsAutoFillToggled(),
                     (b) => _settings.copyWith(autoFill: b),
                   ),
                 ),
@@ -207,10 +210,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _toggleLanguage() async {
+  void _toggleLanguage() {
     final next = _settings.language == 'ar' ? 'en' : 'ar';
     setState(() => _settings = _settings.copyWith(language: next));
-    await _repo.setLanguage(next);
+    context.read<SettingsBloc>().add(SettingsLanguageChanged(next));
   }
 
   void _showTimeoutPicker() {
@@ -238,11 +241,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: _settings.lockTimeout == m
                     ? const Icon(Icons.check, color: AppConstants.primaryCyan)
                     : null,
-                onTap: () async {
+                onTap: () {
                   Navigator.pop(context);
                   setState(() =>
                       _settings = _settings.copyWith(lockTimeout: m));
-                  await _repo.setLockTimeout(m);
+                  context.read<SettingsBloc>().add(SettingsLockTimeoutChanged(m));
                 },
               )),
           const SizedBox(height: 20),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/features/security_center/presentation/bloc/security_bloc.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -128,7 +129,15 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<VaultBloc, VaultState>(
+    return BlocListener<VaultBloc, VaultState>(
+      listener: (context, vaultState) {
+        if (vaultState is VaultLoaded) {
+          context.read<SecurityBloc>().add(
+                SecurityVaultUpdated(vaultState.allItems),
+              );
+        }
+      },
+      child: BlocBuilder<VaultBloc, VaultState>(
       builder: (context, state) {
         final items = state is VaultLoaded ? state.allItems : <VaultEntry>[];
         final score = _computeScore(items);
@@ -229,7 +238,8 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
           ),
         );
       },
-    );
+      ),  // BlocBuilder
+    );  // BlocListener
   }
 }
 
