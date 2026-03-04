@@ -110,7 +110,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   ),
                   if (isOperating)
                     const Padding(
-                      padding: EdgeInsets.only(right: 12),
+                      padding: EdgeInsets.only(right: 4),
                       child: SizedBox(
                         width: 18,
                         height: 18,
@@ -119,6 +119,25 @@ class _VaultListScreenState extends State<VaultListScreen> {
                             color: AppConstants.primaryCyan),
                       ),
                     ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.white54),
+                    color: AppConstants.surfaceDark,
+                    onSelected: (val) {
+                      if (val == 'import_export') {
+                        context.push(AppConstants.routeImportExport);
+                      }
+                    },
+                    itemBuilder: (_) => [
+                      const PopupMenuItem(
+                        value: 'import_export',
+                        child: Row(children: [
+                          Icon(Icons.import_export, color: AppConstants.primaryCyan, size: 18),
+                          SizedBox(width: 10),
+                          Text('استيراد / تصدير', style: TextStyle(color: Colors.white)),
+                        ]),
+                      ),
+                    ],
+                  ),
                 ],
               ),
 

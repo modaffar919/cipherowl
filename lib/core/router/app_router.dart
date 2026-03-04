@@ -14,6 +14,7 @@ import '../../features/security_center/presentation/screens/security_center_scre
 import '../../features/academy/presentation/screens/academy_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/face_track/presentation/screens/face_setup_screen.dart';
+import '../../features/vault/presentation/screens/import_export_screen.dart';
 import '../../features/sharing/presentation/screens/sharing_screen.dart';
 import '../../features/enterprise/presentation/screens/enterprise_screen.dart';
 import '../constants/app_constants.dart';
@@ -120,7 +121,11 @@ abstract class AppRouter {
         path: AppConstants.routeEnterprise,
         builder: (context, state) => const EnterpriseScreen(),
       ),
-    ],
+      // ── Import / Export ───────────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeImportExport,
+        builder: (context, state) => const ImportExportScreen(),
+      ),    ],
 
     // ── Error handler ────────────────────────────────────
     errorBuilder: (context, state) => const _ErrorScreen(),

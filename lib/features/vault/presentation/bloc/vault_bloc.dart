@@ -29,6 +29,7 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
     on<VaultFavoriteToggled>(_onFavoriteToggled);
     on<VaultRefreshRequested>(_onRefreshRequested);
     on<VaultMessageDismissed>(_onMessageDismissed);
+    on<VaultItemsImported>(_onItemsImported);
   }
 
   // ── Event handlers ───────────────────────────────────────────────────────
@@ -166,6 +167,27 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
     if (state is VaultLoaded) {
       emit((state as VaultLoaded).copyWith(clearMessage: true));
     }
+  }
+
+  Future<void> _onItemsImported(
+      VaultItemsImported event, Emitter<VaultState> emit) async {
+    if (state is! VaultLoaded) return;
+    final current = state as VaultLoaded;
+    emit(current.copyWith(isOperating: true));
+    int imported = 0;
+    int skipped = 0;
+    for (final entry in event.entries) {
+      try {
+        await _repo.addItem(entry);
+        imported++;
+      } catch (_) {
+        skipped++;
+      }
+    }
+    final msg = skipped == 0
+        ? 'تم استيراد $imported حساب بنجاح ✓'
+        : 'تم $imported حساب | تخطّي $skipped';
+    emit(current.copyWith(isOperating: false, message: msg));
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────

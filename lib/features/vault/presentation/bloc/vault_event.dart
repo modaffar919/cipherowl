@@ -65,3 +65,9 @@ class VaultRefreshRequested extends VaultEvent {
 class VaultMessageDismissed extends VaultEvent {
   const VaultMessageDismissed();
 }
+
+/// Bulk import — add many items at once (from CSV import).
+class VaultItemsImported extends VaultEvent {
+  final List<VaultEntry> entries;
+  const VaultItemsImported(this.entries);
+}
