@@ -18,6 +18,7 @@ use crate::face::embedding;
 use crate::password::generator::{GeneratorConfig, GeneratorError};
 
 use crate::crypto::x25519;
+use crate::totp::generator as totp;
 
 // ─── AES-256-GCM ─────────────────────────────────────────────────────────────
 
@@ -180,6 +181,50 @@ pub fn api_generate_password(config: ApiGeneratorConfig) -> anyhow::Result<Strin
                 anyhow::anyhow!("Password length too short (minimum {})", minimum)
             }
         })
+}
+
+// ─── TOTP / RFC 6238 ─────────────────────────────────────────────────────────
+
+/// Generate a 6-digit TOTP code from a Base32-encoded secret.
+///
+/// * `secret_base32`  — otpauth secret (case-insensitive, spaces/dashes stripped).
+/// * `timestamp_secs` — current Unix time in **whole seconds**
+///                      (pass `DateTime.now().millisecondsSinceEpoch ~/ 1000`).
+///
+/// Returns a zero-padded 6-character string, e.g. `"094287"`.
+/// Throws if the secret is empty or not valid Base32.
+#[frb(sync)]
+pub fn api_totp_generate(secret_base32: String, timestamp_secs: u64) -> anyhow::Result<String> {
+    totp::generate(&secret_base32, timestamp_secs)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Like `api_totp_generate` but with custom digit count (6–8) and period (seconds).
+#[frb(sync)]
+pub fn api_totp_generate_custom(
+    secret_base32: String,
+    timestamp_secs: u64,
+    digits: u32,
+    period: u64,
+) -> anyhow::Result<String> {
+    totp::generate_custom(&secret_base32, timestamp_secs, digits, period)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Returns how many seconds remain in the current 30-second time window.
+///
+/// Useful for driving a countdown ring in the UI.
+#[frb(sync)]
+pub fn api_totp_time_remaining(timestamp_secs: u64) -> u64 {
+    totp::time_remaining(timestamp_secs)
+}
+
+/// Returns the TOTP counter index (floor(timestamp / 30)).
+///
+/// Two timestamps with the same counter will produce the same code.
+#[frb(sync)]
+pub fn api_totp_time_step(timestamp_secs: u64) -> u64 {
+    totp::time_step(timestamp_secs)
 }
 
 // ─── Utility init ─────────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ pub mod crypto;
 pub mod face;
 pub mod memory;
 pub mod password;
+pub mod totp;
 pub mod api;
 
 // Re-export core API surface
@@ -17,4 +18,5 @@ pub use crypto::aes_gcm::{decrypt, encrypt, generate_key, generate_nonce, Crypto
 pub use crypto::argon2::{derive_key, hash_password, verify_password, ArgonError};
 pub use memory::secure_memory::SecureBytes;
 pub use face::embedding::{cosine_similarity, is_same_person, find_best_match, EMBEDDING_DIM, DEFAULT_THRESHOLD};
+pub use totp::generator::{generate as totp_generate, generate_custom as totp_generate_custom, time_remaining as totp_time_remaining, TotpError};
 // api module re-exported for frb codegen
