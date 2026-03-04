@@ -1,10 +1,11 @@
 import 'dart:math';
 
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.dart';
 
 /// Password & Passphrase Generator
 class GeneratorScreen extends StatefulWidget {
@@ -31,223 +32,195 @@ class _GeneratorScreenState extends State<GeneratorScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppConstants.backgroundDark,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('مولّد كلمات المرور', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
-                  const Text('اصنع كلمات مرور غير قابلة للكسر', style: TextStyle(color: Colors.white54, fontSize: 14)),
-                  const SizedBox(height: 16),
-                  TabBar(
-                    controller: _tabs,
-                    indicatorColor: AppConstants.primaryCyan,
-                    labelColor: AppConstants.primaryCyan,
-                    unselectedLabelColor: Colors.white38,
-                    tabs: const [Tab(text: 'كلمة مرور'), Tab(text: 'عبارة مرور')],
-                  ),
-                ],
+    return BlocProvider<GeneratorBloc>(
+      create: (_) => GeneratorBloc(),
+      child: Scaffold(
+        backgroundColor: AppConstants.backgroundDark,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('مولّد كلمات المرور', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+                    const Text('اصنع كلمات مرور غير قابلة للكسر', style: TextStyle(color: Colors.white54, fontSize: 14)),
+                    const SizedBox(height: 16),
+                    TabBar(
+                      controller: _tabs,
+                      indicatorColor: AppConstants.primaryCyan,
+                      labelColor: AppConstants.primaryCyan,
+                      unselectedLabelColor: Colors.white38,
+                      tabs: const [Tab(text: 'كلمة مرور'), Tab(text: 'عبارة مرور')],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            Expanded(
-              child: TabBarView(
-                controller: _tabs,
-                children: const [
-                  _PasswordTab(),
-                  _PassphraseTab(),
-                ],
+              Expanded(
+                child: TabBarView(
+                  controller: _tabs,
+                  children: const [
+                    _PasswordTab(),
+                    _PassphraseTab(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _PasswordTab extends StatefulWidget {
+class _PasswordTab extends StatelessWidget {
   const _PasswordTab();
-  @override
-  State<_PasswordTab> createState() => _PasswordTabState();
-}
-
-class _PasswordTabState extends State<_PasswordTab> {
-  double _length = 20;
-  bool _upper = true;
-  bool _lower = true;
-  bool _digits = true;
-  bool _symbols = true;
-  bool _exclude = false;
-  String _result = '';
-  int _strength = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _generate();
-  }
-
-  void _generate() {
-    // Guard: at least one charset must be enabled
-    if (!_upper && !_lower && !_digits && !_symbols) {
-      setState(() => _lower = true);
-    }
-
-    // Rust: cryptographically random password via ChaCha20Rng
-    var pwd = apiGeneratePassword(
-      config: ApiGeneratorConfig(
-        length: BigInt.from(_length.toInt()),
-        useLowercase: _lower,
-        useUppercase: _upper,
-        useDigits: _digits,
-        useSymbols: _symbols,
-      ),
-    );
-
-    // Post-filter ambiguous characters if requested
-    if (_exclude) {
-      const ambig = 'iIlLoO01';
-      pwd = pwd.split('').where((c) => !ambig.contains(c)).join();
-    }
-
-    final score = _calcStrength(pwd);
-    setState(() {
-      _result = pwd;
-      _strength = score;
-    });
-  }
-
-  int _calcStrength(String p) {
-    int s = 0;
-    if (p.length >= 12) s += 20;
-    if (p.length >= 20) s += 20;
-    if (RegExp(r'[A-Z]').hasMatch(p)) s += 15;
-    if (RegExp(r'[a-z]').hasMatch(p)) s += 15;
-    if (RegExp(r'[0-9]').hasMatch(p)) s += 15;
-    if (RegExp(r'[^A-Za-z0-9]').hasMatch(p)) s += 15;
-    return s;
-  }
-
-  Color get _strengthColor => _strength >= 80
-      ? AppConstants.successGreen
-      : _strength >= 50
-          ? AppConstants.warningAmber
-          : AppConstants.errorRed;
-
-  String get _strengthLabel => _strength >= 80 ? 'قوية جداً' : _strength >= 50 ? 'متوسطة' : 'ضعيفة';
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        // Result display
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppConstants.cardDark,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3)),
-          ),
-          child: Column(
-            children: [
-              Text(
-                _result,
-                style: const TextStyle(
-                  color: AppConstants.primaryCyan,
-                  fontFamily: 'SpaceMono',
-                  fontSize: 15,
-                  letterSpacing: 1,
-                ),
-                textAlign: TextAlign.center,
+    return BlocBuilder<GeneratorBloc, GeneratorState>(
+      builder: (context, state) {
+        final bloc = context.read<GeneratorBloc>();
+        return ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            // ── Result display ───────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: AppConstants.cardDark,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3)),
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.circle, color: _strengthColor, size: 10),
-                      const SizedBox(width: 6),
-                      Text(_strengthLabel, style: TextStyle(color: _strengthColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                    ],
+                  Text(
+                    state.password,
+                    style: const TextStyle(
+                      color: AppConstants.primaryCyan,
+                      fontFamily: 'SpaceMono',
+                      fontSize: 15,
+                      letterSpacing: 1,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 12),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _IconBtn(icon: Icons.refresh, color: AppConstants.primaryCyan, onTap: _generate),
-                      const SizedBox(width: 8),
-                      _IconBtn(
-                        icon: Icons.copy,
-                        color: Colors.white,
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: _result));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('تم نسخ كلمة المرور ✓')),
-                          );
-                        },
+                      // Strength label
+                      Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            width: 10, height: 10,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: state.strengthColor,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: Text(
+                              state.strengthLabel,
+                              key: ValueKey(state.strengthLabel),
+                              style: TextStyle(color: state.strengthColor, fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _IconBtn(
+                            icon: Icons.refresh,
+                            color: AppConstants.primaryCyan,
+                            onTap: () => bloc.add(const GeneratorRefreshRequested()),
+                          ),
+                          const SizedBox(width: 8),
+                          _IconBtn(
+                            icon: Icons.copy,
+                            color: Colors.white,
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(text: state.password));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('تم نسخ كلمة المرور ✓')),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
 
-        // Strength bar
-        const SizedBox(height: 16),
-        LinearProgressIndicator(value: _strength / 100, backgroundColor: AppConstants.borderDark, color: _strengthColor, minHeight: 4, borderRadius: BorderRadius.circular(2)),
+            // ── Animated strength bar (cipherowl-xw9) ───────────────────
+            const SizedBox(height: 16),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(end: state.strengthScore / 4.0),
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOut,
+              builder: (_, value, __) => ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: LinearProgressIndicator(
+                  value: value,
+                  backgroundColor: AppConstants.borderDark,
+                  valueColor: AlwaysStoppedAnimation<Color>(state.strengthColor),
+                  minHeight: 6,
+                ),
+              ),
+            ),
 
-        const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-        // Options
-        _OptionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // ── Options ──────────────────────────────────────────────────
+            _OptionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('الطول', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                  Text('${_length.toInt()}', style: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w700, fontSize: 16)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('الطول', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                      Text('${state.length.toInt()}', style: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w700, fontSize: 16)),
+                    ],
+                  ),
+                  Slider(
+                    value: state.length,
+                    min: 8,
+                    max: 64,
+                    divisions: 56,
+                    activeColor: AppConstants.primaryCyan,
+                    inactiveColor: AppConstants.borderDark,
+                    onChanged: (v) => bloc.add(GeneratorConfigUpdated(length: v)),
+                  ),
                 ],
               ),
-              Slider(
-                value: _length,
-                min: 8,
-                max: 64,
-                divisions: 56,
-                activeColor: AppConstants.primaryCyan,
-                inactiveColor: AppConstants.borderDark,
-                onChanged: (v) { setState(() => _length = v); _generate(); },
+            ),
+
+            const SizedBox(height: 12),
+            _OptionCard(
+              child: Column(
+                children: [
+                  _ToggleTile(label: 'أحرف كبيرة A-Z', value: state.useUppercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useUppercase: v))),
+                  _ToggleTile(label: 'أحرف صغيرة a-z', value: state.useLowercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useLowercase: v))),
+                  _ToggleTile(label: 'أرقام 0-9', value: state.useDigits, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useDigits: v))),
+                  _ToggleTile(label: 'رموز !@#', value: state.useSymbols, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useSymbols: v))),
+                  _ToggleTile(label: 'استبعاد الأحرف المتشابهة', value: state.excludeAmbiguous, onChanged: (v) => bloc.add(GeneratorConfigUpdated(excludeAmbiguous: v))),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
 
-        const SizedBox(height: 12),
-        _OptionCard(
-          child: Column(
-            children: [
-              _ToggleTile(label: 'أحرف كبيرة A-Z', value: _upper, onChanged: (v) { setState(() => _upper = v); _generate(); }),
-              _ToggleTile(label: 'أحرف صغيرة a-z', value: _lower, onChanged: (v) { setState(() => _lower = v); _generate(); }),
-              _ToggleTile(label: 'أرقام 0-9', value: _digits, onChanged: (v) { setState(() => _digits = v); _generate(); }),
-              _ToggleTile(label: 'رموز !@#', value: _symbols, onChanged: (v) { setState(() => _symbols = v); _generate(); }),
-              _ToggleTile(label: 'استبعاد الأحرف المتشابهة', value: _exclude, onChanged: (v) { setState(() => _exclude = v); _generate(); }),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 80),
-      ],
+            const SizedBox(height: 80),
+          ],
+        );
+      },
     );
   }
 }

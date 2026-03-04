@@ -13,6 +13,7 @@ aes-gcm = { version = "0.10.3", features = ["std"] }
 argon2 = { version = "0.5.3", features = ["std", "password-hash"] }
 x25519-dalek = { version = "2.0.1", features = ["static_secrets"] }
 ed25519-dalek = { version = "2.1.0", features = ["rand_core"] }
+pbkdf2 = { version = "0.12.2", features = ["hmac"] }
 zeroize = { version = "1.7.0", features = ["derive"] }
 rand = { version = "0.8.5", features = ["std"] }
 sha2 = "0.10.8"

@@ -13,7 +13,7 @@
 
 use flutter_rust_bridge::frb;
 
-use crate::crypto::{aes_gcm, argon2};
+use crate::crypto::{aes_gcm, argon2, ed25519, pbkdf2, sharing};
 use crate::face::embedding;
 use crate::password::generator::{GeneratorConfig, GeneratorError};
 
@@ -225,6 +225,87 @@ pub fn api_totp_time_remaining(timestamp_secs: u64) -> u64 {
 #[frb(sync)]
 pub fn api_totp_time_step(timestamp_secs: u64) -> u64 {
     totp::time_step(timestamp_secs)
+}
+
+// ─── PBKDF2-SHA512 (fallback KDF) ────────────────────────────────────────────
+
+/// Derive a 32-byte key using PBKDF2-HMAC-SHA512 (600,000 iterations).
+///
+/// Use as a fallback when the device cannot satisfy Argon2id's 64 MiB memory
+/// requirement.  Prefer `api_derive_key` (Argon2id) whenever possible.
+///
+/// Async — runs on Rust worker thread.
+#[frb]
+pub fn api_derive_key_pbkdf2(password: Vec<u8>, salt: Vec<u8>) -> Vec<u8> {
+    pbkdf2::derive_key(&password, &salt)
+}
+
+// ─── Ed25519 Digital Signatures ──────────────────────────────────────────────
+
+/// Generate a random Ed25519 signing key (32-byte seed).
+#[frb(sync)]
+pub fn api_ed25519_generate_signing_key() -> Vec<u8> {
+    ed25519::generate_signing_key().to_vec()
+}
+
+/// Derive the 32-byte Ed25519 verifying (public) key from a 32-byte seed.
+#[frb(sync)]
+pub fn api_ed25519_get_verifying_key(signing_key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+    ed25519::get_verifying_key(&signing_key)
+        .map(|k| k.to_vec())
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Sign `message` with the 32-byte Ed25519 signing key seed.
+/// Returns a 64-byte signature.
+#[frb(sync)]
+pub fn api_ed25519_sign(message: Vec<u8>, signing_key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+    ed25519::sign(&message, &signing_key)
+        .map(|s| s.to_vec())
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Verify an Ed25519 `signature` (64 bytes) over `message` using the 32-byte
+/// verifying key.  Returns `true` if valid.
+#[frb(sync)]
+pub fn api_ed25519_verify(
+    message: Vec<u8>,
+    signature: Vec<u8>,
+    verifying_key: Vec<u8>,
+) -> anyhow::Result<bool> {
+    ed25519::verify(&message, &signature, &verifying_key)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+// ─── X25519 Encrypted Sharing ────────────────────────────────────────────────
+
+/// Encrypt `plaintext` for a recipient identified by their 32-byte X25519
+/// public key.
+///
+/// Returns the wire-format bytes:
+/// `[sender_eph_pk (32)] [nonce (12)] [ciphertext + tag (N+16)]`
+#[frb(sync)]
+pub fn api_sharing_encrypt(
+    plaintext: Vec<u8>,
+    recipient_public_key: Vec<u8>,
+) -> anyhow::Result<Vec<u8>> {
+    let share = sharing::encrypt_for_recipient(&plaintext, &recipient_public_key)
+        .map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(share.to_bytes())
+}
+
+/// Decrypt a share blob produced by `api_sharing_encrypt`.
+///
+/// `recipient_private_key` — the 32-byte X25519 private key of the recipient.
+#[frb(sync)]
+pub fn api_sharing_decrypt(
+    share_bytes: Vec<u8>,
+    recipient_private_key: Vec<u8>,
+) -> anyhow::Result<Vec<u8>> {
+    let share = sharing::EncryptedShare::from_bytes(&share_bytes)
+        .ok_or_else(|| anyhow::anyhow!("Invalid share format"))?;
+    sharing::decrypt_from_sender(&share, &recipient_private_key)
+        .map_err(|e| anyhow::anyhow!("{}", e))
 }
 
 // ─── Utility init ─────────────────────────────────────────────────────────────

@@ -171,19 +171,47 @@ pub fn decrypt_with_nonce(
 mod tests {
     use super::*;
 
-    /// NIST AES-256-GCM test vector (NIST SP 800-38D, Appendix B)
+    /// NIST AES-256-GCM KAT — Vector 1
+    /// Source: NIST CAVP, gcmEncryptExtIV256.rsp (Keylen=256, IVlen=96, PTlen=0, AADlen=0, Taglen=128)
+    /// Key  = 0x00*32, IV = 0x00*12, PT = empty, AAD = empty
+    /// Expected ciphertext+tag = just the 16-byte authentication tag
     #[test]
-    fn test_nist_vector_256_gcm() {
-        // Key: 32 bytes of 0x00
-        let key = [0u8; 32];
-        // Nonce: 12 bytes of 0x00
+    fn test_nist_cavp_v1_empty_plaintext() {
+        use hex_literal::hex;
+        let key   = [0u8; 32];
         let nonce = [0u8; 12];
-        // Plaintext: empty
-        let plaintext = b"";
-        // Encrypt + decrypt round-trip
-        let ct = encrypt_with_nonce(plaintext, &key, &nonce).unwrap();
-        let pt = decrypt_with_nonce(&ct, &key, &nonce).unwrap();
-        assert_eq!(pt.as_slice(), plaintext);
+        let expected_tag = hex!("530f8afbc74536b9a963b4f1c4cb738b");
+
+        let ct_tag = encrypt_with_nonce(b"", &key, &nonce).unwrap();
+        assert_eq!(ct_tag, expected_tag, "NIST CAVP Vector 1: tag mismatch");
+
+        // Verify decrypt also works
+        let pt = decrypt_with_nonce(&ct_tag, &key, &nonce).unwrap();
+        assert!(pt.is_empty());
+    }
+
+    /// NIST AES-256-GCM KAT — Vector 2
+    /// Source: NIST CAVP, gcmEncryptExtIV256.rsp (Keylen=256, IVlen=96, PTlen=128, AADlen=0, Taglen=128)
+    /// Key  = 0x00*32, IV = 0x00*12, PT = 0x00*16, AAD = empty
+    /// Expected CT = 0xcea7403d4d606b6e074ec5d3baf39d18
+    /// Expected Tag= 0xd0d1c8a799996bf0265b98b5d48ab919
+    #[test]
+    fn test_nist_cavp_v2_16byte_plaintext() {
+        use hex_literal::hex;
+        let key      = [0u8; 32];
+        let nonce    = [0u8; 12];
+        let pt       = [0u8; 16];
+        let expected = hex!(
+            "cea7403d4d606b6e074ec5d3baf39d18"  // ciphertext
+            "d0d1c8a799996bf0265b98b5d48ab919"  // tag
+        );
+
+        let ct_tag = encrypt_with_nonce(&pt, &key, &nonce).unwrap();
+        assert_eq!(ct_tag, expected, "NIST CAVP Vector 2: ciphertext+tag mismatch");
+
+        // Verify decryption recovers plaintext
+        let decrypted = decrypt_with_nonce(&ct_tag, &key, &nonce).unwrap();
+        assert_eq!(decrypted, pt);
     }
 
     #[test]

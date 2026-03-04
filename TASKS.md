@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-04 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 24 &nbsp;|&nbsp; 🔴 مفتوحة: 93
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 45 &nbsp;|&nbsp; 🔴 مفتوحة: 72
 
 ---
 
@@ -8,9 +8,9 @@
 
 | الأولوية | المفتوحة | المنجزة |
 |----------|----------|---------|
-| 🔴 P0 · حرج | 27 | 7 |
-| 🟠 P1 · عالي | 45 | 4 |
-| 🔵 P2 · متوسط | 28 | 0 |
+| 🔴 P0 · حرج | 4 | 25 |
+| 🟠 P1 · عالي | 26 | 19 |
+| 🔵 P2 · متوسط | 24 | 4 |
 | ⬜ P3 · منخفض | 6 | 0 |
 
 ---
@@ -60,9 +60,9 @@
 
 | | |
 |---|---|
-| 🔴 | `cipherowl-nqa` |
+| ✅ | `cipherowl-nqa` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/14 |
+| **التقدم** | ████████████████████ 14/14 ✅ |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
@@ -70,16 +70,16 @@
 | ✅ | Scaffold Rust crate with Cargo.toml and deps | `cipherowl-d4r` | P0 · حرج |
 | ✅ | Implement Argon2id key derivation t3 m65536 p4 | `cipherowl-gqr` | P0 · حرج |
 | ✅ | Implement secure memory with mlock and zeroize | `cipherowl-6bh` | P0 · حرج |
-| 🔴 | Configure SQLCipher encryption for Drift database | `cipherowl-5d9` | P0 · حرج |
-| 🔴 | Write Rust unit tests with NIST and IETF vectors | `cipherowl-0i5` | P0 · حرج |
+| ✅ | ~~Configure SQLCipher encryption for Drift database~~ | `cipherowl-5d9` | P0 · حرج |
+| ✅ | ~~Write Rust unit tests with NIST and IETF vectors~~ | `cipherowl-0i5` | P0 · حرج |
 | ✅ | Configure flutter_rust_bridge FFI bindings | `cipherowl-p6g` | P0 · حرج |
-| 🟠 | Implement X25519 ECDH key exchange for sharing | `cipherowl-dgh` | P1 · عالي |
-| 🟠 | Create GeneratorBloc for password generation | `cipherowl-lup` | P1 · عالي |
-| 🟠 | Implement zxcvbn password strength analysis in Rust native | `cipherowl-9j7` | P1 · عالي |
-| 🔵 | Animated password strength meter with zxcvbn | `cipherowl-xw9` | P2 · متوسط |
-| 🔵 | Implement PBKDF2 fallback 600K iterations | `cipherowl-1za` | P2 · متوسط |
-| 🔵 | Implement Ed25519 digital signatures for data integrity | `cipherowl-nmp` | P2 · متوسط |
-| 🔵 | Implement X25519 encrypted item sharing | `cipherowl-a5f` | P2 · متوسط |
+| ✅ | ~~Implement X25519 ECDH key exchange for sharing~~ | `cipherowl-dgh` | P1 · عالي |
+| ✅ | ~~Create GeneratorBloc for password generation~~ | `cipherowl-lup` | P1 · عالي |
+| ✅ | ~~Implement zxcvbn password strength analysis in Rust native~~ | `cipherowl-9j7` | P1 · عالي |
+| ✅ | ~~Animated password strength meter with zxcvbn~~ | `cipherowl-xw9` | P2 · متوسط |
+| ✅ | ~~Implement PBKDF2 fallback 600K iterations~~ | `cipherowl-1za` | P2 · متوسط |
+| ✅ | ~~Implement Ed25519 digital signatures for data integrity~~ | `cipherowl-nmp` | P2 · متوسط |
+| ✅ | ~~Implement X25519 encrypted item sharing~~ | `cipherowl-a5f` | P2 · متوسط |
 
 ---
 
@@ -87,15 +87,15 @@
 
 | | |
 |---|---|
-| 🔴 | `cipherowl-3ej` |
+| ✅ | `cipherowl-3ej` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/5 |
+| **التقدم** | ████████████░░░░░░░░ 3/5 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | ✅ | Create Drift database schema VaultItems SecurityLogs UserSettings | `cipherowl-nlo` | P0 · حرج |
-| 🔴 | Run Drift code generation with build_runner | `cipherowl-jv1` | P0 · حرج |
-| 🔴 | Create Drift DAOs VaultDao SettingsDao SecurityLogDao | `cipherowl-073` | P0 · حرج |
+| ✅ | ~~Run Drift code generation with build_runner~~ | `cipherowl-jv1` | P0 · حرج |
+| ✅ | ~~Create Drift DAOs VaultDao SettingsDao SecurityLogDao~~ | `cipherowl-073` | P0 · حرج |
 | 🟠 | Implement database migration strategy | `cipherowl-4ed` | P1 · عالي |
 | 🔵 | Add database backup and restore functionality | `cipherowl-8xg` | P2 · متوسط |
 
@@ -105,20 +105,20 @@
 
 | | |
 |---|---|
-| 🔴 | `cipherowl-76s` |
+| ✅ | `cipherowl-76s` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/10 |
+| **التقدم** | ██████████░░░░░░░░░░ 5/10 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔴 | Create AuthBloc with login unlock biometric states | `cipherowl-dw8` | P0 · حرج |
-| 🔴 | Create VaultBloc with CRUD search filter categories | `cipherowl-gtb` | P0 · حرج |
-| 🔴 | Wire all BLoCs to 15 screens replace demo data | `cipherowl-ztk` | P0 · حرج |
+| ✅ | ~~Create AuthBloc with login unlock biometric states~~ | `cipherowl-dw8` | P0 · حرج |
+| ✅ | ~~Create VaultBloc with CRUD search filter categories~~ | `cipherowl-gtb` | P0 · حرج |
+| ✅ | ~~Wire all BLoCs to 15 screens replace demo data~~ | `cipherowl-ztk` | P0 · حرج |
 | 🟠 | Wire security_center_screen to real calculated data | `cipherowl-2tp` | P1 · عالي |
 | 🟠 | Create SettingsBloc for all app settings | `cipherowl-1zi` | P1 · عالي |
 | 🟠 | Create SecurityBloc score layers recommendations | `cipherowl-yly` | P1 · عالي |
-| 🟠 | Create Domain entities and use cases layer | `cipherowl-ekw` | P1 · عالي |
-| 🟠 | Create Repository layer for Clean Architecture data abstraction | `cipherowl-yay` | P1 · عالي |
+| ✅ | ~~Create Domain entities and use cases layer~~ | `cipherowl-ekw` | P1 · عالي |
+| ✅ | ~~Create Repository layer for Clean Architecture data abstraction~~ | `cipherowl-yay` | P1 · عالي |
 | 🟠 | Write unit tests for all BLoCs 90pct coverage | `cipherowl-dla` | P1 · عالي |
 | 🔵 | Create GamificationBloc XP levels badges streaks | `cipherowl-yot` | P2 · متوسط |
 
@@ -150,14 +150,14 @@
 |---|---|
 | 🟠 | `cipherowl-wy7` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/6 |
+| **التقدم** | ███░░░░░░░░░░░░░░░░░ 1/6 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | 🟠 | Implement face verification cosine similarity 0.6 | `cipherowl-rtv` | P1 · عالي |
 | 🟠 | Integrate MobileFaceNet TFLite 128-dim embeddings | `cipherowl-9ts` | P1 · عالي |
 | 🟠 | Implement face detection with Google ML Kit | `cipherowl-qm8` | P1 · عالي |
-| 🟠 | Implement face embedding cosine similarity in Rust native | `cipherowl-7gr` | P1 · عالي |
+| ✅ | ~~Implement face embedding cosine similarity in Rust native~~ | `cipherowl-7gr` | P1 · عالي |
 | 🟠 | Build background face monitoring service | `cipherowl-fhh` | P1 · عالي |
 | 🟠 | Build face enrollment flow 5 captures from angles | `cipherowl-ko8` | P1 · عالي |
 
@@ -185,11 +185,11 @@
 |---|---|
 | 🟠 | `cipherowl-r2m` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/4 |
+| **التقدم** | █████░░░░░░░░░░░░░░░ 1/4 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟠 | Implement TOTP code generation RFC6238 30s period | `cipherowl-933` | P1 · عالي |
+| ✅ | ~~Implement TOTP code generation RFC6238 30s period~~ | `cipherowl-933` | P1 · عالي |
 | 🟠 | Implement BIP39 12-word recovery key system | `cipherowl-df4` | P1 · عالي |
 | 🟠 | Wire TOTP to vault item detail with live countdown | `cipherowl-6jv` | P1 · عالي |
 | 🟠 | QR code scanner for TOTP secret import otpauth | `cipherowl-kgc` | P1 · عالي |
@@ -235,11 +235,11 @@
 |---|---|
 | 🟠 | `cipherowl-rzx` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
+| **التقدم** | ███████░░░░░░░░░░░░░ 1/3 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟠 | Android AutofillService implementation | `cipherowl-26b` | P1 · عالي |
+| ✅ | ~~Android AutofillService implementation~~ | `cipherowl-26b` | P1 · عالي |
 | 🟠 | iOS AutoFill Credential Provider extension | `cipherowl-yqj` | P1 · عالي |
 | ⬜ | Browser extension autofill Phase 2 | `cipherowl-x0y` | P3 · منخفض |
 
@@ -330,12 +330,12 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🟠 | Implement password import export CSV Chrome Firefox Bitwarden | `cipherowl-dyn` | P1 · عالي |
-| 🟠 | Create app icons and splash screens from logo | `cipherowl-fce` | P1 · عالي |
+| ✅ | ~~Implement password import export CSV Chrome Firefox Bitwarden~~ | `cipherowl-dyn` | P1 · عالي |
+| ✅ | ~~Create app icons and splash screens from logo~~ | `cipherowl-fce` | P1 · عالي |
 | ⬜ | Implement Geo-Fencing auto-lock outside safe zones | `cipherowl-tbc` | P3 · منخفض |
 | ⬜ | Implement Travel Mode hide vault categories at borders | `cipherowl-tju` | P3 · منخفض |
 
 ---
 
-*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01*
+*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01 · آخر مزامنة يدوية: 2026-03-05*
 

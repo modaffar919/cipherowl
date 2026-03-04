@@ -187,4 +187,53 @@ mod tests {
         // Key must be non-zero
         assert!(key.iter().any(|&b| b != 0));
     }
+
+    /// IETF RFC 9106 Section 5 — Argon2id official test vector (exact KAT).
+    ///
+    /// Parameters from the RFC:
+    ///   Password : 0x01 × 32
+    ///   Salt     : 0x02 × 16
+    ///   Secret   : 0x03 × 8
+    ///   Data (AD): 0x04 × 12
+    ///   m = 32 KiB, t = 3, p = 4, taglen = 32
+    ///
+    /// Expected tag (hex):
+    ///   0d640df5 8d78766c 08c037a3 4a8b53c9 d01ef045 2d75b65e b52520e9 6b01e659
+    #[test]
+    fn test_rfc9106_argon2id_official_vector() {
+        use argon2::{Algorithm, Argon2, AssociatedData, ParamsBuilder, Version};
+        use hex_literal::hex;
+
+        let password = [0x01u8; 32];
+        let salt     = [0x02u8; 16];
+        let secret   = [0x03u8; 8];
+        let ad_bytes = [0x04u8; 12];
+
+        let ad = AssociatedData::new(&ad_bytes).expect("valid AD");
+
+        let mut builder = ParamsBuilder::new();
+        builder.m_cost(32);         // 32 KiB — RFC 9106 §5
+        builder.t_cost(3);
+        builder.p_cost(4);
+        builder.output_len(32);
+        builder.data(ad);
+        let params = builder.build().expect("valid Argon2 params");
+
+        let argon2 = Argon2::new_with_secret(
+            &secret,
+            Algorithm::Argon2id,
+            Version::V0x13,
+            params,
+        ).expect("valid Argon2id with secret");
+
+        let mut tag = [0u8; 32];
+        argon2.hash_password_into(&password, &salt, &mut tag)
+            .expect("Argon2id hash_password_into");
+
+        let expected = hex!(
+            "0d640df58d78766c08c037a34a8b53c9"
+            "d01ef0452d75b65eb52520e96b01e659"
+        );
+        assert_eq!(tag, expected, "RFC 9106 §5 Argon2id KAT mismatch");
+    }
 }
