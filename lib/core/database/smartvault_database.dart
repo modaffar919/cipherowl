@@ -1,6 +1,10 @@
 // ignore_for_file: type=lint
+import 'dart:io';
+
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import 'daos/vault_dao.dart';
 import 'daos/settings_dao.dart';
@@ -148,9 +152,10 @@ class UserSettings extends Table {
   daos: [VaultDao, SettingsDao, SecurityLogDao],
 )
 class SmartVaultDatabase extends _$SmartVaultDatabase {
-  SmartVaultDatabase() : super(_openConnection());
+  SmartVaultDatabase({required String encryptionKey})
+      : super(_openConnection(encryptionKey));
 
-  /// For injecting a custom executor in tests.
+  /// For injecting a custom executor in tests (unencrypted / in-memory).
   SmartVaultDatabase.forTesting(super.e);
 
   @override
@@ -186,8 +191,26 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
 
 // ─── Connection factory ──────────────────────────────────────────────────────
 
-/// Opens the SQLite/SQLCipher database using drift_flutter.
-/// SQLCipher encryption key is managed by the Rust core (cipherowl-5d9).
-QueryExecutor _openConnection() {
-  return driftDatabase(name: 'smartvault');
+/// Opens an encrypted SQLCipher database using drift + sqlcipher_flutter_libs.
+///
+/// The [encryptionKey] is a 64-char hex string (32 bytes) derived from the
+/// master password via Argon2id (EPIC-2) or randomly generated on first launch.
+QueryExecutor _openConnection(String encryptionKey) {
+  return LazyDatabase(() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 'smartvault.db'));
+
+    return NativeDatabase.createBackgroundConnection(
+      file,
+      setup: (db) {
+        // SQLCipher PRAGMA — must be the very first operation on the database.
+        db.execute("PRAGMA key = \"x'$encryptionKey'\";");
+        // Recommended SQLCipher settings for security/performance balance.
+        db.execute('PRAGMA cipher_page_size = 4096;');
+        db.execute('PRAGMA kdf_iter = 64000;');
+        db.execute('PRAGMA cipher_hmac_algorithm = HMAC_SHA512;');
+        db.execute('PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512;');
+      },
+    );
+  });
 }

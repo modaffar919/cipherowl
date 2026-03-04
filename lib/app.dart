@@ -13,12 +13,12 @@ import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
 
 class CipherOwlApp extends StatelessWidget {
-  const CipherOwlApp({super.key});
+  final SmartVaultDatabase db;
+  const CipherOwlApp({super.key, required this.db});
 
   @override
   Widget build(BuildContext context) {
-    // Singletons — created once, disposed when the widget tree is torn down.
-    final db = SmartVaultDatabase();
+    // db is already created and encrypted — passed from main().
     final vaultRepo = VaultRepository(db);
 
     return MultiRepositoryProvider(

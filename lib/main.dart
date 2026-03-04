@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'core/constants/app_constants.dart';
+import 'core/database/database_key_service.dart';
+import 'core/database/smartvault_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +39,11 @@ void main() async {
     return true;
   }());
 
-  runApp(const CipherOwlApp());
+  // ── Encrypted database init ─────────────────────────
+  final dbKey = await DatabaseKeyService.getDatabaseKey();
+  final db = SmartVaultDatabase(encryptionKey: dbKey);
+
+  runApp(CipherOwlApp(db: db));
 }
 
 class _AppBlocObserver extends BlocObserver {
