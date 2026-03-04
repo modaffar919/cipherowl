@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
@@ -54,6 +55,17 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
         _category = found.category;
         _strength =
             found.strengthScore >= 0 ? found.strengthScore / 4.0 : 0;
+
+        // Decrypt stored password for editing
+        if (found.encryptedPassword != null &&
+            found.encryptedPassword!.isNotEmpty) {
+          context
+              .read<VaultCryptoService>()
+              .decrypt(found.encryptedPassword!)
+              .then((decrypted) {
+            if (mounted) setState(() => _passCtrl.text = decrypted);
+          }).catchError((_) {/* leave blank if decrypt fails */});
+        }
       }
     }
   }
@@ -62,33 +74,33 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
+    // Capture context-dependent refs BEFORE the first await (lint: use_build_context_synchronously)
     final authState = context.read<AuthBloc>().state;
     final userId =
         authState is AuthAuthenticated ? authState.userId : 'local_user';
+    final crypto = context.read<VaultCryptoService>();
+    final vaultBloc = context.read<VaultBloc>();
 
     final now = DateTime.now();
-    // NOTE: password stored as plain UTF-8 bytes for now.
-    // EPIC-2 (Rust FFI) will encrypt before storage.
-    final passwordBytes = _passCtrl.text.isNotEmpty
-        ? _passCtrl.text.codeUnits
-            .map((c) => c & 0xFF)
-            .toList()
-        : null;
+
+    // Encrypt password with Rust AES-256-GCM
+    Uint8List? encryptedPwd;
+    if (_passCtrl.text.isNotEmpty) {
+      encryptedPwd = await crypto.encrypt(_passCtrl.text.trim());
+    }
 
     if (_isEdit) {
-      final existing = (context.read<VaultBloc>().state as VaultLoaded)
+      final existing = (vaultBloc.state as VaultLoaded)
           .allItems
           .firstWhere((i) => i.id == widget.itemId!);
-      context.read<VaultBloc>().add(
+      vaultBloc.add(
             VaultItemUpdated(
               existing.copyWith(
                 title: _titleCtrl.text.trim(),
                 username:
                     _userCtrl.text.isEmpty ? null : _userCtrl.text.trim(),
                 encryptedPassword:
-                    passwordBytes != null
-                        ? Uint8List.fromList(passwordBytes)
-                        : existing.encryptedPassword,
+                    encryptedPwd ?? existing.encryptedPassword,
                 url: _urlCtrl.text.isEmpty ? null : _urlCtrl.text.trim(),
                 category: _category,
                 updatedAt: now,
@@ -96,7 +108,7 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             ),
           );
     } else {
-      context.read<VaultBloc>().add(
+      vaultBloc.add(
             VaultItemAdded(
               VaultEntry(
                 id: const Uuid().v4(),
@@ -104,9 +116,7 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
                 title: _titleCtrl.text.trim(),
                 username:
                     _userCtrl.text.isEmpty ? null : _userCtrl.text.trim(),
-                encryptedPassword: passwordBytes != null
-                    ? Uint8List.fromList(passwordBytes)
-                    : null,
+                encryptedPassword: encryptedPwd,
                 url: _urlCtrl.text.isEmpty ? null : _urlCtrl.text.trim(),
                 category: _category,
                 createdAt: now,

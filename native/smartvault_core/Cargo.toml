@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-flutter_rust_bridge = "2.0.0"
+flutter_rust_bridge = "=2.11.1"
 anyhow = "1.0"
 aes-gcm = { version = "0.10.3", features = ["std"] }
 argon2 = { version = "0.5.3", features = ["std", "password-hash"] }

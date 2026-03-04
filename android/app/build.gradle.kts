@@ -74,6 +74,65 @@ flutter {
     source = "../.."
 }
 
+// ─── Rust (cargo-ndk) build ───────────────────────────────────────────────────
+//
+// Compiles the native/smartvault_core Rust crate for Android targets.
+// Requires: cargo-ndk (`cargo install cargo-ndk`)
+//           Android targets: `rustup target add aarch64-linux-android armv7-linux-androideabi`
+//
+// Skip gracefully if cargo-ndk is not installed (allows dev builds without Rust).
+val rustBuild by tasks.registering {
+    doLast {
+        val ndkVersion = "28.2.13676358"
+        val androidHome = System.getenv("ANDROID_HOME")
+            ?: "${System.getProperty("user.home")}/AppData/Local/Android/Sdk"
+        val ndkHome = "$androidHome/ndk/$ndkVersion"
+        val cargoNdk = if (System.getProperty("os.name").lowercase().contains("windows")) {
+            // cargo-ndk on PATH (installed via `cargo install cargo-ndk`)
+            "cargo-ndk"
+        } else {
+            "cargo-ndk"
+        }
+
+        // Check if cargo-ndk is available
+        val hasCargoNdk = try {
+            ProcessBuilder(cargoNdk, "--version")
+                .start().waitFor() == 0
+        } catch (_: Exception) { false }
+
+        if (!hasCargoNdk) {
+            println("⚠️  cargo-ndk not found — skipping Rust build (run `cargo install cargo-ndk`)")
+            return@doLast
+        }
+
+        val rustDir = file("../../native/smartvault_core")
+        val outDir = file("src/main/jniLibs")
+        val profile = if (project.hasProperty("release")) "release" else "debug"
+
+        exec {
+            workingDir = rustDir
+            environment("ANDROID_NDK_HOME", ndkHome)
+            commandLine =
+                listOf(
+                    cargoNdk,
+                    "-t", "arm64-v8a",
+                    "-t", "armeabi-v7a",
+                    "--output-dir", outDir.absolutePath,
+                    "build",
+                    if (profile == "release") "--release" else "--"
+                ).filter { it != "--" || profile != "release" }
+        }
+        println("✅ Rust library built → $outDir")
+    }
+}
+
+// Run Rust build before JNI libs are merged (debug and release)
+tasks.whenTaskAdded {
+    if (name.startsWith("merge") && name.contains("JniLibFolders")) {
+        dependsOn(rustBuild)
+    }
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

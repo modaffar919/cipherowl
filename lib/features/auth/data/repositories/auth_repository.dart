@@ -1,18 +1,14 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:cryptography/cryptography.dart';
+import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 
 /// Handles master password hashing, storage, and biometric authentication.
 ///
-/// NOTE: Password hashing currently uses PBKDF2-SHA256 (Dart-side).
-/// Will be replaced by Rust Argon2id (EPIC-2 FFI integration).
+/// Password hashing: Argon2id via Rust FFI (t=3, m=64MiB, p=4 — OWASP MASVS L2).
+/// The stored PHC string includes the salt, so no separate salt storage needed.
 class AuthRepository {
   static const String _setupDoneKey = 'cipher_setup_done';
-  static const String _masterHashKey = 'cipher_master_hash';
-  static const String _saltKey = 'cipher_master_salt';
+  static const String _masterHashKey = 'cipher_master_hash'; // PHC string from Argon2id
   static const String _lockoutUntilKey = 'cipher_lockout_until';
   static const String _failedAttemptsKey = 'cipher_failed_attempts';
 
@@ -37,13 +33,12 @@ class AuthRepository {
 
   // ── Master Password ─────────────────────────────────────
 
-  /// Hash and store the master password.
+  /// Hash and store the master password using Rust Argon2id (async, non-blocking).
   Future<void> saveMasterPassword(String password) async {
-    final salt = _generateSalt();
-    final hash = await _hashPassword(password, salt);
+    // Rust computes Argon2id(t=3, m=64MiB) with a random salt, returns PHC string
+    final phcHash = await apiHashPassword(password: password);
     await Future.wait([
-      _storage.write(key: _saltKey, value: base64Encode(salt)),
-      _storage.write(key: _masterHashKey, value: hash),
+      _storage.write(key: _masterHashKey, value: phcHash),
       _storage.write(key: _setupDoneKey, value: 'true'),
       _storage.write(key: _failedAttemptsKey, value: '0'),
     ]);
@@ -64,18 +59,16 @@ class AuthRepository {
       await _storage.write(key: _failedAttemptsKey, value: '0');
     }
 
-    // Read stored hash
+    // Read stored Argon2id PHC hash
     final storedHash = await _storage.read(key: _masterHashKey);
-    final storedSaltB64 = await _storage.read(key: _saltKey);
-    if (storedHash == null || storedSaltB64 == null) {
+    if (storedHash == null) {
       return VerifyResult.error('لم يتم إعداد كلمة المرور بعد');
     }
 
-    // Compare
-    final salt = base64Decode(storedSaltB64);
-    final hash = await _hashPassword(password, salt);
+    // Verify via Rust Argon2id (async, non-blocking)
+    final isMatch = await apiVerifyPassword(password: password, hash: storedHash);
 
-    if (hash == storedHash) {
+    if (isMatch) {
       // Reset failed attempts on success
       await _storage.write(key: _failedAttemptsKey, value: '0');
       return VerifyResult.success();
@@ -145,29 +138,6 @@ class AuthRepository {
   // ── Clear ────────────────────────────────────────────────
 
   Future<void> clearAll() async => _storage.deleteAll();
-
-  // ── Private Helpers ──────────────────────────────────────
-
-  /// PBKDF2-SHA256, 100,000 iterations.
-  /// TODO: Replace with Rust Argon2id (EPIC-2 FFI integration — cipherowl-p6g).
-  Future<String> _hashPassword(String password, List<int> salt) async {
-    final pbkdf2 = Pbkdf2(
-      macAlgorithm: Hmac.sha256(),
-      iterations: 100000,
-      bits: 256,
-    );
-    final secretKey = await pbkdf2.deriveKeyFromPassword(
-      password: password,
-      nonce: salt,
-    );
-    final bytes = await secretKey.extractBytes();
-    return base64Encode(bytes);
-  }
-
-  List<int> _generateSalt() {
-    final rng = Random.secure();
-    return List<int>.generate(32, (_) => rng.nextInt(256));
-  }
 }
 
 // ── Result Types ─────────────────────────────────────────────

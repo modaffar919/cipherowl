@@ -1,4 +1,6 @@
 import 'dart:math';
+
+import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -94,24 +96,29 @@ class _PasswordTabState extends State<_PasswordTab> {
   }
 
   void _generate() {
-    const u = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const l = 'abcdefghijklmnopqrstuvwxyz';
-    const d = '0123456789';
-    const s = '!@#\$%^&*()-_=+[]{}|;:,.<>?';
-    const ambig = 'iIlLoO01';
+    // Guard: at least one charset must be enabled
+    if (!_upper && !_lower && !_digits && !_symbols) {
+      setState(() => _lower = true);
+    }
 
-    var pool = '';
-    if (_upper) pool += u;
-    if (_lower) pool += l;
-    if (_digits) pool += d;
-    if (_symbols) pool += s;
-    if (_exclude) pool = pool.split('').where((c) => !ambig.contains(c)).join();
-    if (pool.isEmpty) pool = l;
+    // Rust: cryptographically random password via ChaCha20Rng
+    var pwd = apiGeneratePassword(
+      config: ApiGeneratorConfig(
+        length: BigInt.from(_length.toInt()),
+        useLowercase: _lower,
+        useUppercase: _upper,
+        useDigits: _digits,
+        useSymbols: _symbols,
+      ),
+    );
 
-    final rng = Random.secure();
-    final pwd = List.generate(_length.toInt(), (_) => pool[rng.nextInt(pool.length)]).join();
+    // Post-filter ambiguous characters if requested
+    if (_exclude) {
+      const ambig = 'iIlLoO01';
+      pwd = pwd.split('').where((c) => !ambig.contains(c)).join();
+    }
+
     final score = _calcStrength(pwd);
-
     setState(() {
       _result = pwd;
       _strength = score;

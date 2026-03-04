@@ -50,21 +50,24 @@ pub fn api_decrypt(ciphertext_with_nonce: Vec<u8>, key: Vec<u8>) -> anyhow::Resu
 ///
 /// Parameters: t=3, m=64 MiB, p=4 (OWASP MASVS L2).
 /// The `salt` must be at least 16 bytes; store it alongside the vault.
-#[frb(sync)]
+/// Async — runs on Rust worker thread to avoid blocking Flutter UI.
+#[frb]
 pub fn api_derive_key(password: Vec<u8>, salt: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     argon2::derive_key(&password, &salt).map_err(|e| anyhow::anyhow!("{}", e))
 }
 
 /// Hash `password` using Argon2id with a random salt.
 /// Returns a PHC-format string suitable for server-side auth.
-#[frb(sync)]
+/// Async — runs on Rust worker thread to avoid blocking Flutter UI.
+#[frb]
 pub fn api_hash_password(password: String) -> anyhow::Result<String> {
     argon2::hash_password(&password).map_err(|e| anyhow::anyhow!("{}", e))
 }
 
 /// Verify `password` against a PHC hash string.
 /// Returns `true` on match, `false` on mismatch.
-#[frb(sync)]
+/// Async — runs on Rust worker thread to avoid blocking Flutter UI.
+#[frb]
 pub fn api_verify_password(password: String, hash: String) -> anyhow::Result<bool> {
     argon2::verify_password(&password, &hash).map_err(|e| anyhow::anyhow!("{}", e))
 }

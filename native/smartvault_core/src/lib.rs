@@ -5,6 +5,7 @@
 //! Keys are derived via Argon2id (OWASP MASVS compliant).
 //! Sensitive memory is zeroed on drop via zeroize.
 
+mod frb_generated; /* AUTO INJECTED BY flutter_rust_bridge */
 pub mod crypto;
 pub mod memory;
 pub mod password;
