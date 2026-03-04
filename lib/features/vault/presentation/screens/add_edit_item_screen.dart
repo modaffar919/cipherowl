@@ -1,7 +1,13 @@
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
+import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
 /// Add or Edit an existing vault item
 class AddEditItemScreen extends StatefulWidget {
@@ -23,13 +29,11 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
   final _totpCtrl = TextEditingController();
 
   bool _obscurePass = true;
-  String _category = 'social';
+  VaultCategory _category = VaultCategory.login;
   double _strength = 0;
   bool _isSaving = false;
 
-  static const _categories = ['social', 'work', 'finance', 'entertainment', 'other'];
-  static const _catIcons = {'social': '👥', 'work': '💼', 'finance': '🏦', 'entertainment': '🎬', 'other': '📁'};
-  static const _catLabels = {'social': 'تواصل', 'work': 'عمل', 'finance': 'مالي', 'entertainment': 'ترفيه', 'other': 'أخرى'};
+  static final _categories = VaultCategory.values;
 
   @override
   void initState() {
@@ -38,20 +42,80 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
   }
 
   void _loadItem() {
-    // TODO: load from drift
-    _titleCtrl.text = 'Google';
-    _userCtrl.text = 'user@gmail.com';
-    _passCtrl.text = 'SecureP@ss123!';
-    _urlCtrl.text = 'https://accounts.google.com';
-    _category = 'social';
-    _strength = 0.95;
+    final state = context.read<VaultBloc>().state;
+    if (state is VaultLoaded) {
+      final found = state.allItems
+          .where((i) => i.id == widget.itemId)
+          .firstOrNull;
+      if (found != null) {
+        _titleCtrl.text = found.title;
+        _userCtrl.text = found.username ?? '';
+        _urlCtrl.text = found.url ?? '';
+        _category = found.category;
+        _strength =
+            found.strengthScore >= 0 ? found.strengthScore / 4.0 : 0;
+      }
+    }
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
-    // TODO: Save to drift + sync Supabase
-    await Future.delayed(const Duration(milliseconds: 600));
+
+    final authState = context.read<AuthBloc>().state;
+    final userId =
+        authState is AuthAuthenticated ? authState.userId : 'local_user';
+
+    final now = DateTime.now();
+    // NOTE: password stored as plain UTF-8 bytes for now.
+    // EPIC-2 (Rust FFI) will encrypt before storage.
+    final passwordBytes = _passCtrl.text.isNotEmpty
+        ? _passCtrl.text.codeUnits
+            .map((c) => c & 0xFF)
+            .toList()
+        : null;
+
+    if (_isEdit) {
+      final existing = (context.read<VaultBloc>().state as VaultLoaded)
+          .allItems
+          .firstWhere((i) => i.id == widget.itemId!);
+      context.read<VaultBloc>().add(
+            VaultItemUpdated(
+              existing.copyWith(
+                title: _titleCtrl.text.trim(),
+                username:
+                    _userCtrl.text.isEmpty ? null : _userCtrl.text.trim(),
+                encryptedPassword:
+                    passwordBytes != null
+                        ? Uint8List.fromList(passwordBytes)
+                        : existing.encryptedPassword,
+                url: _urlCtrl.text.isEmpty ? null : _urlCtrl.text.trim(),
+                category: _category,
+                updatedAt: now,
+              ),
+            ),
+          );
+    } else {
+      context.read<VaultBloc>().add(
+            VaultItemAdded(
+              VaultEntry(
+                id: const Uuid().v4(),
+                userId: userId,
+                title: _titleCtrl.text.trim(),
+                username:
+                    _userCtrl.text.isEmpty ? null : _userCtrl.text.trim(),
+                encryptedPassword: passwordBytes != null
+                    ? Uint8List.fromList(passwordBytes)
+                    : null,
+                url: _urlCtrl.text.isEmpty ? null : _urlCtrl.text.trim(),
+                category: _category,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            ),
+          );
+    }
+    setState(() => _isSaving = false);
     if (mounted) context.pop();
   }
 
@@ -61,13 +125,13 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
       backgroundColor: AppConstants.backgroundDark,
       appBar: AppBar(
         backgroundColor: AppConstants.backgroundDark,
-        title: Text(_isEdit ? 'تعديل الحساب' : 'حساب جديد',
+        title: Text(_isEdit ? 'طھط¹ط¯ظٹظ„ ط§ظ„ط­ط³ط§ط¨' : 'ط­ط³ط§ط¨ ط¬ط¯ظٹط¯',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
         leading: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => context.pop()),
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _save,
-            child: Text(_isSaving ? 'جاري الحفظ...' : 'حفظ',
+            child: Text(_isSaving ? 'ط¬ط§ط±ظٹ ط§ظ„ط­ظپط¸...' : 'ط­ظپط¸',
                 style: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -82,11 +146,11 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             const SizedBox(height: 20),
 
             // Title
-            _buildField(ctrl: _titleCtrl, label: 'اسم الحساب', hint: 'مثال: Google', validator: _required),
+            _buildField(ctrl: _titleCtrl, label: 'ط§ط³ظ… ط§ظ„ط­ط³ط§ط¨', hint: 'ظ…ط«ط§ظ„: Google', validator: _required),
             const SizedBox(height: 12),
 
             // Username
-            _buildField(ctrl: _userCtrl, label: 'اسم المستخدم / البريد', hint: 'user@example.com'),
+            _buildField(ctrl: _userCtrl, label: 'ط§ط³ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… / ط§ظ„ط¨ط±ظٹط¯', hint: 'user@example.com'),
             const SizedBox(height: 12),
 
             // Password
@@ -94,15 +158,15 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             const SizedBox(height: 12),
 
             // URL
-            _buildField(ctrl: _urlCtrl, label: 'الموقع الإلكتروني', hint: 'https://...', keyboard: TextInputType.url),
+            _buildField(ctrl: _urlCtrl, label: 'ط§ظ„ظ…ظˆظ‚ط¹ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ', hint: 'https://...', keyboard: TextInputType.url),
             const SizedBox(height: 12),
 
             // TOTP
-            _buildField(ctrl: _totpCtrl, label: 'مفتاح TOTP (اختياري)', hint: 'JBSWY3DPEHPK3PXP'),
+            _buildField(ctrl: _totpCtrl, label: 'ظ…ظپطھط§ط­ TOTP (ط§ط®طھظٹط§ط±ظٹ)', hint: 'JBSWY3DPEHPK3PXP'),
             const SizedBox(height: 12),
 
             // Notes
-            _buildField(ctrl: _notesCtrl, label: 'ملاحظات', hint: 'أي معلومات إضافية...', maxLines: 3),
+            _buildField(ctrl: _notesCtrl, label: 'ظ…ظ„ط§ط­ط¸ط§طھ', hint: 'ط£ظٹ ظ…ط¹ظ„ظˆظ…ط§طھ ط¥ط¶ط§ظپظٹط©...', maxLines: 3),
 
             const SizedBox(height: 24),
 
@@ -110,7 +174,7 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             OutlinedButton.icon(
               onPressed: () => context.go(AppConstants.routeGenerator),
               icon: const Icon(Icons.auto_fix_high, size: 18),
-              label: const Text('توليد كلمة مرور قوية'),
+              label: const Text('طھظˆظ„ظٹط¯ ظƒظ„ظ…ط© ظ…ط±ظˆط± ظ‚ظˆظٹط©'),
             ),
           ],
         ),
@@ -122,7 +186,11 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('الفئة', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500)),
+        const Text('ط§ظ„ظپط¦ط©',
+            style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.w500)),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -133,18 +201,28 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
                 onTap: () => setState(() => _category = c),
                 child: Container(
                   margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: sel ? AppConstants.primaryCyan.withOpacity(0.15) : AppConstants.surfaceDark,
+                    color: sel
+                        ? AppConstants.primaryCyan.withAlpha(38)
+                        : AppConstants.surfaceDark,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: sel ? AppConstants.primaryCyan.withOpacity(0.5) : AppConstants.borderDark),
+                    border: Border.all(
+                        color: sel
+                            ? AppConstants.primaryCyan.withAlpha(128)
+                            : AppConstants.borderDark),
                   ),
                   child: Row(
                     children: [
-                      Text(_catIcons[c]!),
+                      Text(c.emoji),
                       const SizedBox(width: 6),
-                      Text(_catLabels[c]!,
-                          style: TextStyle(color: sel ? AppConstants.primaryCyan : Colors.white60, fontSize: 13)),
+                      Text(c.labelAr,
+                          style: TextStyle(
+                              color: sel
+                                  ? AppConstants.primaryCyan
+                                  : Colors.white60,
+                              fontSize: 13)),
                     ],
                   ),
                 ),
@@ -165,7 +243,7 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
           obscureText: _obscurePass,
           style: const TextStyle(color: Colors.white, fontFamily: 'SpaceMono'),
           decoration: InputDecoration(
-            labelText: 'كلمة المرور',
+            labelText: 'ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±',
             suffixIcon: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -211,6 +289,6 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
     );
   }
 
-  String? _required(String? v) => (v == null || v.isEmpty) ? 'هذا الحقل مطلوب' : null;
+  String? _required(String? v) => (v == null || v.isEmpty) ? 'ظ‡ط°ط§ ط§ظ„ط­ظ‚ظ„ ظ…ط·ظ„ظˆط¨' : null;
 }
 
