@@ -83,20 +83,69 @@ impl std::fmt::Display for SecureBytes {
 
 /// Attempt to lock memory pages into RAM, preventing them from being swapped.
 ///
-/// Currently a no-op stub; full implementation (libc mlock / WinAPI VirtualLock)
-/// will be added when the FFI layer is wired up and platform deps are declared.
+/// On Linux/Android: uses libc::mlock
+/// On Windows: uses VirtualLock (via winapi)
+/// On other platforms: no-op, returns false
 ///
-/// Returns `true` if the lock succeeded, `false` if not supported.
-#[allow(unused_variables)]
-pub fn lock_memory(_data: &[u8]) -> bool {
-    // TODO(cipherowl-6bh): implement platform mlock / VirtualLock
-    false
+/// Returns `true` if the lock succeeded, `false` if not supported or failed.
+pub fn lock_memory(data: &[u8]) -> bool {
+    if data.is_empty() {
+        return true;
+    }
+    #[cfg(target_os = "android")]
+    {
+        // Android is Linux — mlock is available via libc
+        unsafe {
+            libc::mlock(data.as_ptr() as *const libc::c_void, data.len()) == 0
+        }
+    }
+    #[cfg(all(unix, not(target_os = "android")))]
+    {
+        unsafe {
+            libc::mlock(data.as_ptr() as *const libc::c_void, data.len()) == 0
+        }
+    }
+    #[cfg(windows)]
+    {
+        unsafe {
+            winapi::um::memoryapi::VirtualLock(
+                data.as_ptr() as *mut winapi::ctypes::c_void,
+                data.len(),
+            ) != 0
+        }
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        false
+    }
 }
 
 /// Unlock memory pages previously locked with `lock_memory`.
-#[allow(unused_variables)]
-pub fn unlock_memory(_data: &[u8]) {
-    // TODO(cipherowl-6bh): implement platform munlock / VirtualUnlock
+pub fn unlock_memory(data: &[u8]) {
+    if data.is_empty() {
+        return;
+    }
+    #[cfg(target_os = "android")]
+    {
+        unsafe {
+            libc::munlock(data.as_ptr() as *const libc::c_void, data.len());
+        }
+    }
+    #[cfg(all(unix, not(target_os = "android")))]
+    {
+        unsafe {
+            libc::munlock(data.as_ptr() as *const libc::c_void, data.len());
+        }
+    }
+    #[cfg(windows)]
+    {
+        unsafe {
+            winapi::um::memoryapi::VirtualUnlock(
+                data.as_ptr() as *mut winapi::ctypes::c_void,
+                data.len(),
+            );
+        }
+    }
 }
 
 // ─── Unit tests ──────────────────────────────────────────────────────────────

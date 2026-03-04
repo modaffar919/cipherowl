@@ -19,5 +19,11 @@ sha2 = "0.10.8"
 hex = "0.4.3"
 base64 = "0.22.1"
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["memoryapi"] }
+
 [dev-dependencies]
 hex-literal = "0.4.1"

@@ -16,6 +16,8 @@ use flutter_rust_bridge::frb;
 use crate::crypto::{aes_gcm, argon2};
 use crate::password::generator::{GeneratorConfig, GeneratorError};
 
+use crate::crypto::x25519;
+
 // ─── AES-256-GCM ─────────────────────────────────────────────────────────────
 
 /// Generate a random 32-byte AES-256 key.
@@ -72,6 +74,37 @@ pub fn api_verify_password(password: String, hash: String) -> anyhow::Result<boo
     argon2::verify_password(&password, &hash).map_err(|e| anyhow::anyhow!("{}", e))
 }
 
+// ─── X25519 ECDH Key Exchange ────────────────────────────────────────────────
+
+/// Generate a new X25519 private key (32 bytes).
+#[frb(sync)]
+pub fn api_generate_x25519_private_key() -> Vec<u8> {
+    x25519::generate_private_key().to_vec()
+}
+
+/// Get the X25519 public key for a given 32-byte private key.
+#[frb(sync)]
+pub fn api_get_x25519_public_key(private_key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+    if private_key.len() != 32 {
+        return Err(anyhow::anyhow!("Private key must be 32 bytes"));
+    }
+    let mut arr = [0u8; 32];
+    arr.copy_from_slice(&private_key);
+    Ok(x25519::get_public_key(&arr).to_vec())
+}
+
+/// Derive an X25519 shared secret from your private key and peer's public key.
+#[frb(sync)]
+pub fn api_derive_x25519_shared_secret(private_key: Vec<u8>, peer_public_key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+    if private_key.len() != 32 || peer_public_key.len() != 32 {
+        return Err(anyhow::anyhow!("Keys must be 32 bytes"));
+    }
+    let mut priv_arr = [0u8; 32];
+    priv_arr.copy_from_slice(&private_key);
+    let mut pub_arr = [0u8; 32];
+    pub_arr.copy_from_slice(&peer_public_key);
+    Ok(x25519::derive_shared_secret(&priv_arr, &pub_arr).to_vec())
+}
 // ─── Password Generator ───────────────────────────────────────────────────────
 
 /// Config for `api_generate_password`.
