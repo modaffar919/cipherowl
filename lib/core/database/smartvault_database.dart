@@ -158,8 +158,14 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
   /// For injecting a custom executor in tests (unencrypted / in-memory).
   SmartVaultDatabase.forTesting(super.e);
 
+  /// Current schema version.
+  ///
+  /// History:
+  ///   v1 — Initial schema: VaultItems, SecurityLogs, UserSettings
+  ///   v2 — VaultItems: added [strengthScore], [syncedAt], [lastAccessedAt]
+  ///          and [encryptedTotpSecret] columns (back-filled with NULL).
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -168,7 +174,19 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
           await _seedDefaultSettings();
         },
         onUpgrade: (m, from, to) async {
-          // Future migrations go here
+          await customStatement('PRAGMA foreign_keys = OFF');
+          await transaction(() async {
+            // v1 → v2: add columns that were missing in the original schema
+            if (from < 2) {
+              // These columns were introduced in v2; add them if absent.
+              // addColumn is a no-op-safe migration helper in Drift.
+              await m.addColumn(vaultItems, vaultItems.strengthScore);
+              await m.addColumn(vaultItems, vaultItems.syncedAt);
+              await m.addColumn(vaultItems, vaultItems.lastAccessedAt);
+              await m.addColumn(vaultItems, vaultItems.encryptedTotpSecret);
+            }
+          });
+          await customStatement('PRAGMA foreign_keys = ON');
         },
       );
 

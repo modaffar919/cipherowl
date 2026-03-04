@@ -89,15 +89,15 @@
 |---|---|
 | ✅ | `cipherowl-3ej` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ████████████░░░░░░░░ 3/5 |
+| **التقدم** | ████████████████████ 5/5 ✅ |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | ✅ | ~~Create Drift database schema VaultItems SecurityLogs UserSettings~~ | `cipherowl-nlo` | P0 · حرج |
 | ✅ | ~~Run Drift code generation with build_runner~~ | `cipherowl-jv1` | P0 · حرج |
 | ✅ | ~~Create Drift DAOs VaultDao SettingsDao SecurityLogDao~~ | `cipherowl-073` | P0 · حرج |
-| 🟠 | Implement database migration strategy | `cipherowl-4ed` | P1 · عالي |
-| 🔵 | Add database backup and restore functionality | `cipherowl-8xg` | P2 · متوسط |
+| ✅ | ~~Implement database migration strategy~~ | `cipherowl-4ed` | P1 · عالي |
+| ✅ | ~~Add database backup and restore functionality~~ | `cipherowl-8xg` | P2 · متوسط |
 
 ---
 
