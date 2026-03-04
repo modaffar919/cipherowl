@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-04 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 17 &nbsp;|&nbsp; 🔴 مفتوحة: 100
+> **آخر تحديث:** 2026-03-04 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 18 &nbsp;|&nbsp; 🔴 مفتوحة: 99
 
 ---
 
@@ -26,7 +26,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-d5g` |
+| 🔴 | `cipherowl-d5g` |
 | **الأولوية** | P0 · حرج |
 | **التقدم** | ██████████░░░░░░░░░░ 10/21 |
 
@@ -38,7 +38,7 @@
 | ✅ | ~~Create app_localizations.dart - COMPILE BLOCKER~~ | `cipherowl-4ho` | P0 · حرج |
 | ✅ | ~~Verify full project compiles with flutter build~~ | `cipherowl-9bz` | P0 · حرج |
 | ✅ | ~~Configure Android build.gradle minSdk24 NDK signing~~ | `cipherowl-1kg` | P0 · حرج |
-| 🟠 | Create l10n ARB files for Arabic and English | `cipherowl-zis` | P1 · عالي |
+| ✅ | Create l10n ARB files for Arabic and English | `cipherowl-zis` | P1 · عالي |
 | 🟠 | Configure release signing Android and iOS | `cipherowl-j7j` | P1 · عالي |
 | 🟠 | Configure iOS Xcode project and Info.plist permissions | `cipherowl-ag6` | P1 · عالي |
 | 🟠 | Add font files Cairo and SpaceMono to assets | `cipherowl-8gi` | P1 · عالي |
@@ -60,7 +60,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-nqa` |
+| 🔴 | `cipherowl-nqa` |
 | **الأولوية** | P0 · حرج |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/14 |
 
@@ -87,7 +87,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-3ej` |
+| 🔴 | `cipherowl-3ej` |
 | **الأولوية** | P0 · حرج |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/5 |
 
@@ -105,7 +105,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-76s` |
+| 🔴 | `cipherowl-76s` |
 | **الأولوية** | P0 · حرج |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/10 |
 
@@ -128,7 +128,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-w7f` |
+| 🟠 | `cipherowl-w7f` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/7 |
 
@@ -148,7 +148,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-wy7` |
+| 🟠 | `cipherowl-wy7` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/6 |
 
@@ -167,7 +167,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-uci` |
+| 🔵 | `cipherowl-uci` |
 | **الأولوية** | P2 · متوسط |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -183,7 +183,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-r2m` |
+| 🟠 | `cipherowl-r2m` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/4 |
 
@@ -200,7 +200,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-zyq` |
+| 🔵 | `cipherowl-zyq` |
 | **الأولوية** | P2 · متوسط |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/4 |
 
@@ -217,7 +217,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-n2e` |
+| 🟠 | `cipherowl-n2e` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -233,7 +233,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-rzx` |
+| 🟠 | `cipherowl-rzx` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -249,7 +249,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-dw5` |
+| 🔵 | `cipherowl-dw5` |
 | **الأولوية** | P2 · متوسط |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -265,7 +265,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-6cs` |
+| 🔵 | `cipherowl-6cs` |
 | **الأولوية** | P2 · متوسط |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -281,7 +281,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-dwm` |
+| 🔵 | `cipherowl-dwm` |
 | **الأولوية** | P2 · متوسط |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/4 |
 
@@ -298,7 +298,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-gbw` |
+| 🟠 | `cipherowl-gbw` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 
@@ -314,7 +314,7 @@
 
 | | |
 |---|---|
-| **ID** | `cipherowl-v6a` |
+| 🟠 | `cipherowl-v6a` |
 | **الأولوية** | P1 · عالي |
 | **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
 

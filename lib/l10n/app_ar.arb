@@ -1,0 +1,310 @@
+{
+  "@@locale": "ar",
+  "@@last_modified": "2026-03-04",
+
+  "appName": "CipherOwl",
+  "@appName": { "description": "Application name" },
+
+  "appTagline": "حارسك الرقمي",
+  "@appTagline": { "description": "App tagline shown on splash/onboarding" },
+
+  "appVersion": "الإصدار {version}",
+  "@appVersion": {
+    "description": "App version label",
+    "placeholders": { "version": { "type": "String" } }
+  },
+
+  "next": "التالي",
+  "@next": { "description": "Next button" },
+
+  "skip": "تخطي",
+  "@skip": { "description": "Skip button" },
+
+  "skipNow": "تخطي الآن",
+  "@skipNow": { "description": "Skip now button on onboarding" },
+
+  "later": "لاحقاً",
+  "@later": { "description": "Later button" },
+
+  "cancel": "إلغاء",
+  "@cancel": { "description": "Cancel button" },
+
+  "confirm": "تأكيد",
+  "@confirm": { "description": "Confirm button" },
+
+  "save": "حفظ",
+  "@save": { "description": "Save button" },
+
+  "delete": "حذف",
+  "@delete": { "description": "Delete button" },
+
+  "done": "تم",
+  "@done": { "description": "Done button" },
+
+  "copy": "نسخ",
+  "@copy": { "description": "Copy button" },
+
+  "add": "إضافة",
+  "@add": { "description": "Add button" },
+
+  "edit": "تعديل",
+  "@edit": { "description": "Edit button" },
+
+  "close": "إغلاق",
+  "@close": { "description": "Close button" },
+
+  "search": "بحث",
+  "@search": { "description": "Search hint/label" },
+
+  "loading": "جاري التحميل...",
+  "@loading": { "description": "Generic loading message" },
+
+  "error": "خطأ",
+  "@error": { "description": "Generic error label" },
+
+  "success": "نجاح",
+  "@success": { "description": "Generic success label" },
+
+  "copiedSuccess": "تم النسخ ✓",
+  "@copiedSuccess": { "description": "Snackbar shown after copying to clipboard" },
+
+  "savedSecurely": "لقد حفظتها بأمان ✓",
+  "@savedSecurely": { "description": "Confirmation that data is saved securely" },
+
+  "excellent": "رائع! ✓",
+  "@excellent": { "description": "Positive feedback label" },
+
+  "pageNotFound": "404 - الصفحة غير موجودة",
+  "@pageNotFound": { "description": "404 error page message" },
+
+  "onboardingTitle1": "حماية عسكرية لكلماتك",
+  "@onboardingTitle1": { "description": "First onboarding slide title" },
+
+  "onboardingDesc1": "تشفير AES-256 وAES-256-GCM العسكري يحمي كل بياناتك",
+  "@onboardingDesc1": { "description": "First onboarding slide description" },
+
+  "onboardingTitle2": "Face-Track الذكاء المستمر",
+  "@onboardingTitle2": { "description": "Second onboarding slide title" },
+
+  "onboardingDesc2": "مراقبة بيومترية مستمرة تقفل الخزنة عند ابتعادك تلقائياً",
+  "@onboardingDesc2": { "description": "Second onboarding slide description" },
+
+  "onboardingTitle3": "حمايتك في كل مكان",
+  "@onboardingTitle3": { "description": "Third onboarding slide title" },
+
+  "onboardingDesc3": "مزامنة آمنة عبر أجهزتك بتشفير Zero-Knowledge",
+  "@onboardingDesc3": { "description": "Third onboarding slide description" },
+
+  "getStarted": "ابدأ التسجيل",
+  "@getStarted": { "description": "Get started CTA on onboarding" },
+
+  "learnAndEarnPoints": "تعلّم وأكسب نقاطاً",
+  "@learnAndEarnPoints": { "description": "Academy section CTA" },
+
+  "openVault": "فتح الخزنة 🔓",
+  "@openVault": { "description": "Unlock vault button on lock screen" },
+
+  "enterVault": "ادخل إلى خزنتك 🔓",
+  "@enterVault": { "description": "Enter vault prompt" },
+
+  "createUnbreakablePasswords": "اصنع كلمات مرور غير قابلة للكسر",
+  "@createUnbreakablePasswords": { "description": "Generator screen subtitle" },
+
+  "masterPassword": "كلمة المرور الرئيسية",
+  "@masterPassword": { "description": "Master password field label" },
+
+  "enterMasterPassword": "أدخل كلمة المرور الرئيسية",
+  "@enterMasterPassword": { "description": "Master password field hint" },
+
+  "verificationCode2FA": "رمز التحقق (2FA)",
+  "@verificationCode2FA": { "description": "2FA code field label" },
+
+  "biometricPrompt": "استخدم بصمة الوجه أو البصمة للدخول",
+  "@biometricPrompt": { "description": "Biometric auth prompt" },
+
+  "setupMasterPassword": "إعداد كلمة المرور الرئيسية",
+  "@setupMasterPassword": { "description": "Setup screen title" },
+
+  "confirmPassword": "تأكيد كلمة المرور",
+  "@confirmPassword": { "description": "Confirm password field label" },
+
+  "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+  "@passwordsDoNotMatch": { "description": "Password mismatch error" },
+
+  "passwordTooShort": "كلمة المرور قصيرة جداً (12 حرفاً على الأقل)",
+  "@passwordTooShort": { "description": "Password too short error" },
+
+  "vaultTitle": "الخزنة",
+  "@vaultTitle": { "description": "Vault screen title" },
+
+  "addItem": "إضافة عنصر",
+  "@addItem": { "description": "Add vault item button" },
+
+  "editItem": "تعديل العنصر",
+  "@editItem": { "description": "Edit vault item title" },
+
+  "itemDetails": "تفاصيل الحساب",
+  "@itemDetails": { "description": "Vault item detail screen title" },
+
+  "category": "الفئة",
+  "@category": { "description": "Category field label" },
+
+  "copyPassword": "نسخ كلمة المرور",
+  "@copyPassword": { "description": "Copy password action" },
+
+  "passwordCopied": "تم نسخ كلمة المرور ✓",
+  "@passwordCopied": { "description": "Password copied snackbar" },
+
+  "passwordCopiedWillClear": "تم نسخ كلمة المرور — تمسح خلال 30 ثانية",
+  "@passwordCopiedWillClear": { "description": "Password copied with auto-clear notice" },
+
+  "deleteAccount": "حذف الحساب؟",
+  "@deleteAccount": { "description": "Delete account confirmation title" },
+
+  "deleteAllData": "حذف كل البيانات؟",
+  "@deleteAllData": { "description": "Delete all data confirmation title" },
+
+  "deletePermanently": "حذف نهائياً",
+  "@deletePermanently": { "description": "Permanent delete button" },
+
+  "deleteAccountWarning": "سيتم حذف جميع بياناتك نهائياً بدون إمكانية الاسترداد.",
+  "@deleteAccountWarning": { "description": "Delete account warning message" },
+
+  "irreversibleAction": "لا يمكن التراجع عن هذا الإجراء.",
+  "@irreversibleAction": { "description": "Warning that action cannot be undone" },
+
+  "generatorTitle": "مولّد كلمات المرور",
+  "@generatorTitle": { "description": "Password generator screen title" },
+
+  "generateStrongPassword": "توليد كلمة مرور قوية",
+  "@generateStrongPassword": { "description": "Generate password button" },
+
+  "length": "الطول",
+  "@length": { "description": "Password length label" },
+
+  "wordCount": "عدد الكلمات",
+  "@wordCount": { "description": "Passphrase word count label" },
+
+  "recommendations": "التوصيات",
+  "@recommendations": { "description": "Recommendations section title" },
+
+  "securityCenter": "مركز الأمان",
+  "@securityCenter": { "description": "Security center screen title" },
+
+  "overallSecurityScore": "درجة الأمان الكلية",
+  "@overallSecurityScore": { "description": "Security score section header" },
+
+  "securityInfo": "معلومات الأمان",
+  "@securityInfo": { "description": "Security information label" },
+
+  "faceTrackSetup": "إعداد Face-Track",
+  "@faceTrackSetup": { "description": "Face-Track setup screen title" },
+
+  "faceTrackActive": "Face-Track أصبح يعمل الآن.\nستُقفل الخزنة تلقائياً إذا ابتعدت.",
+  "@faceTrackActive": { "description": "Face-Track activation success message" },
+
+  "faceTrackHowItWorks": "كيف يعمل Face-Track؟",
+  "@faceTrackHowItWorks": { "description": "How Face-Track works label" },
+
+  "placeFaceInCircle": "ضع وجهك داخل الدائرة وانظر مباشرة للشاشة",
+  "@placeFaceInCircle": { "description": "Face capture instruction" },
+
+  "capture": "التقاط",
+  "@capture": { "description": "Capture button" },
+
+  "captureProgress": "التقاط {current} / {total}",
+  "@captureProgress": {
+    "description": "Face capture progress indicator",
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "faceSavedSuccess": "تم تسجيل وجهك بنجاح!",
+  "@faceSavedSuccess": { "description": "Face registration success message" },
+
+  "autoLockTimeout": "مهلة القفل التلقائي",
+  "@autoLockTimeout": { "description": "Auto-lock timeout setting label" },
+
+  "minuteUnit": "{minutes} دقيقة",
+  "@minuteUnit": {
+    "description": "Minutes unit label",
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+
+  "settings": "الإعدادات",
+  "@settings": { "description": "Settings screen title" },
+
+  "academyTitle": "أكاديمية التهديدات",
+  "@academyTitle": { "description": "Academy screen title" },
+
+  "sharingTitle": "المشاركة الآمنة",
+  "@sharingTitle": { "description": "Sharing screen title" },
+
+  "activeLinks": "الروابط النشطة",
+  "@activeLinks": { "description": "Active sharing links section header" },
+
+  "createSecureLink": "إنشاء رابط آمن",
+  "@createSecureLink": { "description": "Create secure link button" },
+
+  "createShareLink": "إنشاء رابط مشاركة",
+  "@createShareLink": { "description": "Share link creation label" },
+
+  "linkCreated": "تم إنشاء الرابط",
+  "@linkCreated": { "description": "Share link created success" },
+
+  "copyLink": "نسخ الرابط",
+  "@copyLink": { "description": "Copy share link button" },
+
+  "linkCopied": "تم النسخ",
+  "@linkCopied": { "description": "Link copied to clipboard snackbar" },
+
+  "expiryDuration": "مدة الصلاحية",
+  "@expiryDuration": { "description": "Link expiry duration label" },
+
+  "enterpriseTitle": "وضع المؤسسة",
+  "@enterpriseTitle": { "description": "Enterprise screen title" },
+
+  "enterpriseFeatures": "الميزات المؤسسية",
+  "@enterpriseFeatures": { "description": "Enterprise features section header" },
+
+  "enterpriseProtection": "حماية شاملة لفرق العمل والمؤسسات",
+  "@enterpriseProtection": { "description": "Enterprise value proposition subtitle" },
+
+  "enterprisePricing": "تواصل معنا للحصول على سعر مخصص للمؤسسات",
+  "@enterprisePricing": { "description": "Enterprise pricing CTA" },
+
+  "contactSales": "تواصل مع فريق المبيعات",
+  "@contactSales": { "description": "Contact sales button" },
+
+  "teamSize": "كم موظفاً في فريقك؟",
+  "@teamSize": { "description": "Team size field label" },
+
+  "enterpriseMode": "وضع المؤسسة",
+  "@enterpriseMode": { "description": "Enterprise mode badge label" },
+
+  "proBadge": "PRO",
+  "@proBadge": { "description": "PRO badge label" },
+
+  "gotItXP": "فهمت! (+{xp} XP)",
+  "@gotItXP": {
+    "description": "Academy card dismiss with XP reward",
+    "placeholders": { "xp": { "type": "int" } }
+  },
+
+  "earnedXP": "+{xp} XP",
+  "@earnedXP": {
+    "description": "XP earned label",
+    "placeholders": { "xp": { "type": "int" } }
+  },
+
+  "scoreOutOf100": "/ 100",
+  "@scoreOutOf100": { "description": "Score suffix out of 100" },
+
+  "cipherowlEnterprise": "CipherOwl Enterprise",
+  "@cipherowlEnterprise": { "description": "Enterprise product name" },
+
+  "cipherowlSecurity": "CipherOwl Security",
+  "@cipherowlSecurity": { "description": "Security product variant name" }
+}
