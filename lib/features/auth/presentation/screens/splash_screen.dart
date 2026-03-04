@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/shared/widgets/cipherowl_logo.dart';
+import '../bloc/auth_bloc.dart';
 
 /// Splash Screen — shows animated CipherOwl logo then navigates
 class SplashScreen extends StatefulWidget {
@@ -109,8 +111,16 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _navigate() {
-    // TODO: Check if first launch → onboarding, else → lock
-    if (mounted) context.go(AppConstants.routeLock);
+    if (!mounted) return;
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthFirstTimeSetup) {
+      context.go(AppConstants.routeOnboarding);
+    } else if (authState is AuthAuthenticated) {
+      context.go(AppConstants.routeDashboard);
+    } else {
+      // AuthLocked or still AuthChecking → go to lock screen
+      context.go(AppConstants.routeLock);
+    }
   }
 
   @override

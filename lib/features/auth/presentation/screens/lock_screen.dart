@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
-import 'package:cipherowl/shared/widgets/cipherowl_logo.dart';
+import '../bloc/auth_bloc.dart';
 
 /// Lock Screen — primary vault entry point after cold start
 class LockScreen extends StatefulWidget {
@@ -19,10 +20,6 @@ class _LockScreenState extends State<LockScreen>
   final _focusNode = FocusNode();
 
   bool _obscureText = true;
-  bool _isLoading = false;
-  bool _hasError = false;
-  int _failedAttempts = 0;
-  String? _errorMessage;
 
   // ── Biometric indicator animation ──────────────────────
   late final AnimationController _shakeController;
@@ -56,48 +53,39 @@ class _LockScreenState extends State<LockScreen>
     super.dispose();
   }
 
-  Future<void> _unlock() async {
+  void _unlock() {
     final password = _passwordController.text;
     if (password.isEmpty) return;
+    context.read<AuthBloc>().add(AuthMasterPasswordSubmitted(password));
+  }
 
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-      _errorMessage = null;
-    });
-
-    // TODO: Call Rust Argon2id verify via SecureKeyHandle
-    await Future.delayed(const Duration(milliseconds: 800)); // simulate
-
-    // Simulate success/failure for UI
-    final success = password == 'demo'; // placeholder
-
-    if (!mounted) return;
-
-    if (success) {
-      context.go(AppConstants.routeDashboard);
-    } else {
-      _failedAttempts++;
-      setState(() {
-        _isLoading = false;
-        _hasError = true;
-        _errorMessage = _failedAttempts >= 3
-            ? 'تنبيه: محاولات فاشلة متعددة ($_failedAttempts)'
-            : 'كلمة المرور غير صحيحة';
-      });
-      _shakeController.forward(from: 0);
-      HapticFeedback.heavyImpact();
-
-      // Capture intruder snapshot after 3 attempts
-      if (_failedAttempts == 3) {
-        // TODO: TriggerIntruderSnapshot()
-      }
-    }
+  void _biometricUnlock() {
+    context.read<AuthBloc>().add(const AuthBiometricRequested());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          _passwordController.clear();
+          context.go(AppConstants.routeDashboard);
+        } else if (state is AuthFailed) {
+          _shakeController.forward(from: 0);
+          HapticFeedback.heavyImpact();
+        } else if (state is AuthBlocked) {
+          HapticFeedback.heavyImpact();
+        } else if (state is AuthFirstTimeSetup) {
+          context.go(AppConstants.routeSetup);
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is AuthUnlocking || state is AuthBiometricInProgress;
+        final hasError = state is AuthFailed;
+        final isBlocked = state is AuthBlocked;
+        final errorMessage = state is AuthFailed ? state.message : null;
+
+        return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -118,7 +106,13 @@ class _LockScreenState extends State<LockScreen>
                   const Spacer(),
 
                   // ── Password field ───────────────────────
-                  _buildPasswordSection(),
+                  _buildPasswordSection(
+                    isLoading: isLoading,
+                    hasError: hasError,
+                    errorMessage: errorMessage,
+                    isBlocked: isBlocked,
+                    blockedUntil: state is AuthBlocked ? state.unblockAt : null,
+                  ),
 
                   const SizedBox(height: 24),
 
@@ -136,6 +130,8 @@ class _LockScreenState extends State<LockScreen>
           ),
         ],
       ),
+    );
+      },
     );
   }
 
@@ -189,11 +185,21 @@ class _LockScreenState extends State<LockScreen>
     );
   }
 
-  Widget _buildPasswordSection() {
+  Widget _buildPasswordSection({
+    required bool isLoading,
+    required bool hasError,
+    required bool isBlocked,
+    String? errorMessage,
+    DateTime? blockedUntil,
+  }) {
+    final blockedMsg = isBlocked && blockedUntil != null
+        ? 'الخزنة مقفلة مؤقتاً. حاول بعد ${blockedUntil.difference(DateTime.now()).inMinutes + 1} دقيقة'
+        : null;
+
     return AnimatedBuilder(
       animation: _shakeAnim,
       builder: (context, child) {
-        final offset = _hasError
+        final offset = hasError
             ? Offset(8 * (0.5 - (_shakeAnim.value % 1)).abs() * 4, 0)
             : Offset.zero;
         return Transform.translate(offset: offset, child: child);
@@ -212,11 +218,29 @@ class _LockScreenState extends State<LockScreen>
           ),
           const SizedBox(height: 8),
 
+          // Blocked banner
+          if (isBlocked && blockedMsg != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.red.withOpacity(0.4)),
+              ),
+              child: Text(
+                blockedMsg,
+                style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
           // Input
           TextFormField(
             controller: _passwordController,
             focusNode: _focusNode,
             obscureText: _obscureText,
+            enabled: !isBlocked,
             textDirection: TextDirection.ltr,
             style: const TextStyle(
               color: Colors.white,
@@ -225,7 +249,7 @@ class _LockScreenState extends State<LockScreen>
             ),
             decoration: InputDecoration(
               hintText: '••••••••••••••••',
-              errorText: _hasError ? _errorMessage : null,
+              errorText: hasError ? errorMessage : null,
               suffixIcon: IconButton(
                 onPressed: () => setState(() => _obscureText = !_obscureText),
                 icon: Icon(
@@ -245,8 +269,8 @@ class _LockScreenState extends State<LockScreen>
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
-              onPressed: _isLoading ? null : _unlock,
-              child: _isLoading
+              onPressed: (isLoading || isBlocked) ? null : _unlock,
+              child: isLoading
                   ? const SizedBox(
                       width: 20,
                       height: 20,
@@ -285,15 +309,13 @@ class _LockScreenState extends State<LockScreen>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Face Unlock
+            // Biometric Unlock
             _AuthOptionButton(
               icon: Icons.face_retouching_natural,
               labelAr: 'الوجه',
               labelEn: 'Face',
               color: AppConstants.primaryCyan,
-              onTap: () {
-                // TODO: Face recognition unlock
-              },
+              onTap: _biometricUnlock,
             ),
             const SizedBox(width: 24),
             // FIDO2 Key

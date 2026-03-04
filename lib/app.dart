@@ -6,13 +6,24 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
+import 'features/auth/data/repositories/auth_repository.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 class CipherOwlApp extends StatelessWidget {
   const CipherOwlApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(
+            authRepository: AuthRepository(),
+          )..add(const AuthAppStarted()),
+          lazy: false,
+        ),
+      ],
+      child: ScreenUtilInit(
       designSize: const Size(390, 844), // iPhone 14 base
       minTextAdapt: true,
       splitScreenMode: true,
@@ -52,6 +63,7 @@ class CipherOwlApp extends StatelessWidget {
           },
         );
       },
-    );
+      ),  // ScreenUtilInit
+    );    // MultiBlocProvider
   }
 }

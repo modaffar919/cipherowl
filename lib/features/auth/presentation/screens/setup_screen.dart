@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import '../bloc/auth_bloc.dart';
 
 /// First-time setup — creates master password + recovery key
 class SetupScreen extends StatefulWidget {
@@ -13,10 +15,17 @@ class SetupScreen extends StatefulWidget {
 class _SetupScreenState extends State<SetupScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
+  String _masterPassword = '';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          context.go(AppConstants.routeDashboard);
+        }
+      },
+      child: Scaffold(
       backgroundColor: AppConstants.backgroundDark,
       body: SafeArea(
         child: Column(
@@ -31,7 +40,10 @@ class _SetupScreenState extends State<SetupScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (p) => setState(() => _currentPage = p),
                 children: [
-                  _SetupPage1(onNext: _nextPage),   // Create master password
+                  _SetupPage1(onNext: (password) {
+                    _masterPassword = password;
+                    _nextPage();
+                  }),   // Create master password
                   _SetupPage2(onNext: _nextPage),   // Recovery key (BIP39)
                   _SetupPage3(onNext: _nextPage),   // Face setup (optional)
                   _SetupPage4(onDone: _complete),   // Done
@@ -41,6 +53,7 @@ class _SetupScreenState extends State<SetupScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -51,7 +64,10 @@ class _SetupScreenState extends State<SetupScreen> {
     );
   }
 
-  void _complete() => context.go(AppConstants.routeDashboard);
+  void _complete() {
+    if (_masterPassword.isEmpty) return;
+    context.read<AuthBloc>().add(AuthSetupCompleted(_masterPassword));
+  }
 }
 
 class _BuildProgress extends StatelessWidget {
@@ -85,7 +101,7 @@ class _BuildProgress extends StatelessWidget {
 }
 
 class _SetupPage1 extends StatefulWidget {
-  final VoidCallback onNext;
+  final Function(String password) onNext;
   const _SetupPage1({required this.onNext});
   @override
   State<_SetupPage1> createState() => _SetupPage1State();
@@ -153,7 +169,7 @@ class _SetupPage1State extends State<_SetupPage1> {
           const Spacer(),
           ElevatedButton(
             onPressed: _ctrl.text.length >= 12 && _ctrl.text == _confirmCtrl.text
-                ? widget.onNext
+                ? () => widget.onNext(_ctrl.text)
                 : null,
             child: const Text('التالي'),
           ),
