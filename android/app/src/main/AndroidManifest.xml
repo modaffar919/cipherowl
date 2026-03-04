@@ -25,6 +25,24 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- ── CipherOwl AutofillService (API 26+) ──────────────────────────
+             Provides username/password autofill for apps and browsers.
+             The vault credential cache is written by Flutter via
+             MethodChannel (autofill_bridge.dart) into SharedPreferences
+             so the service can read it without a live Flutter engine. -->
+        <service
+            android:name=".CipherOwlAutofillService"
+            android:exported="true"
+            android:label="CipherOwl"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/autofillservice" />
+        </service>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

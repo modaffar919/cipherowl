@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CipherOwl AutofillService descriptor.
+  - settingsActivity: launched when the user taps "Settings" in the
+    Android autofill picker (routes to our Flutter settings screen).
+  - supportsInlineSuggestions: show chips in the keyboard IME bar on
+    Android 11+ devices.
+-->
+<autofill-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.cipherowl.cipherowl.MainActivity"
+    android:supportsInlineSuggestions="true" />

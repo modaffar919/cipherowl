@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:cipherowl/features/autofill/autofill_bridge.dart';
+import 'package:cipherowl/features/autofill/autofill_credential.dart';
 import 'package:cipherowl/features/vault/data/repositories/vault_repository.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 
@@ -53,6 +55,36 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
       searchQuery: current?.searchQuery ?? '',
       categoryFilter: current?.categoryFilter,
     ));
+
+    // ── Autofill cache update ─────────────────────────────────────────────
+    // Push login credentials to the Android AutofillService cache so they
+    // are available even when the Flutter engine is not running.
+    //
+    // NOTE: Passwords are stored encrypted in VaultEntry.encryptedPassword.
+    // Until the vault decryption key (DEK) is exposed to the BLoC layer, only
+    // the username is cached here. Full password caching requires a follow-up
+    // task (decrypt with the Rust FFI `api_decrypt` function).
+    _updateAutofillCache(event.items);
+  }
+
+  void _updateAutofillCache(List<VaultEntry> items) {
+    final credentials = items
+        .where((e) =>
+            e.category == VaultCategory.login &&
+            (e.username?.isNotEmpty ?? false))
+        .map((e) => AutofillCredential(
+              id: e.id,
+              title: e.title,
+              username: e.username ?? '',
+              // TODO(autofill): decrypt e.encryptedPassword with the vault
+              // DEK once the decryption key is accessible in the BLoC layer.
+              password: '',
+              url: e.url ?? '',
+            ))
+        .toList();
+
+    // Fire-and-forget — cache update is non-critical
+    AutofillBridge.instance.updateCache(credentials);
   }
 
   void _onSearchChanged(
@@ -195,6 +227,8 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   @override
   Future<void> close() async {
     await _itemsSub?.cancel();
+    // Clear the autofill cache when the vault BLoC is disposed (vault locked)
+    await AutofillBridge.instance.clearCache();
     return super.close();
   }
 }
