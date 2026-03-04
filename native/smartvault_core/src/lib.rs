@@ -1,14 +1,17 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! CipherOwl SmartVault Core - Rust Cryptography Engine
+//!
+//! Military-grade cryptography for the CipherOwl password manager.
+//! All sensitive data is encrypted with AES-256-GCM.
+//! Keys are derived via Argon2id (OWASP MASVS compliant).
+//! Sensitive memory is zeroed on drop via zeroize.
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod crypto;
+pub mod memory;
+pub mod password;
+pub mod api;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// Re-export core API surface
+pub use crypto::aes_gcm::{decrypt, encrypt, generate_key, generate_nonce, CryptoError};
+pub use crypto::argon2::{derive_key, hash_password, verify_password, ArgonError};
+pub use memory::secure_memory::SecureBytes;
+// api module re-exported for frb codegen
