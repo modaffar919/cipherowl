@@ -2,6 +2,14 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import 'daos/vault_dao.dart';
+import 'daos/settings_dao.dart';
+import 'daos/security_log_dao.dart';
+
+export 'daos/vault_dao.dart';
+export 'daos/settings_dao.dart';
+export 'daos/security_log_dao.dart';
+
 part 'smartvault_database.g.dart';
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
@@ -135,7 +143,10 @@ class UserSettings extends Table {
 
 // ─── Database ────────────────────────────────────────────────────────────────
 
-@DriftDatabase(tables: [VaultItems, SecurityLogs, UserSettings])
+@DriftDatabase(
+  tables: [VaultItems, SecurityLogs, UserSettings],
+  daos: [VaultDao, SettingsDao, SecurityLogDao],
+)
 class SmartVaultDatabase extends _$SmartVaultDatabase {
   SmartVaultDatabase() : super(_openConnection());
 
@@ -149,91 +160,11 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
-          // Seed default settings
           await _seedDefaultSettings();
         },
         onUpgrade: (m, from, to) async {
           // Future migrations go here
         },
-      );
-
-  // ─── Vault Item DAOs ─────────────────────────────────────────────────────
-
-  /// All non-deleted vault items for a user, sorted by title.
-  Future<List<VaultItem>> watchAllItems(String userId) =>
-      (select(vaultItems)
-            ..where((t) => t.userId.equals(userId) & t.isDeleted.equals(false))
-            ..orderBy([(t) => OrderingTerm.asc(t.title)]))
-          .get();
-
-  /// Find a single vault item by id.
-  Future<VaultItem?> findItemById(String id) =>
-      (select(vaultItems)..where((t) => t.id.equals(id))).getSingleOrNull();
-
-  /// Insert or replace a vault item (upsert semantics for sync).
-  Future<void> upsertItem(VaultItemsCompanion item) =>
-      into(vaultItems).insertOnConflictUpdate(item);
-
-  /// Soft-delete an item (keeps row for sync/undo).
-  Future<void> softDeleteItem(String id) =>
-      (update(vaultItems)..where((t) => t.id.equals(id))).write(
-        VaultItemsCompanion(
-          isDeleted: const Value(true),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-
-  /// Items modified after [since] — used for incremental sync.
-  Future<List<VaultItem>> itemsModifiedAfter(String userId, DateTime since) =>
-      (select(vaultItems)
-            ..where(
-              (t) =>
-                  t.userId.equals(userId) &
-                  t.updatedAt.isBiggerThanValue(since),
-            ))
-          .get();
-
-  // ─── Security Log DAOs ───────────────────────────────────────────────────
-
-  Future<void> logEvent({
-    required String eventType,
-    required String description,
-    String severity = 'info',
-    String? deviceInfo,
-    String? relatedItemId,
-  }) =>
-      into(securityLogs).insert(
-        SecurityLogsCompanion.insert(
-          eventType: eventType,
-          description: description,
-          severity: Value(severity),
-          deviceInfo: Value(deviceInfo),
-          relatedItemId: Value(relatedItemId),
-        ),
-      );
-
-  /// Recent security events.
-  Future<List<SecurityLog>> recentEvents({int limit = 50}) =>
-      (select(securityLogs)
-            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
-            ..limit(limit))
-          .get();
-
-  // ─── Settings DAOs ───────────────────────────────────────────────────────
-
-  Future<String?> getSetting(String key) async {
-    final row = await (select(userSettings)
-          ..where((t) => t.key.equals(key)))
-        .getSingleOrNull();
-    return row?.value;
-  }
-
-  Future<void> setSetting(String key, String value) =>
-      into(userSettings).insertOnConflictUpdate(
-        UserSettingsCompanion.insert(
-          key: key,
-          value: value,
-        ),
       );
 
   // ─── Private helpers ─────────────────────────────────────────────────────
@@ -248,7 +179,7 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
       'show_password_strength': 'true',
     };
     for (final entry in defaults.entries) {
-      await setSetting(entry.key, entry.value);
+      await settingsDao.setSetting(entry.key, entry.value);
     }
   }
 }
