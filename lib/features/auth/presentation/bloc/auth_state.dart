@@ -34,7 +34,14 @@ class AuthUnlocking extends AuthState {
 
 /// Vault is open → navigate to dashboard
 class AuthAuthenticated extends AuthState {
-  const AuthAuthenticated();
+  /// Stable user identifier. Offline = 'local_user'.
+  /// Will be replaced by Supabase UID in EPIC-5.
+  final String userId;
+
+  const AuthAuthenticated({this.userId = 'local_user'});
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 /// Wrong password entered
