@@ -7,6 +7,7 @@
 
 mod frb_generated; /* AUTO INJECTED BY flutter_rust_bridge */
 pub mod crypto;
+pub mod face;
 pub mod memory;
 pub mod password;
 pub mod api;
@@ -15,4 +16,5 @@ pub mod api;
 pub use crypto::aes_gcm::{decrypt, encrypt, generate_key, generate_nonce, CryptoError};
 pub use crypto::argon2::{derive_key, hash_password, verify_password, ArgonError};
 pub use memory::secure_memory::SecureBytes;
+pub use face::embedding::{cosine_similarity, is_same_person, find_best_match, EMBEDDING_DIM, DEFAULT_THRESHOLD};
 // api module re-exported for frb codegen

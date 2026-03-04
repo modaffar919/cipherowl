@@ -14,6 +14,7 @@
 use flutter_rust_bridge::frb;
 
 use crate::crypto::{aes_gcm, argon2};
+use crate::face::embedding;
 use crate::password::generator::{GeneratorConfig, GeneratorError};
 
 use crate::crypto::x25519;
@@ -105,6 +106,44 @@ pub fn api_derive_x25519_shared_secret(private_key: Vec<u8>, peer_public_key: Ve
     pub_arr.copy_from_slice(&peer_public_key);
     Ok(x25519::derive_shared_secret(&priv_arr, &pub_arr).to_vec())
 }
+
+// ─── Face Embedding ───────────────────────────────────────────────────────────
+
+/// Compute cosine similarity between two 128-dimensional face embeddings.
+/// Returns a score in [-1.0, 1.0]. Handles L2-normalisation internally.
+///
+/// Both `a` and `b` must be Vec<f32> of length 128 (MobileFaceNet output).
+#[frb(sync)]
+pub fn api_face_cosine_similarity(a: Vec<f32>, b: Vec<f32>) -> anyhow::Result<f32> {
+    embedding::cosine_similarity(&a, &b).map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Returns `true` if the two face embeddings belong to the same person.
+///
+/// `threshold`: optional custom threshold (default = 0.75 for MobileFaceNet 128D).
+#[frb(sync)]
+pub fn api_face_is_same_person(a: Vec<f32>, b: Vec<f32>, threshold: Option<f32>) -> anyhow::Result<bool> {
+    embedding::is_same_person(&a, &b, threshold).map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Find the best matching stored face embedding for a probe.
+/// Returns `(index, score)` of the best match, or `None` if `stored` is empty.
+///
+/// All vectors must be length-128 f32 embeddings.
+#[frb(sync)]
+pub fn api_face_find_best_match(probe: Vec<f32>, stored: Vec<Vec<f32>>) -> anyhow::Result<Option<(usize, f32)>> {
+    embedding::find_best_match(&probe, &stored).map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// L2-normalise a 128-dimensional face embedding.
+/// Returns the normalised embedding as Vec<f32>.
+#[frb(sync)]
+pub fn api_face_normalize_embedding(embedding_vec: Vec<f32>) -> anyhow::Result<Vec<f32>> {
+    let arr = embedding::to_normalized_array(&embedding_vec)
+        .map_err(|e| anyhow::anyhow!("{}", e))?;
+    Ok(arr.to_vec())
+}
+
 // ─── Password Generator ───────────────────────────────────────────────────────
 
 /// Config for `api_generate_password`.
