@@ -165,6 +165,11 @@ void main() {
       expect(find.byType(PageView), findsOneWidget);
       // Skip button exists (any TextButton on screen)
       expect(find.byType(TextButton), findsAtLeastNWidgets(1));
+      // Dispose widget to cancel AnimationControllers (stops tickers).
+      await tester.pumpWidget(const SizedBox());
+      // Advance clock past the max _scheduleBlink delay (5 s) so the pending
+      // Future.delayed timer fires, sees mounted=false, and exits cleanly.
+      await tester.pump(const Duration(seconds: 6));
     });
 
     testWidgets('tapping skip/next button does not crash', (tester) async {
@@ -176,6 +181,9 @@ void main() {
       await tester.pump();
       // Screen is still alive (navigation call may be a no-op without router)
       expect(find.byType(Scaffold), findsOneWidget);
+      // Dispose and drain pending blink timer.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 6));
     });
   });
 

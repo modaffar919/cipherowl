@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zxcvbn/zxcvbn.dart';
@@ -8,6 +9,12 @@ import 'package:cipherowl/src/rust/api.dart';
 part 'generator_event.dart';
 part 'generator_state.dart';
 
+/// Signature for the password-generation function so it can be overridden in
+/// tests without loading the native Rust library.
+typedef PasswordGeneratorFn = String Function({
+  required ApiGeneratorConfig config,
+});
+
 /// BLoC that drives the password generator tab.
 ///
 /// Password generation is delegated to the Rust core (ChaCha20Rng) via FFI.
@@ -15,9 +22,12 @@ part 'generator_state.dart';
 class GeneratorBloc extends Bloc<GeneratorEvent, GeneratorState> {
   static const _ambiguousChars = 'iIlLoO01';
   final _zxcvbn = Zxcvbn();
+  final PasswordGeneratorFn _generatePassword;
 
-  GeneratorBloc()
-      : super(const GeneratorState(
+  GeneratorBloc({
+    @visibleForTesting PasswordGeneratorFn? passwordGenerator,
+  })  : _generatePassword = passwordGenerator ?? apiGeneratePassword,
+        super(const GeneratorState(
           password: '',
           strengthScore: 0,
           strengthLabel: 'ضعيفة',
@@ -56,7 +66,7 @@ class GeneratorBloc extends Bloc<GeneratorEvent, GeneratorState> {
     final useLower =
         cfg.useLowercase || (!cfg.useUppercase && !cfg.useDigits && !cfg.useSymbols);
 
-    var pwd = apiGeneratePassword(
+    var pwd = _generatePassword(
       config: ApiGeneratorConfig(
         length: BigInt.from(cfg.length.toInt()),
         useLowercase: useLower,
