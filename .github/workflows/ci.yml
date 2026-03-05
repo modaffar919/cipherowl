@@ -60,7 +60,10 @@ jobs:
       # ── Unit + widget tests ───────────────────────────────────────────────
       - name: Run tests
         run: flutter test --coverage --reporter=github
-
+      # ── Rust unit tests (native/smartvault_core) ─────────────────────────────────
+      - name: Run Rust tests
+        working-directory: native/smartvault_core
+        run: cargo test --release -- --test-threads=4
       # ── Upload coverage (optional, to Codecov) ────────────────────────────
       - name: Upload coverage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

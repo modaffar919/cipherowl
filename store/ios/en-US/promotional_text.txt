@@ -1,0 +1,1 @@
+🦉 CipherOwl v1.0 is here — military-grade security meets continuous biometric protection. Face-Track, AES-256-GCM, TOTP 2FA, zero-knowledge sync, and a Security Academy that makes staying safe enjoyable. Arabic and English fully supported.

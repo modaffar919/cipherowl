@@ -1,0 +1,83 @@
+🦉 CipherOwl — Your 24/7 Digital Guardian
+
+CipherOwl is more than a password manager. It is a military-grade security vault that watches over your digital life around the clock, combining the strongest encryption available with continuous biometric surveillance and a gamification system that makes security enjoyable.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 MILITARY-GRADE ENCRYPTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• AES-256-GCM encryption implemented in Rust — the same standard used by intelligence agencies
+• Argon2id key derivation (3 iterations, 64 MB memory, 4 threads) — resistant to GPU brute-force
+• Zero-knowledge architecture: your master password never leaves your device
+• All data is encrypted client-side before any cloud sync
+
+👁️ FACE-TRACK CONTINUOUS BIOMETRIC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• On-device MobileFaceNet (128-dim embeddings) — no face data ever sent to servers
+• Continuous background monitoring — vault locks the instant an unknown face is detected
+• 5-angle face enrollment for robust, reliable recognition
+• Cosine similarity threshold (0.6) tuned for security vs. convenience balance
+
+🔑 ADVANCED AUTHENTICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• TOTP 2FA with live countdown — RFC 6238 compliant, 30-second periods
+• QR code scanner for instant TOTP secret import (otpauth://)
+• FIDO2 / WebAuthn hardware key support
+• BIP39 12-word recovery key — encrypted, never stored in plaintext
+• Duress password triggers a convincing fake vault (plausible deniability)
+• Intruder selfie: 3 failed unlock attempts → silent photo capture
+
+☁️ ZERO-KNOWLEDGE CLOUD SYNC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Supabase backend with Row-Level Security — only you can decrypt your vault
+• Conflict-free sync across all your devices
+• Offline-first: full functionality without internet connection
+• End-to-end encrypted sharing via X25519 ECDH key exchange
+
+🎯 INTELLIGENT SECURITY CENTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 6-layer security score engine (encryption, biometrics, 2FA, sync, breach, behavior)
+• HaveIBeenPwned breach checking using k-anonymity (your passwords are never exposed)
+• Real-time security recommendations with XP rewards
+• Dark web monitoring with push notifications
+
+🏆 SECURITY ACADEMY & GAMIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 10 threat-intelligence modules in Arabic and English
+• Interactive quizzes with scoring and XP systems
+• 25 achievement badges: from "First Vault" to "Security Master"
+• Daily challenges and streaks to build security habits
+• Level-up system with unlockable perks
+
+⚡ SMART PASSWORD TOOLS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Cryptographically secure password generator (Rust)
+• Real-time zxcvbn strength analysis with animated meter
+• Passphrase generator with custom word lists
+• Password health dashboard: duplicates, weak, expired, reused
+• Import from Chrome, Firefox, Safari, Bitwarden, and 1Password (CSV)
+
+🔧 PRODUCTIVITY FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Android AutoFill Service — one-tap fill in any app or browser
+• iOS AutoFill Credential Provider extension
+• Secure notes, credit cards, IDs, and passports storage
+• Custom categories and tags with powerful search
+• Encrypted item sharing with time-limited links
+• Organization & team vaults with role-based access control
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIVACY COMMITMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Open-source cryptography core (Rust) — auditable by anyone
+• Face biometric data stored only on your device — never in the cloud
+• No advertising, no tracking, no data selling
+• Supabase backend with transparent Row-Level Security policies
+
+Requires Android 7.0 (API 24) or higher.
+Camera permission required for Face-Track and QR code scanning.
+Biometric permission required for fingerprint/Face ID unlock.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"Security is not a product, but a process." — Bruce Schneier
+CipherOwl makes that process automatic.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

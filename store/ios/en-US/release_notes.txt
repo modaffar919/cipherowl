@@ -1,0 +1,13 @@
+Welcome to CipherOwl v1.0.0!
+
+Your 24/7 digital guardian is now live with:
+• Face-Track continuous biometric vault protection
+• AES-256-GCM military-grade encryption (Rust core)
+• Zero-knowledge cloud sync — only you hold the key
+• TOTP 2FA + FIDO2/WebAuthn + BIP39 recovery
+• Security score engine with 6-layer analysis
+• HaveIBeenPwned breach detection (k-anonymity)
+• Security Academy: 10 modules, 25 badges, daily challenges
+• iOS AutoFill Credential Provider
+• Import from Chrome, Firefox, Safari, Bitwarden, 1Password
+• Full Arabic (RTL) and English support

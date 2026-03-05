@@ -1,0 +1,141 @@
+name: Security Audit
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"      # Every Monday at 03:00 UTC
+  workflow_dispatch:          # Also triggerable manually
+  push:
+    branches: [main]
+    paths:
+      - "native/smartvault_core/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+
+env:
+  FLUTTER_VERSION: "3.27.4"
+
+jobs:
+  # ── Rust Dependency Audit ─────────────────────────────────────────────────────────
+  rust-audit:
+    name: Rust Dependency Audit (cargo-audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native/smartvault_core
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Run cargo audit
+        working-directory: native/smartvault_core
+        run: cargo audit --deny warnings
+
+      - name: Check for outdated Rust dependencies
+        working-directory: native/smartvault_core
+        run: |
+          cargo install cargo-outdated --locked
+          cargo outdated --exit-code 0   # report only, don't fail
+
+  # ── Flutter Dependency Audit ──────────────────────────────────────────────────────
+  flutter-audit:
+    name: Flutter Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Check for outdated Flutter packages
+        run: flutter pub outdated --no-color || true
+
+      - name: Dart security analysis (dart pub audit)
+        run: dart pub audit || true
+
+  # ── Static Application Security Testing ──────────────────────────────────────────
+  sast:
+    name: SAST — Secret Scanning & Code Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # full history for secret scanning
+
+      # Scan for hardcoded secrets (API keys, passwords, tokens)
+      - name: Scan for secrets (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true   # report but don't block
+
+      # CodeQL analysis for common vulnerability patterns
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript    # browser_extension/
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+
+  # ── License Compliance ────────────────────────────────────────────────────────────
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-license
+        run: cargo install cargo-license --locked
+
+      - name: Check Rust dependency licenses
+        working-directory: native/smartvault_core
+        run: |
+          echo "## Rust Dependency Licenses" >> $GITHUB_STEP_SUMMARY
+          cargo license --json | python3 -c "
+          import sys, json
+          deps = json.load(sys.stdin)
+          blocked = ['GPL-2.0', 'GPL-3.0', 'AGPL-3.0', 'LGPL-2.1']
+          issues = [d for d in deps if any(b in (d.get('license') or '') for b in blocked)]
+          if issues:
+              print('BLOCKED licenses found:')
+              for d in issues:
+                  print(f'  {d[\"name\"]} {d[\"version\"]}: {d[\"license\"]}')
+              sys.exit(1)
+          else:
+              print(f'All {len(deps)} dependencies use permissive licenses. ✅')
+          "

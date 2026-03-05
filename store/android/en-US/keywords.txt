@@ -1,0 +1,1 @@
+password manager, security, encryption, biometric, TOTP, 2FA, vault, AES-256, zero knowledge, autofill, face recognition, dark web, breach check, passphrase, secure notes

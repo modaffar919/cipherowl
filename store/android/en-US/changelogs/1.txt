@@ -1,0 +1,22 @@
+🦉 CipherOwl v1.0.0 — Initial Release
+
+We are proud to introduce CipherOwl, your 24/7 digital guardian.
+
+What's new in this release:
+• Military-grade AES-256-GCM encryption implemented in Rust
+• Face-Track continuous biometric surveillance using on-device MobileFaceNet
+• Zero-knowledge cloud sync via Supabase — your data is always encrypted
+• TOTP 2FA with live countdown and QR code scanner
+• FIDO2 / WebAuthn hardware key support
+• Security score engine with 6-layer analysis
+• HaveIBeenPwned breach checking (k-anonymity)
+• Security Academy with 10 modules and 25 achievement badges
+• Android AutoFill Service integration
+• Password generator with real-time zxcvbn strength analysis
+• Import from Chrome, Firefox, Bitwarden, and 1Password
+• BIP39 12-word recovery key
+• Duress password with fake vault (plausible deniability)
+• Organization & team vaults with role-based access control
+• Arabic (RTL) and English full support
+
+Thank you for trusting CipherOwl with your security.

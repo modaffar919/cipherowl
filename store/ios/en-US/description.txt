@@ -1,0 +1,30 @@
+🦉 Your 24/7 Digital Guardian
+
+CipherOwl combines military-grade AES-256-GCM encryption (Rust core) with Face-Track continuous biometric surveillance and zero-knowledge cloud sync — keeping your passwords safe even when your phone is in someone else's hands.
+
+SECURITY THAT NEVER SLEEPS
+• Face-Track: on-device MobileFaceNet monitors who is looking at your screen and locks the vault the instant it sees an unfamiliar face — all processing stays on your device
+• AES-256-GCM + Argon2id: the same cryptographic standards trusted by security professionals worldwide, implemented in auditable Rust code
+• Zero-knowledge sync: data is encrypted on your device before it reaches Supabase — not even we can read your vault
+• TOTP 2FA with live countdown, FIDO2/WebAuthn hardware keys, and BIP39 12-word recovery
+
+INTELLIGENT SECURITY CENTER
+• 6-layer security score tracking encryption, biometrics, 2FA, sync, breach status, and behavior
+• HaveIBeenPwned breach detection using k-anonymity — your passwords are never transmitted in full
+• Dark web monitoring with instant push notifications
+• Duress password activates a convincing decoy vault
+
+SECURITY ACADEMY & GAMIFICATION
+• 10 threat-intelligence learning modules (Arabic + English)
+• 25 achievement badges, daily challenges, and XP streaks
+• Real-time password strength analysis (zxcvbn)
+
+SEAMLESS AUTOFILL & IMPORT
+• iOS AutoFill Credential Provider — works in Safari and all apps
+• Import from Chrome, Firefox, Safari, Bitwarden, and 1Password
+• Secure notes, credit cards, IDs, and passports
+
+PRIVACY FIRST
+• Face data never leaves your device
+• No ads • No tracking • No data selling
+• Open-source Rust cryptography core
