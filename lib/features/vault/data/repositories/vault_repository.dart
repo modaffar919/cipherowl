@@ -99,6 +99,10 @@ class VaultRepository {
   Future<void> toggleFavorite(String id, {required bool value}) =>
       _db.vaultDao.setFavorite(id, value: value);
 
+  /// Upsert an entry as-is (used by cloud sync merge — preserves updatedAt).
+  Future<void> upsertItem(VaultEntry entry) =>
+      _db.vaultDao.upsertItem(_toCompanion(entry));
+
   /// Cache the zxcvbn strength score from the Rust analyser.
   Future<void> updateStrengthScore(String id, int score) =>
       _db.vaultDao.updateStrengthScore(id, score);

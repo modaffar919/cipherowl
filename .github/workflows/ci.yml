@@ -1,0 +1,71 @@
+name: CI — Test & Analyze
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "fix/**"]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.27.4"
+  JAVA_VERSION: "17"
+
+jobs:
+  # ── Flutter Tests & Static Analysis ────────────────────────────────────────
+  test:
+    name: Flutter Test & Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # ── Rust toolchain (needed for flutter_rust_bridge code generation) ──
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native/smartvault_core
+
+      # ── Flutter dependencies ──────────────────────────────────────────────
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # ── Static analysis ───────────────────────────────────────────────────
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      # ── Unit + widget tests ───────────────────────────────────────────────
+      - name: Run tests
+        run: flutter test --coverage --reporter=github
+
+      # ── Upload coverage (optional, to Codecov) ────────────────────────────
+      - name: Upload coverage
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: false
+        continue-on-error: true

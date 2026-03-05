@@ -77,3 +77,8 @@ class VaultItemsImported extends VaultEvent {
 class VaultDuressActivated extends VaultEvent {
   const VaultDuressActivated();
 }
+
+/// Trigger a zero-knowledge cloud sync (push local + pull remote).
+class VaultCloudSyncRequested extends VaultEvent {
+  const VaultCloudSyncRequested();
+}

@@ -36,6 +36,12 @@ class VaultLoaded extends VaultState {
   /// Whether [message] represents an error.
   final bool isError;
 
+  /// True while a cloud sync is in progress.
+  final bool isSyncing;
+
+  /// Timestamp of the last successful cloud sync, or null if never synced.
+  final DateTime? lastSyncAt;
+
   const VaultLoaded({
     required this.allItems,
     this.searchQuery = '',
@@ -43,6 +49,8 @@ class VaultLoaded extends VaultState {
     this.isOperating = false,
     this.message,
     this.isError = false,
+    this.isSyncing = false,
+    this.lastSyncAt,
   });
 
   // ── Derived ──────────────────────────────────────────────────────────────
@@ -82,6 +90,8 @@ class VaultLoaded extends VaultState {
     bool? isOperating,
     String? message,
     bool? isError,
+    bool? isSyncing,
+    DateTime? lastSyncAt,
     bool clearMessage = false,
     bool clearCategory = false,
   }) =>
@@ -93,6 +103,8 @@ class VaultLoaded extends VaultState {
         isOperating: isOperating ?? this.isOperating,
         message: clearMessage ? null : (message ?? this.message),
         isError: isError ?? this.isError,
+        isSyncing: isSyncing ?? this.isSyncing,
+        lastSyncAt: lastSyncAt ?? this.lastSyncAt,
       );
 }
 

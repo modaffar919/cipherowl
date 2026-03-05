@@ -6,6 +6,8 @@ import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
 import 'package:cipherowl/features/autofill/autofill_bridge.dart';
 import 'package:cipherowl/features/autofill/autofill_credential.dart';
 import 'package:cipherowl/features/autofill/browser_autofill_sync_service.dart';
+import 'package:cipherowl/features/sync/data/zero_knowledge_sync_service.dart';
+import 'package:cipherowl/features/sync/domain/sync_result.dart';
 import 'package:cipherowl/features/vault/data/repositories/vault_repository.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 
@@ -20,15 +22,18 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   final VaultRepository _repo;
   final VaultCryptoService? _cryptoService;
   final BrowserAutofillSyncService? _browserSync;
+  final ZeroKnowledgeSyncService? _cloudSync;
   StreamSubscription<List<VaultEntry>>? _itemsSub;
 
   VaultBloc({
     required VaultRepository repository,
     VaultCryptoService? cryptoService,
     BrowserAutofillSyncService? browserSyncService,
+    ZeroKnowledgeSyncService? cloudSyncService,
   })  : _repo = repository,
         _cryptoService = cryptoService,
         _browserSync = browserSyncService,
+        _cloudSync = cloudSyncService,
         super(const VaultInitial()) {
     on<VaultStarted>(_onStarted);
     on<_VaultItemsReceived>(_onItemsReceived);
@@ -42,6 +47,7 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
     on<VaultMessageDismissed>(_onMessageDismissed);
     on<VaultItemsImported>(_onItemsImported);
     on<VaultDuressActivated>(_onDuressActivated);
+    on<VaultCloudSyncRequested>(_onCloudSyncRequested);
   }
 
   // ── Event handlers ───────────────────────────────────────────────────────
@@ -241,6 +247,44 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
         ? 'تم استيراد $imported حساب بنجاح ✓'
         : 'تم $imported حساب | تخطّي $skipped';
     emit(current.copyWith(isOperating: false, message: msg));
+  }
+
+  // ── Cloud sync ───────────────────────────────────────────────────────────
+
+  Future<void> _onCloudSyncRequested(
+      VaultCloudSyncRequested event, Emitter<VaultState> emit) async {
+    final syncService = _cloudSync;
+    if (syncService == null) return;
+    if (state is! VaultLoaded) return;
+    final current = state as VaultLoaded;
+    emit(current.copyWith(isSyncing: true));
+
+    final result = await syncService.sync(
+      localItems: current.allItems,
+      onMerge: (merged) async {
+        for (final entry in merged) {
+          await _repo.upsertItem(entry);
+        }
+      },
+    );
+
+    if (state is! VaultLoaded) return;
+    switch (result) {
+      case SyncSuccess(:final pushed, :final pulled):
+        emit((state as VaultLoaded).copyWith(
+          isSyncing: false,
+          lastSyncAt: DateTime.now(),
+          message: 'تمّت المزامنة ✓  (رُفع: $pushed | نُزِّل: $pulled)',
+        ));
+      case SyncSkipped():
+        emit((state as VaultLoaded).copyWith(isSyncing: false));
+      case SyncFailure(:final message):
+        emit((state as VaultLoaded).copyWith(
+          isSyncing: false,
+          message: 'فشلت المزامنة: $message',
+          isError: true,
+        ));
+    }
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────
