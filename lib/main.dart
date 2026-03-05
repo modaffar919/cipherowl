@@ -7,7 +7,7 @@ import 'app.dart';
 import 'core/constants/app_constants.dart';
 import 'core/database/database_key_service.dart';
 import 'core/database/smartvault_database.dart';
-import 'src/rust/frb_generated.dart/frb_generated.dart';
+import 'src/rust/frb_generated.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

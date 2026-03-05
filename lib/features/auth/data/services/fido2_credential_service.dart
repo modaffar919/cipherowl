@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:cipherowl/core/supabase/supabase_client_provider.dart';
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
+import 'package:cipherowl/src/rust/api.dart';
 
 /// FIDO2-style credential manager using Ed25519 via Rust FFI.
 ///

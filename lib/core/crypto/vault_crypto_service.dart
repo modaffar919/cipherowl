@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
+import 'package:cipherowl/src/rust/api.dart';
 
 /// Manages field-level AES-256-GCM encryption for vault items.
 ///

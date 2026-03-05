@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:zxcvbn/zxcvbn.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
+import 'package:cipherowl/src/rust/api.dart';
 
 part 'generator_event.dart';
 part 'generator_state.dart';

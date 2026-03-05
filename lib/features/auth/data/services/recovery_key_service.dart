@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
+import 'package:cipherowl/src/rust/api.dart';
 
 /// Service for BIP39 12-word recovery key management.
 ///

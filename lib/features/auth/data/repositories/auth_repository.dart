@@ -1,4 +1,4 @@
-import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
+import 'package:cipherowl/src/rust/api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 
