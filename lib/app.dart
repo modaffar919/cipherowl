@@ -10,6 +10,7 @@ import 'core/theme/app_theme.dart';
 import 'core/localization/app_localizations.dart';
 import 'features/auth/data/repositories/auth_repository.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/gamification/presentation/bloc/gamification_bloc.dart';
 import 'features/security_center/presentation/bloc/security_bloc.dart';
 import 'features/settings/data/repositories/settings_repository.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
@@ -54,6 +55,10 @@ class CipherOwlApp extends StatelessWidget {
         BlocProvider<SecurityBloc>(
           create: (_) => SecurityBloc(),
           lazy: true,
+        ),
+        BlocProvider<GamificationBloc>(
+          create: (_) => GamificationBloc()..add(const GamificationStarted()),
+          lazy: false,
         ),
       ],
       child: ScreenUtilInit(

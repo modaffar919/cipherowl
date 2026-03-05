@@ -107,7 +107,7 @@
 |---|---|
 | ✅ | `cipherowl-76s` |
 | **الأولوية** | P0 · حرج |
-| **التقدم** | ██████████████░░░░░░ 7/10 |
+| **التقدم** | ██████████████████░░ 9/10 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
@@ -119,8 +119,8 @@
 | ✅ | ~~Create SecurityBloc score layers recommendations~~ | `cipherowl-yly` | P1 · عالي |
 | ✅ | ~~Create Domain entities and use cases layer~~ | `cipherowl-ekw` | P1 · عالي |
 | ✅ | ~~Create Repository layer for Clean Architecture data abstraction~~ | `cipherowl-yay` | P1 · عالي |
-| 🟠 | Write unit tests for all BLoCs 90pct coverage | `cipherowl-dla` | P1 · عالي |
-| 🔵 | Create GamificationBloc XP levels badges streaks | `cipherowl-yot` | P2 · متوسط |
+| ✅ | ~~Write unit tests for all BLoCs 90pct coverage~~ | `cipherowl-dla` | P1 · عالي |
+| ✅ | ~~Create GamificationBloc XP levels badges streaks~~ | `cipherowl-yot` | P2 · متوسط |
 
 ---
 

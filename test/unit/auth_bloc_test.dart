@@ -1,0 +1,211 @@
+import 'package:bloc_test/bloc_test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+import 'package:cipherowl/features/auth/data/repositories/auth_repository.dart';
+import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+
+// ── Mocks ─────────────────────────────────────────────────────────────────────
+class MockAuthRepository extends Mock implements AuthRepository {}
+
+void main() {
+  late MockAuthRepository mockRepo;
+
+  setUp(() {
+    mockRepo = MockAuthRepository();
+  });
+
+  group('AuthBloc', () {
+    // ── AuthAppStarted ──────────────────────────────────────────────────────
+    group('AuthAppStarted', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthChecking, AuthLocked] when setup is complete',
+        build: () {
+          when(() => mockRepo.isSetupComplete()).thenAnswer((_) async => true);
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthAppStarted()),
+        expect: () => const [AuthChecking(), AuthLocked()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthChecking, AuthFirstTimeSetup] when setup not done',
+        build: () {
+          when(() => mockRepo.isSetupComplete()).thenAnswer((_) async => false);
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthAppStarted()),
+        expect: () => const [AuthChecking(), AuthFirstTimeSetup()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthChecking, AuthFirstTimeSetup] on repository error',
+        build: () {
+          when(() => mockRepo.isSetupComplete())
+              .thenThrow(Exception('db error'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthAppStarted()),
+        expect: () => const [AuthChecking(), AuthFirstTimeSetup()],
+      );
+    });
+
+    // ── AuthMasterPasswordSubmitted ─────────────────────────────────────────
+    group('AuthMasterPasswordSubmitted', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthAuthenticated] on correct password',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenAnswer((_) async => VerifyResult.success());
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) =>
+            bloc.add(const AuthMasterPasswordSubmitted('correct123')),
+        expect: () => const [AuthUnlocking(), AuthAuthenticated()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthFailed] on wrong password',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenAnswer((_) async =>
+                  VerifyResult.failed(attempts: 1, remainingAttempts: 4));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
+        expect: () => [
+          const AuthUnlocking(),
+          isA<AuthFailed>()
+              .having((s) => s.attempts, 'attempts', 1)
+              .having((s) => s.message, 'message', contains('4')),
+        ],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthBlocked] when account locked',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any())).thenAnswer((_) async =>
+              VerifyResult.locked(const Duration(minutes: 5),
+                  isNewLockout: true));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
+        expect: () => [
+          const AuthUnlocking(),
+          isA<AuthBlocked>().having((s) => s.durationMinutes, 'duration', 5),
+        ],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'does nothing when password is empty',
+        build: () => AuthBloc(authRepository: mockRepo),
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('')),
+        expect: () => const <AuthState>[],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthFailed] on repository exception',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenThrow(Exception('network'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('pass')),
+        expect: () => [
+          const AuthUnlocking(),
+          isA<AuthFailed>().having((s) => s.attempts, 'attempts', 0),
+        ],
+      );
+    });
+
+    // ── AuthSetupCompleted ──────────────────────────────────────────────────
+    group('AuthSetupCompleted', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthAuthenticated] after saving password',
+        build: () {
+          when(() => mockRepo.saveMasterPassword(any()))
+              .thenAnswer((_) async {});
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) =>
+            bloc.add(const AuthSetupCompleted('NewP@ss1!')),
+        expect: () => const [AuthUnlocking(), AuthAuthenticated()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthFailed] if save throws',
+        build: () {
+          when(() => mockRepo.saveMasterPassword(any()))
+              .thenThrow(Exception('disk full'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) =>
+            bloc.add(const AuthSetupCompleted('P@ss!')),
+        expect: () => [
+          const AuthUnlocking(),
+          isA<AuthFailed>().having((s) => s.attempts, 'attempts', 0),
+        ],
+      );
+    });
+
+    // ── AuthBiometricRequested ──────────────────────────────────────────────
+    group('AuthBiometricRequested', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthBiometricInProgress, AuthAuthenticated] on success',
+        build: () {
+          when(() => mockRepo.authenticateWithBiometric())
+              .thenAnswer((_) async => BiometricResult.success());
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthBiometricRequested()),
+        expect: () => const [AuthBiometricInProgress(), AuthAuthenticated()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthBiometricInProgress, AuthLocked] on biometric failure',
+        build: () {
+          when(() => mockRepo.authenticateWithBiometric())
+              .thenAnswer((_) async =>
+                  BiometricResult.failed('fingerprint mismatch'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthBiometricRequested()),
+        expect: () => const [AuthBiometricInProgress(), AuthLocked()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthBiometricInProgress, AuthBiometricUnavailable] when unavailable',
+        build: () {
+          when(() => mockRepo.authenticateWithBiometric())
+              .thenAnswer((_) async =>
+                  BiometricResult.unavailable('no sensor'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthBiometricRequested()),
+        expect: () => [
+          const AuthBiometricInProgress(),
+          isA<AuthBiometricUnavailable>(),
+        ],
+      );
+    });
+
+    // ── AuthVaultLocked / AuthErrorDismissed ────────────────────────────────
+    group('AuthVaultLocked', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthLocked]',
+        build: () => AuthBloc(authRepository: mockRepo),
+        act: (bloc) => bloc.add(const AuthVaultLocked()),
+        expect: () => const [AuthLocked()],
+      );
+    });
+
+    group('AuthErrorDismissed', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthLocked]',
+        build: () => AuthBloc(authRepository: mockRepo),
+        act: (bloc) => bloc.add(const AuthErrorDismissed()),
+        expect: () => const [AuthLocked()],
+      );
+    });
+  });
+}
