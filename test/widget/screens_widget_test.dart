@@ -45,6 +45,7 @@ import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.da
 import 'package:cipherowl/features/security_center/presentation/bloc/security_bloc.dart';
 import 'package:cipherowl/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
+import 'package:cipherowl/features/academy/presentation/bloc/academy_bloc.dart';
 
 // ── Mock declarations ─────────────────────────────────────────────────────────
 
@@ -66,6 +67,9 @@ class _MockGamificationBloc
 
 class _MockGeneratorBloc extends MockBloc<GeneratorEvent, GeneratorState>
     implements GeneratorBloc {}
+
+class _MockAcademyBloc extends MockBloc<AcademyEvent, AcademyState>
+    implements AcademyBloc {}
 
 class _MockFaceEnrollmentBloc
     extends MockBloc<FaceEnrollmentEvent, FaceEnrollmentState>
@@ -94,6 +98,7 @@ Widget _appWithBlocs(
   required _MockSettingsBloc settingsBloc,
   required _MockSettingsRepository settingsRepo,
   _MockGamificationBloc? gamificationBloc,
+  _MockAcademyBloc? academyBloc,
 }) =>
     MaterialApp(
       home: Directionality(
@@ -110,6 +115,8 @@ Widget _appWithBlocs(
               BlocProvider<SettingsBloc>.value(value: settingsBloc),
               if (gamificationBloc != null)
                 BlocProvider<GamificationBloc>.value(value: gamificationBloc),
+              if (academyBloc != null)
+                BlocProvider<AcademyBloc>.value(value: academyBloc),
             ],
             child: child,
           ),
@@ -189,10 +196,22 @@ void main() {
 
   group('AcademyScreen', () {
     testWidgets('renders threat topic cards', (tester) async {
-      await tester.pumpWidget(_app(const AcademyScreen()));
+      final academyBloc = _MockAcademyBloc();
+      when(() => academyBloc.state).thenReturn(const AcademyLoaded());
+      when(() => academyBloc.stream)
+          .thenAnswer((_) => Stream.value(const AcademyLoaded()));
+      addTearDown(academyBloc.close);
+      await tester.pumpWidget(MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: BlocProvider<AcademyBloc>.value(
+            value: academyBloc,
+            child: const AcademyScreen(),
+          ),
+        ),
+      ));
       await tester.pump();
       expect(find.byType(Scaffold), findsOneWidget);
-      // Grid of threat cards rendered via SliverGrid inside CustomScrollView
       expect(find.byType(CustomScrollView), findsOneWidget);
     });
   });
@@ -552,6 +571,7 @@ void main() {
     late _MockSettingsBloc settingsBloc;
     late _MockSettingsRepository settingsRepo;
     late _MockGeneratorBloc generatorBloc;
+    late _MockAcademyBloc academyBloc;
 
     setUp(() {
       authBloc = _MockAuthBloc();
@@ -560,6 +580,7 @@ void main() {
       settingsBloc = _MockSettingsBloc();
       settingsRepo = _MockSettingsRepository();
       generatorBloc = _MockGeneratorBloc();
+      academyBloc = _MockAcademyBloc();
 
       when(() => authBloc.state).thenReturn(const AuthAuthenticated());
       when(() => authBloc.stream)
@@ -575,6 +596,9 @@ void main() {
           .thenAnswer((_) => Stream.value(const SettingsInitial()));
       when(() => settingsRepo.loadAll())
           .thenAnswer((_) async => _testSettings());
+      when(() => academyBloc.state).thenReturn(const AcademyLoaded());
+      when(() => academyBloc.stream)
+          .thenAnswer((_) => Stream.value(const AcademyLoaded()));
       when(() => generatorBloc.state).thenReturn(const GeneratorState(
         password: 'Abc123!',
         strengthScore: 3,
@@ -597,6 +621,7 @@ void main() {
       securityBloc.close();
       settingsBloc.close();
       generatorBloc.close();
+      academyBloc.close();
     });
 
     /// Build a DashboardScreen with all real screens replaced by safe stubs
@@ -616,6 +641,7 @@ void main() {
           securityBloc: securityBloc,
           settingsBloc: settingsBloc,
           settingsRepo: settingsRepo,
+          academyBloc: academyBloc,
         );
 
     testWidgets('renders bottom navigation with 5 tabs', (tester) async {

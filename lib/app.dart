@@ -23,6 +23,7 @@ import 'features/notifications/data/repositories/notification_repository.dart';
 import 'features/notifications/data/services/fcm_service.dart';
 import 'features/notifications/presentation/bloc/notification_bloc.dart';
 import 'features/notifications/presentation/bloc/notification_event.dart';
+import 'features/academy/presentation/bloc/academy_bloc.dart';
 import 'core/supabase/supabase_client_provider.dart';
 
 class CipherOwlApp extends StatefulWidget {
@@ -44,6 +45,8 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
 
   // ── BLoCs ─────────────────────────────────────────────────────────────────
   late final NotificationBloc _notifBloc;
+  late final GamificationBloc _gamificationBloc;
+  late final AcademyBloc _academyBloc;
 
   @override
   void initState() {
@@ -58,6 +61,10 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
     _notifBloc = NotificationBloc(_notifRepo)
       ..add(const NotificationsLoadRequested());
 
+    _gamificationBloc = GamificationBloc()..add(const GamificationStarted());
+    _academyBloc = AcademyBloc(gamificationBloc: _gamificationBloc)
+      ..add(const AcademyStarted());
+
     // FCM: store incoming messages in repo and forward to BLoC.
     FcmService.instance.onNotificationReceived =
         (n) => _notifBloc.add(NotificationReceived(n));
@@ -68,6 +75,8 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
   @override
   void dispose() {
     _notifBloc.close();
+    _academyBloc.close();
+    _gamificationBloc.close();
     super.dispose();
   }
 
@@ -108,15 +117,13 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
           create: (_) => SecurityBloc(),
           lazy: true,
         ),
-        BlocProvider<GamificationBloc>(
-          create: (_) => GamificationBloc()..add(const GamificationStarted()),
-          lazy: false,
-        ),
+        BlocProvider<GamificationBloc>.value(value: _gamificationBloc),
         BlocProvider<OrgBloc>(
           create: (_) => OrgBloc(_orgRepo),
           lazy: true,
         ),
         BlocProvider<NotificationBloc>.value(value: _notifBloc),
+        BlocProvider<AcademyBloc>.value(value: _academyBloc),
       ],
       child: ScreenUtilInit(
       designSize: const Size(390, 844), // iPhone 14 base

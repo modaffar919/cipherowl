@@ -147,4 +147,10 @@ abstract class AppConstants {
   static const String routeImportExport     = '/import-export';
   static const String routeFido2Manage      = '/fido2-manage';
   static const String routeNotifications    = '/notifications';
+
+  // Academy sub-routes
+  static const String routeAcademyModule  = '/academy/module/:id';
+  static const String routeAcademyQuiz    = '/academy/quiz/:id';
+  static const String routeAcademyBadges  = '/academy/badges';
+  static const String routeAcademyDaily   = '/academy/daily';
 }

@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import '../../data/academy_content.dart';
+import '../bloc/academy_bloc.dart';
 
-/// Threat Academy — 10 security education cards with quiz
+/// Threat Academy hub — module grid + quick-access to badges and daily challenge.
 class AcademyScreen extends StatelessWidget {
   const AcademyScreen({super.key});
-
-  static const _topics = [
-    _ThreatCard(emoji: '🎣', title: 'التصيد الاحتيالي', titleEn: 'Phishing', body: 'رسائل مزيفة تسرق بياناتك. تحقق دائماً من المرسل والرابط.', xp: 10, color: Color(0xFFFF6B6B)),
-    _ThreatCard(emoji: '🦠', title: 'البرامج الخبيثة', titleEn: 'Malware', body: 'برامج تُثبّت نفسها خفية. لا تحمّل من مصادر غير موثوقة.', xp: 10, color: Color(0xFFFF8C42)),
-    _ThreatCard(emoji: '🔑', title: 'هجمات كلمات المرور', titleEn: 'Password Attacks', body: 'القاموس، القوة الغاشمة، Credential Stuffing. استخدم كلمات مرور فريدة.', xp: 15, color: Color(0xFFFFD166)),
-    _ThreatCard(emoji: '🕵️', title: 'هندسة اجتماعية', titleEn: 'Social Engineering', body: 'استغلال الثقة لسرقة المعلومات. لا تعطِ بياناتك لأي شخص.', xp: 15, color: Color(0xFF06D6A0)),
-    _ThreatCard(emoji: '📡', title: 'الاعتراض الشبكي', titleEn: 'MITM / Sniffing', body: 'التجسس على الشبكة العامة. استخدم VPN دائماً في الأماكن العامة.', xp: 20, color: Color(0xFF118AB2)),
-    _ThreatCard(emoji: '💻', title: 'برامج الفدية', titleEn: 'Ransomware', body: 'تشفير ملفاتك مقابل فدية. النسخ الاحتياطي درعك الأول.', xp: 20, color: Color(0xFFEF476F)),
-    _ThreatCard(emoji: '🤖', title: 'تزييف عميق', titleEn: 'Deepfake', body: 'فيديوهات مزيفة بالذكاء الاصطناعي. تحقق من المصادر قبل المشاركة.', xp: 25, color: Color(0xFF7B2FBE)),
-    _ThreatCard(emoji: '🌐', title: 'الويب المظلم', titleEn: 'Dark Web Leaks', body: 'بياناتك قد تُباع هناك. فعّل المراقبة المستمرة.', xp: 25, color: Color(0xFF3D348B)),
-    _ThreatCard(emoji: '⚡', title: 'ثغرات يوم الصفر', titleEn: 'Zero-Day Exploits', body: 'ثغرات غير مكتشفة. حافظ على تحديث تطبيقاتك دائماً.', xp: 30, color: Color(0xFFFF2D55)),
-    _ThreatCard(emoji: '☁️', title: 'هجمات السحابة', titleEn: 'Cloud-Native Attacks', body: 'استهداف بيانات السحابة. استخدم تشفير Zero-Knowledge.', xp: 30, color: Color(0xFF00CEC9)),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -25,134 +16,266 @@ class AcademyScreen extends StatelessWidget {
       backgroundColor: AppConstants.backgroundDark,
       body: CustomScrollView(
         slivers: [
+          // ── App Bar ─────────────────────────────────────────────────────
           SliverAppBar(
             backgroundColor: AppConstants.backgroundDark,
             pinned: true,
-            title: const Text('أكاديمية التهديدات', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            title: const Text(
+              'أكاديمية CipherOwl',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18),
+            ),
             centerTitle: false,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(48),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+            actions: [
+              // Badges button
+              IconButton(
+                icon: const Icon(Icons.emoji_events_outlined,
+                    color: AppConstants.accentGold),
+                tooltip: 'الإنجازات',
+                onPressed: () =>
+                    context.push(AppConstants.routeAcademyBadges),
+              ),
+            ],
+          ),
+
+          // ── Quick-action row (XP + streak + daily) ─────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: _QuickActions(),
+            ),
+          ),
+
+          // ── Module grid ─────────────────────────────────────────────────
+          BlocBuilder<AcademyBloc, AcademyState>(
+            builder: (context, state) {
+              final loaded =
+                  state is AcademyLoaded ? state : null;
+
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                sliver: SliverGrid(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (_, i) {
+                      final module = AcademyContent.modules[i];
+                      final done =
+                          loaded?.isCompleted(module.id) ?? false;
+                      return _ModuleTile(
+                          module: module, completed: done);
+                    },
+                    childCount: AcademyContent.modules.length,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Quick actions row ─────────────────────────────────────────────────────────
+
+class _QuickActions extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AcademyBloc, AcademyState>(
+      builder: (context, state) {
+        final loaded = state is AcademyLoaded ? state : null;
+        final completed = loaded?.completedCount ?? 0;
+        final total = AcademyContent.modules.length;
+        final dailyDone = loaded?.dailyChallengeAnswered ?? false;
+
+        return Row(
+          children: [
+            // Progress pill
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppConstants.cardDark,
+                  borderRadius: BorderRadius.circular(12),
+                  border:
+                      Border.all(color: AppConstants.borderDark),
+                ),
                 child: Row(
                   children: [
-                    const Text('تعلّم وأكسب نقاطاً', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(color: AppConstants.accentGold.withOpacity(0.15), borderRadius: BorderRadius.circular(20), border: Border.all(color: AppConstants.accentGold.withOpacity(0.3))),
-                      child: const Row(children: [
-                        Text('⭐', style: TextStyle(fontSize: 14)),
-                        SizedBox(width: 4),
-                        Text('150 XP', style: TextStyle(color: AppConstants.accentGold, fontWeight: FontWeight.w700, fontSize: 12)),
-                      ]),
+                    const Text('📚',
+                        style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$completed / $total',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14),
+                        ),
+                        const Text(
+                          'درس مكتمل',
+                          style: TextStyle(
+                              color: Colors.white38, fontSize: 10),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, childAspectRatio: 0.85, crossAxisSpacing: 10, mainAxisSpacing: 10,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => _ThreatTile(card: _topics[i]),
-                childCount: _topics.length,
+            const SizedBox(width: 10),
+            // Daily challenge pill
+            GestureDetector(
+              onTap: () => context
+                  .push(AppConstants.routeAcademyDaily),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: dailyDone
+                      ? AppConstants.cardDark
+                      : AppConstants.warningAmber.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: dailyDone
+                        ? AppConstants.borderDark
+                        : AppConstants.warningAmber
+                            .withOpacity(0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      dailyDone ? '✅' : '🔥',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      dailyDone ? 'أُنجز' : 'تحدي اليوم',
+                      style: TextStyle(
+                        color: dailyDone
+                            ? Colors.white38
+                            : AppConstants.warningAmber,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }
 
-class _ThreatCard {
-  final String emoji, title, titleEn, body;
-  final int xp;
-  final Color color;
-  const _ThreatCard({required this.emoji, required this.title, required this.titleEn, required this.body, required this.xp, required this.color});
-}
+// ── Module tile ───────────────────────────────────────────────────────────────
 
-class _ThreatTile extends StatelessWidget {
-  final _ThreatCard card;
-  const _ThreatTile({required this.card});
+class _ModuleTile extends StatelessWidget {
+  final dynamic module; // AcademyModule
+  final bool completed;
+  const _ModuleTile({required this.module, required this.completed});
 
   @override
   Widget build(BuildContext context) {
+    final color = Color(module.colorValue as int);
+
     return GestureDetector(
-      onTap: () => showModalBottomSheet(
-        context: context,
-        backgroundColor: AppConstants.surfaceDark,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        builder: (_) => _ThreatDetail(card: card),
-      ),
+      onTap: () {
+        context.read<AcademyBloc>().add(AcademyModuleOpened(module.id as String));
+        context.push(
+          AppConstants.routeAcademyModule
+              .replaceFirst(':id', module.id as String),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppConstants.cardDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: card.color.withOpacity(0.2)),
+          border: Border.all(
+            color: completed
+                ? AppConstants.successGreen.withOpacity(0.4)
+                : color.withOpacity(0.2),
+            width: completed ? 1.5 : 1,
+          ),
           gradient: LinearGradient(
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
-            colors: [card.color.withOpacity(0.05), Colors.transparent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color.withOpacity(0.06), Colors.transparent],
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(card.emoji, style: const TextStyle(fontSize: 36)),
+            Row(
+              children: [
+                Text(module.emoji as String,
+                    style: const TextStyle(fontSize: 32)),
+                const Spacer(),
+                if (completed)
+                  const Icon(Icons.check_circle,
+                      color: AppConstants.successGreen, size: 16),
+              ],
+            ),
             const Spacer(),
-            Text(card.title, style: TextStyle(color: card.color, fontWeight: FontWeight.w700, fontSize: 14)),
+            Text(
+              module.titleAr as String,
+              style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13),
+              maxLines: 2,
+            ),
             const SizedBox(height: 2),
-            Text(card.titleEn, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+            Text(
+              module.titleEn as String,
+              style: const TextStyle(color: Colors.white38, fontSize: 10),
+            ),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: AppConstants.accentGold.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
-              child: Text('+${card.xp} XP', style: const TextStyle(color: AppConstants.accentGold, fontSize: 10, fontWeight: FontWeight.w700)),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 7, vertical: 3),
+                  decoration: BoxDecoration(
+                    color:
+                        AppConstants.accentGold.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '+${module.xpReward} XP',
+                    style: const TextStyle(
+                        color: AppConstants.accentGold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                if ((module.quiz as List).isNotEmpty)
+                  Text(
+                    '${(module.quiz as List).length} أسئلة',
+                    style: const TextStyle(
+                        color: Colors.white24, fontSize: 9),
+                  ),
+              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ThreatDetail extends StatelessWidget {
-  final _ThreatCard card;
-  const _ThreatDetail({required this.card});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Text(card.emoji, style: const TextStyle(fontSize: 40)),
-            const SizedBox(width: 12),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(card.title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
-              Text(card.titleEn, style: const TextStyle(color: Colors.white38, fontSize: 13)),
-            ]),
-          ]),
-          const SizedBox(height: 20),
-          Text(card.body, style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6)),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.check_circle_outline),
-            label: Text('فهمت! (+${card.xp} XP)'),
-          ),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }

@@ -416,5 +416,38 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
           colorValue: AppConstants.successGreen.toARGB32(),
           isUnlocked: unlockedIds.contains('badge_academy'),
         ),
+        // ── Academy completion badges ──────────────────────────────────────
+        GamificationBadge(
+          id: 'badge_academy_phishing',
+          nameAr: 'مكافح التصيد',
+          descriptionAr: 'أتمم درس التصيد الاحتيالي',
+          iconCodePoint: Icons.phishing.codePoint,
+          colorValue: 0xFFFF6B6B,
+          isUnlocked: unlockedIds.contains('badge_academy_phishing'),
+        ),
+        GamificationBadge(
+          id: 'badge_academy_malware',
+          nameAr: 'صائد البرامج الخبيثة',
+          descriptionAr: 'أتمم درس البرامج الخبيثة',
+          iconCodePoint: Icons.pest_control.codePoint,
+          colorValue: 0xFFFF8C42,
+          isUnlocked: unlockedIds.contains('badge_academy_malware'),
+        ),
+        GamificationBadge(
+          id: 'badge_academy_passwords',
+          nameAr: 'حارس الكلمات',
+          descriptionAr: 'أتمم درس هجمات كلمات المرور',
+          iconCodePoint: Icons.password.codePoint,
+          colorValue: 0xFFFFD166,
+          isUnlocked: unlockedIds.contains('badge_academy_passwords'),
+        ),
+        GamificationBadge(
+          id: 'badge_academy_ransomware',
+          nameAr: 'مقاوم الفدية',
+          descriptionAr: 'أتمم درس برامج الفدية',
+          iconCodePoint: Icons.lock_reset.codePoint,
+          colorValue: 0xFFEF476F,
+          isUnlocked: unlockedIds.contains('badge_academy_ransomware'),
+        ),
       ];
 }

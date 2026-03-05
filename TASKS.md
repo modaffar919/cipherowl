@@ -281,16 +281,16 @@
 
 | | |
 |---|---|
-| 🔵 | `cipherowl-dwm` |
+| ✅ | `cipherowl-dwm` |
 | **الأولوية** | P2 · متوسط |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/4 |
+| **التقدم** | ████████████████████ 4/4 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔵 | Create academy content 10 threat modules AR EN | `cipherowl-kj5` | P2 · متوسط |
-| 🔵 | Implement quiz system with scoring and XP | `cipherowl-rmq` | P2 · متوسط |
-| 🔵 | Build badge achievement system 25 badges | `cipherowl-p7t` | P2 · متوسط |
-| ⬜ | Daily security challenges and streaks | `cipherowl-7dw` | P3 · منخفض |
+| ✅ | ~~Create academy content 10 threat modules AR EN~~ | `cipherowl-kj5` | P2 · متوسط |
+| ✅ | ~~Implement quiz system with scoring and XP~~ | `cipherowl-rmq` | P2 · متوسط |
+| ✅ | ~~Build badge achievement system 25 badges~~ | `cipherowl-p7t` | P2 · متوسط |
+| ✅ | ~~Daily security challenges and streaks~~ | `cipherowl-7dw` | P3 · منخفض |
 
 ---
 

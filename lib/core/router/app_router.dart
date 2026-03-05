@@ -21,6 +21,12 @@ import '../../features/enterprise/presentation/screens/admin_dashboard_screen.da
 import '../../features/enterprise/presentation/screens/sso_settings_screen.dart';
 import '../../features/auth/presentation/screens/fido2_management_screen.dart';
 import '../../features/notifications/presentation/screens/notification_center_screen.dart';
+import '../../features/academy/data/academy_content.dart';
+import '../../features/academy/domain/entities/academy_module.dart';
+import '../../features/academy/presentation/screens/module_detail_screen.dart';
+import '../../features/academy/presentation/screens/quiz_screen.dart';
+import '../../features/gamification/presentation/screens/badges_screen.dart';
+import '../../features/academy/presentation/screens/daily_challenge_screen.dart';
 import '../constants/app_constants.dart';
 
 // ── Transition helpers ───────────────────────────────────────────────────────
@@ -83,6 +89,11 @@ Page<T> _slideUp<T>(GoRouterState state, Widget child) =>
         );
       },
     );
+
+/// Look up an [AcademyModule] by id (falls back to first module).
+AcademyModule _findModule(String id) =>
+    AcademyContent.modules.firstWhere((m) => m.id == id,
+        orElse: () => AcademyContent.modules.first);
 
 abstract class AppRouter {
   static final GoRouter router = GoRouter(
@@ -234,7 +245,35 @@ abstract class AppRouter {
         path: AppConstants.routeNotifications,
         pageBuilder: (context, state) =>
             _slideRight(state, const NotificationCenterScreen()),
-      ),    ],
+      ),
+
+      // ── Academy sub-routes ───────────────────────────────
+      GoRoute(
+        path: AppConstants.routeAcademyModule,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id']!;
+          final module = _findModule(id);
+          return _slideRight(state, ModuleDetailScreen(module: module));
+        },
+      ),
+      GoRoute(
+        path: AppConstants.routeAcademyQuiz,
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return _slideRight(state, QuizScreen(moduleId: id));
+        },
+      ),
+      GoRoute(
+        path: AppConstants.routeAcademyBadges,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const BadgesScreen()),
+      ),
+      GoRoute(
+        path: AppConstants.routeAcademyDaily,
+        pageBuilder: (context, state) =>
+            _slideUp(state, const DailyChallengeScreen()),
+      ),
+    ],
 
     // ── Error handler ────────────────────────────────────
     errorBuilder: (context, state) => const _ErrorScreen(),

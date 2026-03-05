@@ -15,7 +15,7 @@ void main() {
     // ── GamificationStarted ─────────────────────────────────────────────────
     group('GamificationStarted', () {
       blocTest<GamificationBloc, GamificationState>(
-        'emits GamificationLoaded with zero xp, level 1, 25 badges',
+        'emits GamificationLoaded with zero xp, level 1, 29 badges',
         build: GamificationBloc.new,
         act: (bloc) => bloc.add(const GamificationStarted()),
         expect: () => [
@@ -23,7 +23,7 @@ void main() {
               .having((s) => s.xp, 'xp', 0)
               .having((s) => s.level, 'level', 1)
               .having((s) => s.streak, 'streak', 0)
-              .having((s) => s.badges.length, 'badges', 25)
+              .having((s) => s.badges.length, 'badges', 29)
               .having((s) => s.unlockedCount, 'unlockedCount', 0),
         ],
       );
@@ -234,14 +234,14 @@ void main() {
     // ── Badge catalogue completeness ────────────────────────────────────────
     group('Badge catalogue', () {
       blocTest<GamificationBloc, GamificationState>(
-        'contains exactly 25 badges with unique ids',
+        'contains exactly 29 badges with unique ids',
         build: GamificationBloc.new,
         act: (bloc) => bloc.add(const GamificationStarted()),
         expect: () => [
           isA<GamificationLoaded>().having(
             (s) => s.badges.map((b) => b.id).toSet().length,
-            '25 unique ids',
-            25,
+            '29 unique ids',
+            29,
           ),
         ],
       );
