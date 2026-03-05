@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 73 &nbsp;|&nbsp; 🔴 مفتوحة: 44 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 74 &nbsp;|&nbsp; 🔴 مفتوحة: 43 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -240,7 +240,7 @@
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | ✅ | ~~Android AutofillService implementation~~ | `cipherowl-26b` | P1 · عالي |
-| 🟠 | iOS AutoFill Credential Provider extension | `cipherowl-yqj` | P1 · عالي |
+| ✅ | ~~iOS AutoFill Credential Provider extension~~ | `cipherowl-yqj` | P1 · عالي |
 | ⬜ | Browser extension autofill Phase 2 | `cipherowl-x0y` | P3 · منخفض |
 
 ---

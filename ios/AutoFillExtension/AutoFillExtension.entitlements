@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+  <!--
+    App Groups: shared container between the main CipherOwl app and this AutoFill
+    extension. Both read/write cipher_owl_autofill_cache from
+    UserDefaults(suiteName: "group.com.cipherowl.cipherowl").
+  -->
+  <key>com.apple.security.application-groups</key>
+  <array>
+    <string>group.com.cipherowl.cipherowl</string>
+  </array>
+
+</dict>
+</plist>
