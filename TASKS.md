@@ -265,15 +265,15 @@
 
 | | |
 |---|---|
-| 🔵 | `cipherowl-6cs` |
+| ✅ | `cipherowl-6cs` |
 | **الأولوية** | P2 · متوسط |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
+| **التقدم** | ████████████████████ 3/3 ✅ |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔵 | Configure Firebase project and config files | `cipherowl-wnk` | P2 · متوسط |
-| 🔵 | Implement push notifications for security alerts | `cipherowl-6mm` | P2 · متوسط |
-| 🔵 | Implement in-app notification center | `cipherowl-2p5` | P2 · متوسط |
+| ✅ | ~~Configure Firebase project and config files~~ | `cipherowl-wnk` | P2 · متوسط |
+| ✅ | ~~Implement push notifications for security alerts~~ | `cipherowl-6mm` | P2 · متوسط |
+| ✅ | ~~Implement in-app notification center~~ | `cipherowl-2p5` | P2 · متوسط |
 
 ---
 

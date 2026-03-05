@@ -146,4 +146,5 @@ abstract class AppConstants {
   static const String routeSsoSettings      = '/enterprise/sso';
   static const String routeImportExport     = '/import-export';
   static const String routeFido2Manage      = '/fido2-manage';
+  static const String routeNotifications    = '/notifications';
 }

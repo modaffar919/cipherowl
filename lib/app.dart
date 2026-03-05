@@ -19,29 +19,69 @@ import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
 import 'features/enterprise/data/repositories/org_repository.dart';
 import 'features/enterprise/presentation/bloc/org_bloc.dart';
+import 'features/notifications/data/repositories/notification_repository.dart';
+import 'features/notifications/data/services/fcm_service.dart';
+import 'features/notifications/presentation/bloc/notification_bloc.dart';
+import 'features/notifications/presentation/bloc/notification_event.dart';
 import 'core/supabase/supabase_client_provider.dart';
 
-class CipherOwlApp extends StatelessWidget {
+class CipherOwlApp extends StatefulWidget {
   final SmartVaultDatabase db;
   const CipherOwlApp({super.key, required this.db});
 
   @override
-  Widget build(BuildContext context) {
-    // db is already created and encrypted — passed from main().
-    final vaultRepo = VaultRepository(db);
-    final vaultCrypto = VaultCryptoService();
-    final browserSync = BrowserAutofillSyncService();
-    final settingsRepo = SettingsRepository(db);
-    final orgRepo = OrgRepository(SupabaseClientProvider.client);
+  State<CipherOwlApp> createState() => _CipherOwlAppState();
+}
 
+class _CipherOwlAppState extends State<CipherOwlApp> {
+  // ── Repositories & Services ───────────────────────────────────────────────
+  late final VaultRepository _vaultRepo;
+  late final VaultCryptoService _vaultCrypto;
+  late final BrowserAutofillSyncService _browserSync;
+  late final SettingsRepository _settingsRepo;
+  late final OrgRepository _orgRepo;
+  late final NotificationRepository _notifRepo;
+
+  // ── BLoCs ─────────────────────────────────────────────────────────────────
+  late final NotificationBloc _notifBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _vaultRepo    = VaultRepository(widget.db);
+    _vaultCrypto  = VaultCryptoService();
+    _browserSync  = BrowserAutofillSyncService();
+    _settingsRepo = SettingsRepository(widget.db);
+    _orgRepo      = OrgRepository(SupabaseClientProvider.client);
+    _notifRepo    = NotificationRepository();
+
+    _notifBloc = NotificationBloc(_notifRepo)
+      ..add(const NotificationsLoadRequested());
+
+    // FCM: store incoming messages in repo and forward to BLoC.
+    FcmService.instance.onNotificationReceived =
+        (n) => _notifBloc.add(NotificationReceived(n));
+    // ignore: discarded_futures
+    FcmService.instance.init(_notifRepo);
+  }
+
+  @override
+  void dispose() {
+    _notifBloc.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<SmartVaultDatabase>.value(value: db),
-        RepositoryProvider<VaultRepository>.value(value: vaultRepo),
-        RepositoryProvider<VaultCryptoService>.value(value: vaultCrypto),
-        RepositoryProvider<BrowserAutofillSyncService>.value(value: browserSync),
-        RepositoryProvider<SettingsRepository>.value(value: settingsRepo),
-        RepositoryProvider<OrgRepository>.value(value: orgRepo),
+        RepositoryProvider<SmartVaultDatabase>.value(value: widget.db),
+        RepositoryProvider<VaultRepository>.value(value: _vaultRepo),
+        RepositoryProvider<VaultCryptoService>.value(value: _vaultCrypto),
+        RepositoryProvider<BrowserAutofillSyncService>.value(value: _browserSync),
+        RepositoryProvider<SettingsRepository>.value(value: _settingsRepo),
+        RepositoryProvider<OrgRepository>.value(value: _orgRepo),
+        RepositoryProvider<NotificationRepository>.value(value: _notifRepo),
       ],
       child: MultiBlocProvider(
       providers: [
@@ -53,14 +93,14 @@ class CipherOwlApp extends StatelessWidget {
         ),
         BlocProvider<VaultBloc>(
           create: (_) => VaultBloc(
-            repository: vaultRepo,
-            cryptoService: vaultCrypto,
-            browserSyncService: browserSync,
+            repository: _vaultRepo,
+            cryptoService: _vaultCrypto,
+            browserSyncService: _browserSync,
           ),
           lazy: true,
         ),
         BlocProvider<SettingsBloc>(
-          create: (_) => SettingsBloc(repository: settingsRepo)
+          create: (_) => SettingsBloc(repository: _settingsRepo)
             ..add(const SettingsStarted()),
           lazy: false,
         ),
@@ -73,9 +113,10 @@ class CipherOwlApp extends StatelessWidget {
           lazy: false,
         ),
         BlocProvider<OrgBloc>(
-          create: (_) => OrgBloc(orgRepo),
+          create: (_) => OrgBloc(_orgRepo),
           lazy: true,
         ),
+        BlocProvider<NotificationBloc>.value(value: _notifBloc),
       ],
       child: ScreenUtilInit(
       designSize: const Size(390, 844), // iPhone 14 base

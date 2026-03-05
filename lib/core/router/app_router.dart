@@ -20,6 +20,7 @@ import '../../features/enterprise/presentation/screens/enterprise_screen.dart';
 import '../../features/enterprise/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/enterprise/presentation/screens/sso_settings_screen.dart';
 import '../../features/auth/presentation/screens/fido2_management_screen.dart';
+import '../../features/notifications/presentation/screens/notification_center_screen.dart';
 import '../constants/app_constants.dart';
 
 // ── Transition helpers ───────────────────────────────────────────────────────
@@ -228,7 +229,12 @@ abstract class AppRouter {
         pageBuilder: (context, state) =>
             _slideRight(state, const ImportExportScreen()),
       ),
-    ],
+      // ── Notification Centre ──────────────────────────────
+      GoRoute(
+        path: AppConstants.routeNotifications,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const NotificationCenterScreen()),
+      ),    ],
 
     // ── Error handler ────────────────────────────────────
     errorBuilder: (context, state) => const _ErrorScreen(),

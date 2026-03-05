@@ -7,6 +7,8 @@ import 'app.dart';
 import 'core/constants/app_constants.dart';
 import 'core/database/database_key_service.dart';
 import 'core/database/smartvault_database.dart';
+import 'core/firebase/firebase_service.dart';
+import 'features/notifications/data/services/fcm_service.dart';
 import 'src/rust/frb_generated.dart';
 
 void main() async {
@@ -14,6 +16,10 @@ void main() async {
 
   // ── Rust FFI init (must be first) ──────────────────────
   await RustLib.init();
+
+  // ── Firebase init (optional — continues on failure) ─────
+  await FirebaseService.init();
+  await LocalNotificationService.instance.init();
 
   // ── Lock orientation to portrait on mobile ──────────────
   await SystemChrome.setPreferredOrientations([

@@ -57,8 +57,10 @@ dependencies:
   url_launcher: ^6.3.1
 
   # ── Notifications ────────────────────────────────────────
+  firebase_core: ^4.5.0
   firebase_messaging: ^16.1.2
   flutter_local_notifications: ^20.1.0
+  shared_preferences: ^2.3.3
 
   # ── UI Utilities ─────────────────────────────────────────
   cached_network_image: ^3.4.1
