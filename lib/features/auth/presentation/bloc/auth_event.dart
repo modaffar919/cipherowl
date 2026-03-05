@@ -44,3 +44,18 @@ class AuthVaultLocked extends AuthEvent {
 class AuthErrorDismissed extends AuthEvent {
   const AuthErrorDismissed();
 }
+
+/// User tapped the FIDO2 hardware key button on lock screen
+class AuthFido2Requested extends AuthEvent {
+  const AuthFido2Requested();
+}
+
+/// Save (or clear) the duress password from Settings
+class AuthDuressPasswordSet extends AuthEvent {
+  /// null = clear the duress password
+  final String? password;
+  const AuthDuressPasswordSet(this.password);
+
+  @override
+  List<Object?> get props => [password];
+}

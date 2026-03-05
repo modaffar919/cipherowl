@@ -2,19 +2,26 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/repositories/auth_repository.dart';
+import '../../data/services/intruder_snapshot_service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final IntruderSnapshotService _snapshotService;
 
-  AuthBloc({AuthRepository? authRepository})
-      : _authRepository = authRepository ?? AuthRepository(),
+  AuthBloc({
+    AuthRepository? authRepository,
+    IntruderSnapshotService? snapshotService,
+  })  : _authRepository = authRepository ?? AuthRepository(),
+        _snapshotService = snapshotService ?? IntruderSnapshotService(),
         super(const AuthInitial()) {
     on<AuthAppStarted>(_onAppStarted);
     on<AuthMasterPasswordSubmitted>(_onMasterPasswordSubmitted);
     on<AuthBiometricRequested>(_onBiometricRequested);
+    on<AuthFido2Requested>(_onFido2Requested);
+    on<AuthDuressPasswordSet>(_onDuressPasswordSet);
     on<AuthSetupCompleted>(_onSetupCompleted);
     on<AuthVaultLocked>(_onVaultLocked);
     on<AuthErrorDismissed>(_onErrorDismissed);
@@ -55,7 +62,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         case VerifyStatus.success:
           emit(const AuthAuthenticated());
 
+        case VerifyStatus.duress:
+          // Duress password — open decoy (empty) vault, don't reveal real data
+          emit(const AuthDuressAuthenticated());
+
         case VerifyStatus.failed:
+          // Trigger intruder snapshot if threshold reached
+          if (result.shouldCaptureSnapshot) {
+            _snapshotService.captureAsync();
+          }
           emit(AuthFailed(
             message: result.remainingAttempts > 0
                 ? 'كلمة المرور غير صحيحة — تبقى ${result.remainingAttempts} محاولة'
@@ -106,6 +121,46 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } catch (e) {
       emit(AuthBiometricUnavailable('خطأ في البصمة: ${e.toString()}'));
+    }
+  }
+
+  // ── FIDO2 ──────────────────────────────────────────────
+
+  Future<void> _onFido2Requested(
+    AuthFido2Requested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthFido2InProgress());
+
+    try {
+      final result = await _authRepository.authenticateWithFido2();
+
+      switch (result.status) {
+        case Fido2AuthStatus.success:
+          emit(const AuthAuthenticated());
+
+        case Fido2AuthStatus.noCredentials:
+          emit(AuthFido2Error(result.message ?? 'لا توجد مفاتيح مسجّلة'));
+
+        case Fido2AuthStatus.failed:
+        case Fido2AuthStatus.error:
+          emit(AuthFido2Error(result.message ?? 'فشل التحقق بمفتاح FIDO2'));
+      }
+    } catch (e) {
+      emit(AuthFido2Error('خطأ: ${e.toString()}'));
+    }
+  }
+
+  // ── Duress Password ────────────────────────────────────
+
+  Future<void> _onDuressPasswordSet(
+    AuthDuressPasswordSet event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      await _authRepository.saveDuressPassword(event.password);
+    } catch (_) {
+      // Non-critical — silently ignore
     }
   }
 

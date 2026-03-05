@@ -30,9 +30,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
   void initState() {
     super.initState();
     final authState = context.read<AuthBloc>().state;
-    final userId =
-        authState is AuthAuthenticated ? authState.userId : 'local_user';
-    context.read<VaultBloc>().add(VaultStarted(userId));
+    if (authState is AuthDuressAuthenticated) {
+      context.read<VaultBloc>().add(const VaultDuressActivated());
+    } else {
+      final userId =
+          authState is AuthAuthenticated ? authState.userId : 'local_user';
+      context.read<VaultBloc>().add(VaultStarted(userId));
+    }
   }
 
   @override

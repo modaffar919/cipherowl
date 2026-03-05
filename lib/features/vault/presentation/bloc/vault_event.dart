@@ -71,3 +71,9 @@ class VaultItemsImported extends VaultEvent {
   final List<VaultEntry> entries;
   const VaultItemsImported(this.entries);
 }
+
+/// Activated when the user logged in with the duress (decoy) password.
+/// The vault will show an empty list instead of real items.
+class VaultDuressActivated extends VaultEvent {
+  const VaultDuressActivated();
+}

@@ -3,16 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:cipherowl/features/auth/data/repositories/auth_repository.dart';
+import 'package:cipherowl/features/auth/data/services/intruder_snapshot_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 class MockAuthRepository extends Mock implements AuthRepository {}
+class MockIntruderSnapshotService extends Mock implements IntruderSnapshotService {}
 
 void main() {
   late MockAuthRepository mockRepo;
+  late MockIntruderSnapshotService mockSnapshotService;
 
   setUp(() {
     mockRepo = MockAuthRepository();
+    mockSnapshotService = MockIntruderSnapshotService();
   });
 
   group('AuthBloc', () {
@@ -205,6 +209,138 @@ void main() {
         build: () => AuthBloc(authRepository: mockRepo),
         act: (bloc) => bloc.add(const AuthErrorDismissed()),
         expect: () => const [AuthLocked()],
+      );
+    });
+
+    // ── AuthFido2Requested ─────────────────────────────────────────────────
+    group('AuthFido2Requested', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFido2InProgress, AuthAuthenticated] on success',
+        build: () {
+          when(() => mockRepo.authenticateWithFido2())
+              .thenAnswer((_) async =>
+                  Fido2AuthResult.success(credentialId: 'cred-1'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthFido2Requested()),
+        expect: () => const [AuthFido2InProgress(), AuthAuthenticated()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFido2InProgress, AuthFido2Error] when no credentials',
+        build: () {
+          when(() => mockRepo.authenticateWithFido2())
+              .thenAnswer((_) async => Fido2AuthResult.noCredentials());
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthFido2Requested()),
+        expect: () => [
+          const AuthFido2InProgress(),
+          isA<AuthFido2Error>(),
+        ],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFido2InProgress, AuthFido2Error] on failed verification',
+        build: () {
+          when(() => mockRepo.authenticateWithFido2())
+              .thenAnswer((_) async => Fido2AuthResult.failed('التحقق فشل'));
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthFido2Requested()),
+        expect: () => [
+          const AuthFido2InProgress(),
+          isA<AuthFido2Error>()
+              .having((s) => s.message, 'message', 'التحقق فشل'),
+        ],
+      );
+    });
+
+    // ── Duress authentication ──────────────────────────────────────────────
+    group('Duress authentication', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthUnlocking, AuthDuressAuthenticated] on duress password',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenAnswer((_) async => VerifyResult.duress());
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) =>
+            bloc.add(const AuthMasterPasswordSubmitted('duress123')),
+        expect: () => const [AuthUnlocking(), AuthDuressAuthenticated()],
+      );
+    });
+
+    // ── AuthDuressPasswordSet ──────────────────────────────────────────────
+    group('AuthDuressPasswordSet', () {
+      blocTest<AuthBloc, AuthState>(
+        'calls saveDuressPassword with provided password (no state changes)',
+        build: () {
+          when(() => mockRepo.saveDuressPassword(any()))
+              .thenAnswer((_) async {});
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthDuressPasswordSet('secret')),
+        expect: () => const <AuthState>[],
+        verify: (_) =>
+            verify(() => mockRepo.saveDuressPassword('secret')).called(1),
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'calls saveDuressPassword with null to clear',
+        build: () {
+          when(() => mockRepo.saveDuressPassword(any()))
+              .thenAnswer((_) async {});
+          return AuthBloc(authRepository: mockRepo);
+        },
+        act: (bloc) => bloc.add(const AuthDuressPasswordSet(null)),
+        expect: () => const <AuthState>[],
+        verify: (_) =>
+            verify(() => mockRepo.saveDuressPassword(null)).called(1),
+      );
+    });
+
+    // ── Intruder snapshot ──────────────────────────────────────────────────
+    group('Intruder snapshot', () {
+      blocTest<AuthBloc, AuthState>(
+        'calls captureAsync when shouldCaptureSnapshot is true',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenAnswer((_) async => VerifyResult.failed(
+                    attempts: 3,
+                    remainingAttempts: 2,
+                    shouldCaptureSnapshot: true,
+                  ));
+          when(() => mockSnapshotService.captureAsync()).thenReturn(null);
+          return AuthBloc(
+            authRepository: mockRepo,
+            snapshotService: mockSnapshotService,
+          );
+        },
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
+        expect: () => [const AuthUnlocking(), isA<AuthFailed>()],
+        verify: (_) =>
+            verify(() => mockSnapshotService.captureAsync()).called(1),
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'does NOT call captureAsync when shouldCaptureSnapshot is false',
+        build: () {
+          when(() => mockRepo.verifyMasterPassword(any()))
+              .thenAnswer((_) async => VerifyResult.failed(
+                    attempts: 1,
+                    remainingAttempts: 4,
+                    shouldCaptureSnapshot: false,
+                  ));
+          return AuthBloc(
+            authRepository: mockRepo,
+            snapshotService: mockSnapshotService,
+          );
+        },
+        act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
+        expect: () => [const AuthUnlocking(), isA<AuthFailed>()],
+        verify: (_) =>
+            verifyNever(() => mockSnapshotService.captureAsync()),
       );
     });
   });

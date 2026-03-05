@@ -171,6 +171,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: '����� ���� �����',
                   onTap: () => context.go(AppConstants.routeFaceSetup),
                 ),
+                _ActionCard(
+                  icon: Icons.key,
+                  iconColor: AppConstants.primaryCyan,
+                  title: '������ FIDO2 / Passkeys',
+                  subtitle: '��� ����� ���� ���',
+                  onTap: () => context.go(AppConstants.routeFido2Manage),
+                ),
+                _ActionCard(
+                  icon: Icons.warning_amber_rounded,
+                  iconColor: AppConstants.errorRed,
+                  title: '���� ����� ������',
+                  subtitle: '���� ���������� ������ ������',
+                  onTap: _showDuressPasswordDialog,
+                ),
 
                 const SizedBox(height: 16),
 
@@ -250,6 +264,87 @@ class _SettingsScreenState extends State<SettingsScreen> {
               )),
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  // Duress password dialog — prompts for new password (empty = clear)
+  void _showDuressPasswordDialog() {
+    final ctrl = TextEditingController();
+    bool obscure = true;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocalState) => AlertDialog(
+          backgroundColor: AppConstants.surfaceDark,
+          title: const Text('كلمة مرور الإكراه',
+              style: TextStyle(color: Colors.white)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'عند إدخال هذه الكلمة، يُفتح قبو وهمي فارغ دون تنبيه '
+                'المهاجم. اتركها فارغة لإزالة الإعداد.',
+                style: TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: ctrl,
+                obscureText: obscure,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'كلمة مرور الإكراه (أو فارغة للإزالة)',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: AppConstants.cardDark,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscure ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white38,
+                      size: 18,
+                    ),
+                    onPressed: () => setLocalState(() => obscure = !obscure),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إلغاء',
+                  style: TextStyle(color: Colors.white60)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppConstants.primaryCyan,
+                  foregroundColor: Colors.black),
+              onPressed: () {
+                final pw = ctrl.text.trim();
+                context.read<AuthBloc>().add(
+                  AuthDuressPasswordSet(pw.isEmpty ? null : pw),
+                );
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(pw.isEmpty
+                        ? 'تم إزالة كلمة مرور الإكراه'
+                        : 'تم حفظ كلمة مرور الإكراه'),
+                    backgroundColor: AppConstants.successGreen,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 66 &nbsp;|&nbsp; 🔴 مفتوحة: 51 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 69 &nbsp;|&nbsp; 🔴 مفتوحة: 48 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -173,9 +173,9 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔵 | Implement intruder snapshot on 3 failed attempts | `cipherowl-div` | P2 · متوسط |
-| 🔵 | Implement duress password with fake vault | `cipherowl-dq0` | P2 · متوسط |
-| 🔵 | Implement FIDO2 WebAuthn authentication flow | `cipherowl-b7k` | P2 · متوسط |
+| ✅ | ~~Implement intruder snapshot on 3 failed attempts~~ | `cipherowl-div` | P2 · متوسط |
+| ✅ | ~~Implement duress password with fake vault~~ | `cipherowl-dq0` | P2 · متوسط |
+| ✅ | ~~Implement FIDO2 WebAuthn authentication flow~~ | `cipherowl-b7k` | P2 · متوسط |
 
 ---
 

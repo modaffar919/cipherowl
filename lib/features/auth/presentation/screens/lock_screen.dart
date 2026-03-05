@@ -63,11 +63,19 @@ class _LockScreenState extends State<LockScreen>
     context.read<AuthBloc>().add(const AuthBiometricRequested());
   }
 
+  void _fido2Unlock() {
+    context.read<AuthBloc>().add(const AuthFido2Requested());
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
+          _passwordController.clear();
+          context.go(AppConstants.routeDashboard);
+        } else if (state is AuthDuressAuthenticated) {
+          // Duress password — navigate to dashboard, VaultBloc will serve empty vault
           _passwordController.clear();
           context.go(AppConstants.routeDashboard);
         } else if (state is AuthFailed) {
@@ -77,13 +85,21 @@ class _LockScreenState extends State<LockScreen>
           HapticFeedback.heavyImpact();
         } else if (state is AuthFirstTimeSetup) {
           context.go(AppConstants.routeSetup);
+        } else if (state is AuthFido2Error) {
+          HapticFeedback.mediumImpact();
         }
       },
       builder: (context, state) {
-        final isLoading = state is AuthUnlocking || state is AuthBiometricInProgress;
-        final hasError = state is AuthFailed;
+        final isLoading = state is AuthUnlocking
+            || state is AuthBiometricInProgress
+            || state is AuthFido2InProgress;
+        final hasError = state is AuthFailed || state is AuthFido2Error;
         final isBlocked = state is AuthBlocked;
-        final errorMessage = state is AuthFailed ? state.message : null;
+        final errorMessage = state is AuthFailed
+            ? state.message
+            : state is AuthFido2Error
+                ? state.message
+                : null;
 
         return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
@@ -324,9 +340,7 @@ class _LockScreenState extends State<LockScreen>
               labelAr: 'المفتاح',
               labelEn: 'Key',
               color: AppConstants.accentGold,
-              onTap: () {
-                // TODO: FIDO2 unlock
-              },
+              onTap: _fido2Unlock,
             ),
           ],
         ),

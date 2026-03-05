@@ -143,4 +143,5 @@ abstract class AppConstants {
   static const String routeSharing       = '/sharing';
   static const String routeEnterprise    = '/enterprise';
   static const String routeImportExport  = '/import-export';
+  static const String routeFido2Manage   = '/fido2-manage';
 }

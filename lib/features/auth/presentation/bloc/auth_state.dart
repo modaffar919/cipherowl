@@ -79,3 +79,22 @@ class AuthBiometricUnavailable extends AuthState {
   @override
   List<Object?> get props => [reason];
 }
+
+/// FIDO2 key authentication in progress
+class AuthFido2InProgress extends AuthState {
+  const AuthFido2InProgress();
+}
+
+/// FIDO2 auth failed or no credentials registered
+class AuthFido2Error extends AuthState {
+  final String message;
+  const AuthFido2Error(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Vault opened with the duress (decoy) password — show empty vault
+class AuthDuressAuthenticated extends AuthState {
+  const AuthDuressAuthenticated();
+}

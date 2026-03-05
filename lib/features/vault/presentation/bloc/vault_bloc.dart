@@ -32,6 +32,7 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
     on<VaultRefreshRequested>(_onRefreshRequested);
     on<VaultMessageDismissed>(_onMessageDismissed);
     on<VaultItemsImported>(_onItemsImported);
+    on<VaultDuressActivated>(_onDuressActivated);
   }
 
   // ── Event handlers ───────────────────────────────────────────────────────
@@ -223,6 +224,19 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────
+
+  /// Duress mode: cancel the real DB subscription and serve an empty vault.
+  Future<void> _onDuressActivated(
+      VaultDuressActivated event, Emitter<VaultState> emit) async {
+    await _itemsSub?.cancel();
+    _itemsSub = null;
+    // Emit an empty loaded state — the UI sees zero items
+    emit(const VaultLoaded(
+      allItems: [],
+      searchQuery: '',
+      categoryFilter: null,
+    ));
+  }
 
   @override
   Future<void> close() async {
