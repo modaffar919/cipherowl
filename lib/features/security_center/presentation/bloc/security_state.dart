@@ -38,6 +38,12 @@ class SecurityLoaded extends SecurityState {
   /// Number of items not updated in 90+ days.
   final int stalePasswordCount;
 
+  /// IDs of recommendations the user has already completed this session.
+  final Set<String> completedRecommendationIds;
+
+  /// Cumulative XP earned from completing recommendations this session.
+  final int sessionXpEarned;
+
   const SecurityLoaded({
     required this.score,
     required this.grade,
@@ -47,7 +53,29 @@ class SecurityLoaded extends SecurityState {
     required this.weakPasswordCount,
     required this.noTotpCount,
     required this.stalePasswordCount,
+    this.completedRecommendationIds = const {},
+    this.sessionXpEarned = 0,
   });
+
+  /// Returns a copy of this state with [recommendationId] removed and XP added.
+  SecurityLoaded withCompleted(String recommendationId, int xp) {
+    final newCompleted = {...completedRecommendationIds, recommendationId};
+    final newRecs = recommendations
+        .where((r) => !newCompleted.contains(r.id))
+        .toList();
+    return SecurityLoaded(
+      score: score,
+      grade: grade,
+      gradeColor: gradeColor,
+      layers: layers,
+      recommendations: newRecs,
+      weakPasswordCount: weakPasswordCount,
+      noTotpCount: noTotpCount,
+      stalePasswordCount: stalePasswordCount,
+      completedRecommendationIds: newCompleted,
+      sessionXpEarned: sessionXpEarned + xp,
+    );
+  }
 }
 
 /// One security ring / layer in the shield visualisation.
@@ -69,6 +97,8 @@ class SecurityLayer {
 
 /// A single actionable recommendation card.
 class SecurityRecommendation {
+  /// Stable identifier used to track completions (e.g. 'weak_passwords').
+  final String id;
   final String titleAr;
   final String bodyAr;
   final int xpReward;
@@ -76,6 +106,7 @@ class SecurityRecommendation {
   final int colorValue;
 
   const SecurityRecommendation({
+    required this.id,
     required this.titleAr,
     required this.bodyAr,
     required this.xpReward,

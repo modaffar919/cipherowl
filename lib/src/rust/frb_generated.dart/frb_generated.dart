@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -300425118;
+  int get rustContentHash => -1015979684;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -87,8 +87,38 @@ abstract class RustLibApi extends BaseApi {
   Future<Uint8List> crateApiApiDeriveKey(
       {required List<int> password, required List<int> salt});
 
+  Future<Uint8List> crateApiApiDeriveKeyPbkdf2(
+      {required List<int> password, required List<int> salt});
+
+  Uint8List crateApiApiDeriveX25519SharedSecret(
+      {required List<int> privateKey, required List<int> peerPublicKey});
+
+  Uint8List crateApiApiEd25519GenerateSigningKey();
+
+  Uint8List crateApiApiEd25519GetVerifyingKey({required List<int> signingKey});
+
+  Uint8List crateApiApiEd25519Sign(
+      {required List<int> message, required List<int> signingKey});
+
+  bool crateApiApiEd25519Verify(
+      {required List<int> message,
+      required List<int> signature,
+      required List<int> verifyingKey});
+
   Uint8List crateApiApiEncrypt(
       {required List<int> plaintext, required List<int> key});
+
+  double crateApiApiFaceCosineSimilarity(
+      {required List<double> a, required List<double> b});
+
+  (BigInt, double)? crateApiApiFaceFindBestMatch(
+      {required List<double> probe, required List<Float32List> stored});
+
+  bool crateApiApiFaceIsSamePerson(
+      {required List<double> a, required List<double> b, double? threshold});
+
+  Float32List crateApiApiFaceNormalizeEmbedding(
+      {required List<double> embeddingVec});
 
   Uint8List crateApiApiGenerateKey();
 
@@ -96,7 +126,30 @@ abstract class RustLibApi extends BaseApi {
 
   String crateApiApiGeneratePassword({required ApiGeneratorConfig config});
 
+  Uint8List crateApiApiGenerateX25519PrivateKey();
+
+  Uint8List crateApiApiGetX25519PublicKey({required List<int> privateKey});
+
   Future<String> crateApiApiHashPassword({required String password});
+
+  Uint8List crateApiApiSharingDecrypt(
+      {required List<int> shareBytes, required List<int> recipientPrivateKey});
+
+  Uint8List crateApiApiSharingEncrypt(
+      {required List<int> plaintext, required List<int> recipientPublicKey});
+
+  String crateApiApiTotpGenerate(
+      {required String secretBase32, required BigInt timestampSecs});
+
+  String crateApiApiTotpGenerateCustom(
+      {required String secretBase32,
+      required BigInt timestampSecs,
+      required int digits,
+      required BigInt period});
+
+  BigInt crateApiApiTotpTimeRemaining({required BigInt timestampSecs});
+
+  BigInt crateApiApiTotpTimeStep({required BigInt timestampSecs});
 
   Future<bool> crateApiApiVerifyPassword(
       {required String password, required String hash});
@@ -164,6 +217,158 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Uint8List> crateApiApiDeriveKeyPbkdf2(
+      {required List<int> password, required List<int> salt}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(password, serializer);
+        sse_encode_list_prim_u_8_loose(salt, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 3, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiApiDeriveKeyPbkdf2ConstMeta,
+      argValues: [password, salt],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiDeriveKeyPbkdf2ConstMeta => const TaskConstMeta(
+        debugName: "api_derive_key_pbkdf2",
+        argNames: ["password", "salt"],
+      );
+
+  @override
+  Uint8List crateApiApiDeriveX25519SharedSecret(
+      {required List<int> privateKey, required List<int> peerPublicKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(privateKey, serializer);
+        sse_encode_list_prim_u_8_loose(peerPublicKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiDeriveX25519SharedSecretConstMeta,
+      argValues: [privateKey, peerPublicKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiDeriveX25519SharedSecretConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_derive_x25519_shared_secret",
+        argNames: ["privateKey", "peerPublicKey"],
+      );
+
+  @override
+  Uint8List crateApiApiEd25519GenerateSigningKey() {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiApiEd25519GenerateSigningKeyConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiEd25519GenerateSigningKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_ed25519_generate_signing_key",
+        argNames: [],
+      );
+
+  @override
+  Uint8List crateApiApiEd25519GetVerifyingKey({required List<int> signingKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(signingKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiEd25519GetVerifyingKeyConstMeta,
+      argValues: [signingKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiEd25519GetVerifyingKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_ed25519_get_verifying_key",
+        argNames: ["signingKey"],
+      );
+
+  @override
+  Uint8List crateApiApiEd25519Sign(
+      {required List<int> message, required List<int> signingKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(message, serializer);
+        sse_encode_list_prim_u_8_loose(signingKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiEd25519SignConstMeta,
+      argValues: [message, signingKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiEd25519SignConstMeta => const TaskConstMeta(
+        debugName: "api_ed25519_sign",
+        argNames: ["message", "signingKey"],
+      );
+
+  @override
+  bool crateApiApiEd25519Verify(
+      {required List<int> message,
+      required List<int> signature,
+      required List<int> verifyingKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(message, serializer);
+        sse_encode_list_prim_u_8_loose(signature, serializer);
+        sse_encode_list_prim_u_8_loose(verifyingKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiEd25519VerifyConstMeta,
+      argValues: [message, signature, verifyingKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiEd25519VerifyConstMeta => const TaskConstMeta(
+        debugName: "api_ed25519_verify",
+        argNames: ["message", "signature", "verifyingKey"],
+      );
+
+  @override
   Uint8List crateApiApiEncrypt(
       {required List<int> plaintext, required List<int> key}) {
     return handler.executeSync(SyncTask(
@@ -171,7 +376,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_prim_u_8_loose(plaintext, serializer);
         sse_encode_list_prim_u_8_loose(key, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -189,11 +394,115 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  double crateApiApiFaceCosineSimilarity(
+      {required List<double> a, required List<double> b}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_f_32_loose(a, serializer);
+        sse_encode_list_prim_f_32_loose(b, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_f_32,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiFaceCosineSimilarityConstMeta,
+      argValues: [a, b],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiFaceCosineSimilarityConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_face_cosine_similarity",
+        argNames: ["a", "b"],
+      );
+
+  @override
+  (BigInt, double)? crateApiApiFaceFindBestMatch(
+      {required List<double> probe, required List<Float32List> stored}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_f_32_loose(probe, serializer);
+        sse_encode_list_list_prim_f_32_strict(stored, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_record_usize_f_32,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiFaceFindBestMatchConstMeta,
+      argValues: [probe, stored],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiFaceFindBestMatchConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_face_find_best_match",
+        argNames: ["probe", "stored"],
+      );
+
+  @override
+  bool crateApiApiFaceIsSamePerson(
+      {required List<double> a, required List<double> b, double? threshold}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_f_32_loose(a, serializer);
+        sse_encode_list_prim_f_32_loose(b, serializer);
+        sse_encode_opt_box_autoadd_f_32(threshold, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiFaceIsSamePersonConstMeta,
+      argValues: [a, b, threshold],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiFaceIsSamePersonConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_face_is_same_person",
+        argNames: ["a", "b", "threshold"],
+      );
+
+  @override
+  Float32List crateApiApiFaceNormalizeEmbedding(
+      {required List<double> embeddingVec}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_f_32_loose(embeddingVec, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_f_32_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiFaceNormalizeEmbeddingConstMeta,
+      argValues: [embeddingVec],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiFaceNormalizeEmbeddingConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_face_normalize_embedding",
+        argNames: ["embeddingVec"],
+      );
+
+  @override
   Uint8List crateApiApiGenerateKey() {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -215,7 +524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -238,7 +547,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_api_generator_config(config, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -257,13 +566,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Uint8List crateApiApiGenerateX25519PrivateKey() {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiApiGenerateX25519PrivateKeyConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiGenerateX25519PrivateKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_generate_x25519_private_key",
+        argNames: [],
+      );
+
+  @override
+  Uint8List crateApiApiGetX25519PublicKey({required List<int> privateKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(privateKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiGetX25519PublicKeyConstMeta,
+      argValues: [privateKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiGetX25519PublicKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_get_x25519_public_key",
+        argNames: ["privateKey"],
+      );
+
+  @override
   Future<String> crateApiApiHashPassword({required String password}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(password, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 19, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -281,6 +637,159 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Uint8List crateApiApiSharingDecrypt(
+      {required List<int> shareBytes, required List<int> recipientPrivateKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(shareBytes, serializer);
+        sse_encode_list_prim_u_8_loose(recipientPrivateKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiSharingDecryptConstMeta,
+      argValues: [shareBytes, recipientPrivateKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiSharingDecryptConstMeta => const TaskConstMeta(
+        debugName: "api_sharing_decrypt",
+        argNames: ["shareBytes", "recipientPrivateKey"],
+      );
+
+  @override
+  Uint8List crateApiApiSharingEncrypt(
+      {required List<int> plaintext, required List<int> recipientPublicKey}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_prim_u_8_loose(plaintext, serializer);
+        sse_encode_list_prim_u_8_loose(recipientPublicKey, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiSharingEncryptConstMeta,
+      argValues: [plaintext, recipientPublicKey],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiSharingEncryptConstMeta => const TaskConstMeta(
+        debugName: "api_sharing_encrypt",
+        argNames: ["plaintext", "recipientPublicKey"],
+      );
+
+  @override
+  String crateApiApiTotpGenerate(
+      {required String secretBase32, required BigInt timestampSecs}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(secretBase32, serializer);
+        sse_encode_u_64(timestampSecs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiTotpGenerateConstMeta,
+      argValues: [secretBase32, timestampSecs],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiTotpGenerateConstMeta => const TaskConstMeta(
+        debugName: "api_totp_generate",
+        argNames: ["secretBase32", "timestampSecs"],
+      );
+
+  @override
+  String crateApiApiTotpGenerateCustom(
+      {required String secretBase32,
+      required BigInt timestampSecs,
+      required int digits,
+      required BigInt period}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(secretBase32, serializer);
+        sse_encode_u_64(timestampSecs, serializer);
+        sse_encode_u_32(digits, serializer);
+        sse_encode_u_64(period, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiApiTotpGenerateCustomConstMeta,
+      argValues: [secretBase32, timestampSecs, digits, period],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiTotpGenerateCustomConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_totp_generate_custom",
+        argNames: ["secretBase32", "timestampSecs", "digits", "period"],
+      );
+
+  @override
+  BigInt crateApiApiTotpTimeRemaining({required BigInt timestampSecs}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(timestampSecs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiApiTotpTimeRemainingConstMeta,
+      argValues: [timestampSecs],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiTotpTimeRemainingConstMeta =>
+      const TaskConstMeta(
+        debugName: "api_totp_time_remaining",
+        argNames: ["timestampSecs"],
+      );
+
+  @override
+  BigInt crateApiApiTotpTimeStep({required BigInt timestampSecs}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_64(timestampSecs, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiApiTotpTimeStepConstMeta,
+      argValues: [timestampSecs],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiApiTotpTimeStepConstMeta => const TaskConstMeta(
+        debugName: "api_totp_time_step",
+        argNames: ["timestampSecs"],
+      );
+
+  @override
   Future<bool> crateApiApiVerifyPassword(
       {required String password, required String hash}) {
     return handler.executeNormal(NormalTask(
@@ -289,7 +798,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(password, serializer);
         sse_encode_String(hash, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 26, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -312,7 +821,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 27, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -369,6 +878,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  double dco_decode_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  (BigInt, double) dco_decode_box_autoadd_record_usize_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as (BigInt, double);
+  }
+
+  @protected
+  double dco_decode_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  List<Float32List> dco_decode_list_list_prim_f_32_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_list_prim_f_32_strict)
+        .toList();
+  }
+
+  @protected
+  List<double> dco_decode_list_prim_f_32_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<double>;
+  }
+
+  @protected
+  Float32List dco_decode_list_prim_f_32_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Float32List;
+  }
+
+  @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as List<int>;
@@ -378,6 +925,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_32(raw);
+  }
+
+  @protected
+  (BigInt, double)? dco_decode_opt_box_autoadd_record_usize_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_record_usize_f_32(raw);
+  }
+
+  @protected
+  (BigInt, double) dco_decode_record_usize_f_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_usize(arr[0]),
+      dco_decode_f_32(arr[1]),
+    );
+  }
+
+  @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
   }
 
   @protected
@@ -443,6 +1027,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  double sse_decode_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_f_32(deserializer));
+  }
+
+  @protected
+  (BigInt, double) sse_decode_box_autoadd_record_usize_f_32(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_record_usize_f_32(deserializer));
+  }
+
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat32();
+  }
+
+  @protected
+  List<Float32List> sse_decode_list_list_prim_f_32_strict(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Float32List>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_prim_f_32_strict(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<double> sse_decode_list_prim_f_32_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getFloat32List(len_);
+  }
+
+  @protected
+  Float32List sse_decode_list_prim_f_32_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getFloat32List(len_);
+  }
+
+  @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -454,6 +1084,49 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  (BigInt, double)? sse_decode_opt_box_autoadd_record_usize_f_32(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_record_usize_f_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  (BigInt, double) sse_decode_record_usize_f_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
+    var var_field1 = sse_decode_f_32(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
+  }
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -517,6 +1190,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_32(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_record_usize_f_32(
+      (BigInt, double) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_record_usize_f_32(self, serializer);
+  }
+
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat32(self);
+  }
+
+  @protected
+  void sse_encode_list_list_prim_f_32_strict(
+      List<Float32List> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_prim_f_32_strict(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_f_32_loose(
+      List<double> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putFloat32List(
+        self is Float32List ? self : Float32List.fromList(self));
+  }
+
+  @protected
+  void sse_encode_list_prim_f_32_strict(
+      Float32List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putFloat32List(self);
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_loose(
       List<int> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -531,6 +1250,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_32(double? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_32(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_record_usize_f_32(
+      (BigInt, double)? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_record_usize_f_32(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_record_usize_f_32(
+      (BigInt, double) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
+    sse_encode_f_32(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
+  }
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
   }
 
   @protected

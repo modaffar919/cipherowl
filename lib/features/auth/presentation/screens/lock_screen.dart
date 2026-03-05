@@ -149,7 +149,7 @@ class _LockScreenState extends State<LockScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.primaryCyan.withOpacity(
+                    color: AppConstants.primaryCyan.withValues(alpha: 
                       0.05 + _glowController.value * 0.1,
                     ),
                     blurRadius: 40 + _glowController.value * 20,
@@ -224,9 +224,9 @@ class _LockScreenState extends State<LockScreen>
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.12),
+                color: Colors.red.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red.withOpacity(0.4)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
               ),
               child: Text(
                 blockedMsg,
@@ -376,7 +376,7 @@ class _AuthOptionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppConstants.surfaceDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +401,7 @@ class _OwlIconFallback extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3), width: 1),
+        border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.3), width: 1),
       ),
       child: const Center(
         child: Text('🦉', style: TextStyle(fontSize: 48)),
@@ -423,7 +423,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppConstants.primaryCyan.withOpacity(0.03)
+      ..color = AppConstants.primaryCyan.withValues(alpha: 0.03)
       ..strokeWidth = 1;
     const spacing = 32.0;
     for (double x = 0; x < size.width; x += spacing) {
@@ -436,4 +436,5 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
 }
+
 

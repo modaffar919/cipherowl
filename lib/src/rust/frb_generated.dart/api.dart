@@ -49,9 +49,150 @@ Future<bool> apiVerifyPassword(
     RustLib.instance.api
         .crateApiApiVerifyPassword(password: password, hash: hash);
 
+/// Generate a new X25519 private key (32 bytes).
+Uint8List apiGenerateX25519PrivateKey() =>
+    RustLib.instance.api.crateApiApiGenerateX25519PrivateKey();
+
+/// Get the X25519 public key for a given 32-byte private key.
+Uint8List apiGetX25519PublicKey({required List<int> privateKey}) =>
+    RustLib.instance.api.crateApiApiGetX25519PublicKey(privateKey: privateKey);
+
+/// Derive an X25519 shared secret from your private key and peer's public key.
+Uint8List apiDeriveX25519SharedSecret(
+        {required List<int> privateKey, required List<int> peerPublicKey}) =>
+    RustLib.instance.api.crateApiApiDeriveX25519SharedSecret(
+        privateKey: privateKey, peerPublicKey: peerPublicKey);
+
+/// Compute cosine similarity between two 128-dimensional face embeddings.
+/// Returns a score in [-1.0, 1.0]. Handles L2-normalisation internally.
+///
+/// Both `a` and `b` must be Vec<f32> of length 128 (MobileFaceNet output).
+double apiFaceCosineSimilarity(
+        {required List<double> a, required List<double> b}) =>
+    RustLib.instance.api.crateApiApiFaceCosineSimilarity(a: a, b: b);
+
+/// Returns `true` if the two face embeddings belong to the same person.
+///
+/// `threshold`: optional custom threshold (default = 0.75 for MobileFaceNet 128D).
+bool apiFaceIsSamePerson(
+        {required List<double> a,
+        required List<double> b,
+        double? threshold}) =>
+    RustLib.instance.api
+        .crateApiApiFaceIsSamePerson(a: a, b: b, threshold: threshold);
+
+/// Find the best matching stored face embedding for a probe.
+/// Returns `(index, score)` of the best match, or `None` if `stored` is empty.
+///
+/// All vectors must be length-128 f32 embeddings.
+(BigInt, double)? apiFaceFindBestMatch(
+        {required List<double> probe, required List<Float32List> stored}) =>
+    RustLib.instance.api
+        .crateApiApiFaceFindBestMatch(probe: probe, stored: stored);
+
+/// L2-normalise a 128-dimensional face embedding.
+/// Returns the normalised embedding as Vec<f32>.
+Float32List apiFaceNormalizeEmbedding({required List<double> embeddingVec}) =>
+    RustLib.instance.api
+        .crateApiApiFaceNormalizeEmbedding(embeddingVec: embeddingVec);
+
 /// Generate a cryptographically random password.
 String apiGeneratePassword({required ApiGeneratorConfig config}) =>
     RustLib.instance.api.crateApiApiGeneratePassword(config: config);
+
+/// Generate a 6-digit TOTP code from a Base32-encoded secret.
+///
+/// * `secret_base32`  — otpauth secret (case-insensitive, spaces/dashes stripped).
+/// * `timestamp_secs` — current Unix time in **whole seconds**
+///                      (pass `DateTime.now().millisecondsSinceEpoch ~/ 1000`).
+///
+/// Returns a zero-padded 6-character string, e.g. `"094287"`.
+/// Throws if the secret is empty or not valid Base32.
+String apiTotpGenerate(
+        {required String secretBase32, required BigInt timestampSecs}) =>
+    RustLib.instance.api.crateApiApiTotpGenerate(
+        secretBase32: secretBase32, timestampSecs: timestampSecs);
+
+/// Like `api_totp_generate` but with custom digit count (6–8) and period (seconds).
+String apiTotpGenerateCustom(
+        {required String secretBase32,
+        required BigInt timestampSecs,
+        required int digits,
+        required BigInt period}) =>
+    RustLib.instance.api.crateApiApiTotpGenerateCustom(
+        secretBase32: secretBase32,
+        timestampSecs: timestampSecs,
+        digits: digits,
+        period: period);
+
+/// Returns how many seconds remain in the current 30-second time window.
+///
+/// Useful for driving a countdown ring in the UI.
+BigInt apiTotpTimeRemaining({required BigInt timestampSecs}) =>
+    RustLib.instance.api
+        .crateApiApiTotpTimeRemaining(timestampSecs: timestampSecs);
+
+/// Returns the TOTP counter index (floor(timestamp / 30)).
+///
+/// Two timestamps with the same counter will produce the same code.
+BigInt apiTotpTimeStep({required BigInt timestampSecs}) =>
+    RustLib.instance.api.crateApiApiTotpTimeStep(timestampSecs: timestampSecs);
+
+/// Derive a 32-byte key using PBKDF2-HMAC-SHA512 (600,000 iterations).
+///
+/// Use as a fallback when the device cannot satisfy Argon2id's 64 MiB memory
+/// requirement.  Prefer `api_derive_key` (Argon2id) whenever possible.
+///
+/// Async — runs on Rust worker thread.
+Future<Uint8List> apiDeriveKeyPbkdf2(
+        {required List<int> password, required List<int> salt}) =>
+    RustLib.instance.api
+        .crateApiApiDeriveKeyPbkdf2(password: password, salt: salt);
+
+/// Generate a random Ed25519 signing key (32-byte seed).
+Uint8List apiEd25519GenerateSigningKey() =>
+    RustLib.instance.api.crateApiApiEd25519GenerateSigningKey();
+
+/// Derive the 32-byte Ed25519 verifying (public) key from a 32-byte seed.
+Uint8List apiEd25519GetVerifyingKey({required List<int> signingKey}) =>
+    RustLib.instance.api
+        .crateApiApiEd25519GetVerifyingKey(signingKey: signingKey);
+
+/// Sign `message` with the 32-byte Ed25519 signing key seed.
+/// Returns a 64-byte signature.
+Uint8List apiEd25519Sign(
+        {required List<int> message, required List<int> signingKey}) =>
+    RustLib.instance.api
+        .crateApiApiEd25519Sign(message: message, signingKey: signingKey);
+
+/// Verify an Ed25519 `signature` (64 bytes) over `message` using the 32-byte
+/// verifying key.  Returns `true` if valid.
+bool apiEd25519Verify(
+        {required List<int> message,
+        required List<int> signature,
+        required List<int> verifyingKey}) =>
+    RustLib.instance.api.crateApiApiEd25519Verify(
+        message: message, signature: signature, verifyingKey: verifyingKey);
+
+/// Encrypt `plaintext` for a recipient identified by their 32-byte X25519
+/// public key.
+///
+/// Returns the wire-format bytes:
+/// `[sender_eph_pk (32)] [nonce (12)] [ciphertext + tag (N+16)]`
+Uint8List apiSharingEncrypt(
+        {required List<int> plaintext,
+        required List<int> recipientPublicKey}) =>
+    RustLib.instance.api.crateApiApiSharingEncrypt(
+        plaintext: plaintext, recipientPublicKey: recipientPublicKey);
+
+/// Decrypt a share blob produced by `api_sharing_encrypt`.
+///
+/// `recipient_private_key` — the 32-byte X25519 private key of the recipient.
+Uint8List apiSharingDecrypt(
+        {required List<int> shareBytes,
+        required List<int> recipientPrivateKey}) =>
+    RustLib.instance.api.crateApiApiSharingDecrypt(
+        shareBytes: shareBytes, recipientPrivateKey: recipientPrivateKey);
 
 /// Config for `api_generate_password`.
 class ApiGeneratorConfig {

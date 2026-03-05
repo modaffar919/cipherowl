@@ -22,6 +22,7 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
   SecurityBloc() : super(const SecurityInitial()) {
     on<SecurityScoreRequested>(_onScoreRequested);
     on<SecurityVaultUpdated>(_onVaultUpdated);
+    on<SecurityRecommendationCompleted>(_onRecommendationCompleted);
   }
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -35,6 +36,15 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
   Future<void> _onVaultUpdated(
       SecurityVaultUpdated event, Emitter<SecurityState> emit) async {
     emit(_calculate(event.items));
+  }
+
+  Future<void> _onRecommendationCompleted(
+      SecurityRecommendationCompleted event,
+      Emitter<SecurityState> emit) async {
+    final current = state;
+    if (current is SecurityLoaded) {
+      emit(current.withCompleted(event.recommendationId, event.xpReward));
+    }
   }
 
   // ── Calculation ────────────────────────────────────────────────────────────
@@ -167,6 +177,7 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
 
     if (weak > 0) {
       recs.add(SecurityRecommendation(
+        id: 'weak_passwords',
         titleAr: 'كلمات مرور ضعيفة ($weak)',
         bodyAr: 'استخدم مولّد كلمات المرور لتحسين القوة وحماية حساباتك',
         xpReward: 20 * weak,
@@ -177,6 +188,7 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
 
     if (noTotp > 0) {
       recs.add(SecurityRecommendation(
+        id: 'no_totp',
         titleAr: 'فعّل المصادقة الثنائية ($noTotp حساب)',
         bodyAr: 'أضف TOTP للحسابات المهمة لحماية إضافية ضد الاختراق',
         xpReward: 15 * noTotp,
@@ -186,8 +198,7 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
     }
 
     if (stale > 0) {
-      recs.add(SecurityRecommendation(
-        titleAr: 'كلمات مرور قديمة ($stale)',
+      recs.add(SecurityRecommendation(        id: 'stale_passwords',        titleAr: 'كلمات مرور قديمة ($stale)',
         bodyAr: 'لم تُحدَّث منذ أكثر من 90 يوماً — يُنصح بالتغيير الدوري',
         xpReward: 10 * stale,
         iconCodePoint: Icons.update.codePoint,
@@ -197,6 +208,7 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
 
     if (l2 < 10) {
       recs.add(const SecurityRecommendation(
+        id: 'enable_hibp',
         titleAr: 'تفعيل HaveIBeenPwned',
         bodyAr: 'فعّل مراقبة الاختراقات من إعدادات الأمان للإشعار الفوري',
         xpReward: 25,
@@ -205,8 +217,20 @@ class SecurityBloc extends Bloc<SecurityEvent, SecurityState> {
       ));
     }
 
+    if (items.isNotEmpty && items.every((i) => i.encryptedTotpSecret == null)) {
+      recs.add(const SecurityRecommendation(
+        id: 'setup_recovery',
+        titleAr: 'إعداد مفتاح الاسترداد',
+        bodyAr: 'أنشئ عبارة BIP39 المكونة من 12 كلمة لاسترداد حسابك عند فقدان كلمة المرور',
+        xpReward: 30,
+        iconCodePoint: 0xe8b5, // Icons.vpn_key
+        colorValue: 0xFF4CAF50,
+      ));
+    }
+
     if (recs.isEmpty) {
       recs.add(const SecurityRecommendation(
+        id: 'all_good',
         titleAr: 'أمانك ممتاز! 🎉',
         bodyAr: 'استمر في تحديث كلمات المرور والحفاظ على نقاطك',
         xpReward: 50,

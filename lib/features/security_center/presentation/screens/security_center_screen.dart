@@ -1,4 +1,4 @@
-Ôªøimport 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +7,7 @@ import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/security_center/presentation/bloc/security_bloc.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
-/// Security Center ‚Äî interactive shield showing real security score from SecurityBloc.
+/// Security Center ó interactive shield showing real security score from SecurityBloc.
 class SecurityCenterScreen extends StatefulWidget {
   const SecurityCenterScreen({super.key});
   @override
@@ -70,7 +70,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
               backgroundColor: AppConstants.backgroundDark,
               appBar: AppBar(
                 backgroundColor: AppConstants.backgroundDark,
-                title: const Text('ŸÖÿ±ŸÉÿ≤ ÿßŸÑÿßŸÖÿßŸÜ',
+                title: const Text('„—ﬂ“ «·«„«‰',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w700)),
               ),
@@ -107,7 +107,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                 SliverAppBar(
                   backgroundColor: AppConstants.backgroundDark,
                   pinned: true,
-                  title: const Text('ŸÖÿ±ŸÉÿ≤ ÿßŸÑÿßŸÖÿßŸÜ',
+                  title: const Text('„—ﬂ“ «·«„«‰',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w700)),
                   centerTitle: false,
@@ -123,7 +123,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                           pulse: _pulseCtrl,
                           rotation: _rotCtrl),
                       const SizedBox(height: 8),
-                      const Text('ÿØÿ±ÿ¨ÿ© ÿßŸÑÿßŸÖÿßŸÜ ÿßŸÑŸÉŸÑŸäÿ©',
+                      const Text('œ—Ã… «·«„«‰ «·ﬂ·Ì…',
                           style:
                               TextStyle(color: Colors.white60, fontSize: 14)),
                       const SizedBox(height: 4),
@@ -139,7 +139,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            '$itemCount ÿ≠ÿ≥ÿßÿ® ŸÖÿ≠ŸÅŸàÿ∏',
+                            '$itemCount Õ”«» „Õ›ÊŸ',
                             style: const TextStyle(
                                 color: Colors.white38, fontSize: 12),
                           ),
@@ -166,7 +166,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('ÿßŸÑÿ™ŸàÿµŸäÿßÿ™',
+                        const Text('«· Ê’Ì« ',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -239,7 +239,7 @@ class _SecurityShield extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                      color: _color.withOpacity(0.1 + pulse.value * 0.15),
+                      color: _color.withValues(alpha: 0.1 + pulse.value * 0.15),
                       blurRadius: 30,
                       spreadRadius: 5)
                 ],
@@ -257,7 +257,7 @@ class _SecurityShield extends StatelessWidget {
                       fontFamily: 'SpaceMono')),
               Text('/ 100',
                   style:
-                      TextStyle(color: _color.withOpacity(0.5), fontSize: 14)),
+                      TextStyle(color: _color.withValues(alpha: 0.5), fontSize: 14)),
             ],
           ),
         ],
@@ -282,7 +282,7 @@ class _RingPainter extends CustomPainter {
       canvas.drawCircle(
         Offset(x, y),
         i % 3 == 0 ? 3.0 : 1.5,
-        Paint()..color = color.withOpacity(i % 3 == 0 ? 0.8 : 0.3),
+        Paint()..color = color.withValues(alpha: i % 3 == 0 ? 0.8 : 0.3),
       );
     }
   }
@@ -319,7 +319,7 @@ class _LayerCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                  color: _color.withOpacity(0.1),
+                  color: _color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10)),
               child: Icon(layer.icon, color: _color, size: 20)),
           const SizedBox(width: 12),
@@ -383,9 +383,9 @@ class _RecommendCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -407,7 +407,7 @@ class _RecommendCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-                color: AppConstants.accentGold.withOpacity(0.15),
+                color: AppConstants.accentGold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8)),
             child: Text('+$xp XP',
                 style: const TextStyle(

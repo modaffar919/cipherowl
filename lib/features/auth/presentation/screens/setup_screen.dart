@@ -215,7 +215,7 @@ class _SetupPage2 extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppConstants.surfaceDark,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3)),
+              border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.3)),
             ),
             child: Text(
               mnemonic,
@@ -232,9 +232,9 @@ class _SetupPage2 extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppConstants.errorRed.withOpacity(0.1),
+              color: AppConstants.errorRed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppConstants.errorRed.withOpacity(0.3)),
+              border: Border.all(color: AppConstants.errorRed.withValues(alpha: 0.3)),
             ),
             child: const Text(
               '⚠️ لا تأخذ لقطة شاشة. احفظها يدوياً أو اطبعها.',
@@ -321,4 +321,5 @@ class _SetupPage4 extends StatelessWidget {
     );
   }
 }
+
 

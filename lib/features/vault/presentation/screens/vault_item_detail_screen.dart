@@ -1,12 +1,11 @@
 ﻿import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:otp/otp.dart';
+import 'package:cipherowl/src/rust/frb_generated.dart/api.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
@@ -73,13 +72,10 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
   void _refreshTotp() {
     final secret = _totpSecret;
     if (secret == null) return;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final secsLeft = 30 - (now ~/ 1000) % 30;
+    final nowSecs = BigInt.from(DateTime.now().millisecondsSinceEpoch ~/ 1000);
     try {
-      final code = OTP.generateTOTPCodeString(
-        secret, now,
-        length: 6, interval: 30, algorithm: Algorithm.SHA1, isGoogle: true,
-      );
+      final code = apiTotpGenerate(secretBase32: secret, timestampSecs: nowSecs);
+      final secsLeft = apiTotpTimeRemaining(timestampSecs: nowSecs).toInt();
       if (mounted) setState(() { _totpCode = code; _totpSecondsLeft = secsLeft; });
     } catch (_) {
       if (mounted) setState(() => _totpCode = 'خطأ');

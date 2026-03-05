@@ -278,7 +278,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppConstants.primaryCyan.withOpacity(0.04)
+      ..color = AppConstants.primaryCyan.withValues(alpha: 0.04)
       ..strokeWidth = 1;
 
     const spacing = 32.0;
@@ -291,7 +291,7 @@ class _GridPainter extends CustomPainter {
 
     // Corner dots
     final dotPaint = Paint()
-      ..color = AppConstants.primaryCyan.withOpacity(0.08)
+      ..color = AppConstants.primaryCyan.withValues(alpha: 0.08)
       ..style = PaintingStyle.fill;
     for (double x = 0; x < size.width; x += spacing) {
       for (double y = 0; y < size.height; y += spacing) {
@@ -303,4 +303,5 @@ class _GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
 
