@@ -298,15 +298,15 @@
 
 | | |
 |---|---|
-| 🟠 | `cipherowl-gbw` |
+| ✅ | `cipherowl-gbw` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | █████████████░░░░░░░ 2/3 |
+| **التقدم** | ████████████████████ 3/3 ✅ |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | ✅ | ~~Security audit OWASP MASVS penetration testing~~ | `cipherowl-d5r` | P0 · حرج |
 | ✅ | ~~Write widget tests for all 15 screens~~ | `cipherowl-bbt` | P1 · عالي |
-| 🟠 | Write integration tests end-to-end flows | `cipherowl-8ij` | P1 · عالي |
+| ✅ | ~~Write integration tests end-to-end flows~~ | `cipherowl-8ij` | P1 · عالي |
 
 ---
 
