@@ -3,7 +3,11 @@ package com.cipherowl.cipherowl
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
+import android.view.WindowManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -13,14 +17,39 @@ import io.flutter.plugin.common.MethodChannel
 //
 //  The Dart side (autofill_bridge.dart) calls methods on the channel
 //  'com.cipherowl/autofill'. This host-side handler:
-//    • updateAutofillCache  → persist JSON blob in SharedPreferences
+//    • updateAutofillCache  → persist JSON blob in EncryptedSharedPreferences
 //    • clearAutofillCache   → remove the cache
 //    • isAutofillServiceEnabled → query Android autofill provider
 //    • requestEnableAutofillService → open system autofill settings
+//
+//  Security:
+//    FLAG_SECURE prevents screenshots and screen recording (MASVS-PLATFORM-2).
+//    EncryptedSharedPreferences protects the credential cache (MASVS-STORAGE-1).
 // ─────────────────────────────────────────────────────────────────────────────
 class MainActivity : FlutterActivity() {
 
     private val autofillChannel = "com.cipherowl/autofill"
+
+    // MASVS-PLATFORM-2: Block screenshots and screen recording for all vault screens.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE,
+        )
+    }
+
+    // Returns an EncryptedSharedPreferences instance backed by the Android Keystore.
+    // MASVS-STORAGE-1: credential cache is AES-256-GCM encrypted at rest.
+    private fun getSecurePrefs() = EncryptedSharedPreferences.create(
+        this,
+        CipherOwlAutofillService.PREFS_NAME,
+        MasterKey.Builder(this)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build(),
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+    )
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -34,11 +63,8 @@ class MainActivity : FlutterActivity() {
                 "updateAutofillCache" -> {
                     val cache = call.argument<String>("cache")
                     if (cache != null) {
-                        getSharedPreferences(
-                            "cipher_owl_autofill",
-                            Context.MODE_PRIVATE,
-                        ).edit()
-                            .putString("credential_cache", cache)
+                        getSecurePrefs().edit()
+                            .putString(CipherOwlAutofillService.KEY_CACHE, cache)
                             .apply()
                         result.success(null)
                     } else {
@@ -47,11 +73,8 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "clearAutofillCache" -> {
-                    getSharedPreferences(
-                        "cipher_owl_autofill",
-                        Context.MODE_PRIVATE,
-                    ).edit()
-                        .remove("credential_cache")
+                    getSecurePrefs().edit()
+                        .remove(CipherOwlAutofillService.KEY_CACHE)
                         .apply()
                     result.success(null)
                 }

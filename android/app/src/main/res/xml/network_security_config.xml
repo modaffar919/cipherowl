@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MASVS-NETWORK-1: Disable cleartext HTTP traffic.
+    CipherOwl communicates exclusively over TLS (Supabase HTTPS).
+    Any accidental cleartext request will trigger a NetworkSecurityException
+    instead of silently leaking data.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust the system certificate store only (no user-installed CAs) -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Allow cleartext only for localhost during debug/emulator testing -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">supabase.co</domain>
+        <domain includeSubdomains="true">supabase.io</domain>
+    </domain-config>
+</network-security-config>

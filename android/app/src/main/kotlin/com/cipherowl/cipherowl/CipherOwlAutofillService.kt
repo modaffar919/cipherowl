@@ -8,6 +8,8 @@ import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import org.json.JSONArray
 import android.content.Context
 
@@ -184,8 +186,22 @@ class CipherOwlAutofillService : AutofillService() {
     )
 
     private fun loadCachedCredentials(): List<Credential> {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json  = prefs.getString(KEY_CACHE, null) ?: return emptyList()
+        // MASVS-STORAGE-1: Read from EncryptedSharedPreferences, not plaintext.
+        val prefs = try {
+            val masterKey = MasterKey.Builder(this)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            EncryptedSharedPreferences.create(
+                this,
+                PREFS_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
+        } catch (_: Exception) {
+            return emptyList()
+        }
+        val json = prefs.getString(KEY_CACHE, null) ?: return emptyList()
         return try {
             val arr  = JSONArray(json)
             val list = mutableListOf<Credential>()
