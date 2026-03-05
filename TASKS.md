@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 74 &nbsp;|&nbsp; 🔴 مفتوحة: 43 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-06 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 77 &nbsp;|&nbsp; 🔴 مفتوحة: 40 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -9,8 +9,8 @@
 | الأولوية | المفتوحة | المنجزة |
 |----------|----------|---------|
 | 🔴 P0 · حرج | 4 | 25 |
-| 🟠 P1 · عالي | 26 | 19 |
-| 🔵 P2 · متوسط | 24 | 4 |
+| 🟠 P1 · عالي | 24 | 21 |
+| 🔵 P2 · متوسط | 23 | 5 |
 | ⬜ P3 · منخفض | 6 | 0 |
 
 ---
@@ -314,15 +314,15 @@
 
 | | |
 |---|---|
-| 🟠 | `cipherowl-v6a` |
+| ✅ | `cipherowl-v6a` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/3 |
+| **التقدم** | ████████████████████ 3/3 ✅ |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| ✅ | Graduation project report and presentation | `cipherowl-179` | P0 · حرج |
-| 🟠 | App Store listing screenshots description AR EN | `cipherowl-jf1` | P1 · عالي |
-| 🔵 | CI/CD pipeline GitHub Actions build test deploy | `cipherowl-jsl` | P2 · متوسط |
+| ✅ | ~~Graduation project report and presentation~~ | `cipherowl-179` | P0 · حرج |
+| ✅ | ~~App Store listing screenshots description AR EN~~ | `cipherowl-jf1` | P1 · عالي |
+| ✅ | ~~CI/CD pipeline GitHub Actions build test deploy~~ | `cipherowl-jsl` | P2 · متوسط |
 
 ---
 
@@ -337,5 +337,5 @@
 
 ---
 
-*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01 · آخر مزامنة يدوية: 2026-03-05*
+*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01 · آخر مزامنة يدوية: 2026-03-06*
 
