@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="128" height="128">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="46" fill="#0a0e1a" stroke="#0FF4C6" stroke-width="4"/>
+  <!-- Ear tufts -->
+  <path d="M28 22 L38 10 L44 26" stroke="#0FF4C6" stroke-width="3"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 22 L62 10 L56 26" stroke="#0FF4C6" stroke-width="3"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Left eye -->
+  <circle cx="36" cy="44" r="10" fill="#0FF4C6" opacity="0.2"/>
+  <circle cx="36" cy="44" r="8" stroke="#0FF4C6" stroke-width="2.5" fill="none"/>
+  <circle cx="36" cy="44" r="4" fill="#0FF4C6"/>
+  <!-- Right eye -->
+  <circle cx="64" cy="44" r="10" fill="#0FF4C6" opacity="0.2"/>
+  <circle cx="64" cy="44" r="8" stroke="#0FF4C6" stroke-width="2.5" fill="none"/>
+  <circle cx="64" cy="44" r="4" fill="#0FF4C6"/>
+  <!-- Beak -->
+  <path d="M46 54 L50 60 L54 54 Z" fill="#FFD700"/>
+  <!-- Smile / wing feathers hint -->
+  <path d="M30 68 Q50 80 70 68" stroke="#0FF4C6" stroke-width="2.5"
+        stroke-linecap="round" fill="none"/>
+  <!-- Body outline -->
+  <ellipse cx="50" cy="62" rx="26" ry="16" stroke="#0FF4C6" stroke-width="1.5"
+           fill="#0FF4C6" fill-opacity="0.07"/>
+</svg>

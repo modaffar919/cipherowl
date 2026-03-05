@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/autofill/browser_autofill_sync_service.dart';
 import 'package:cipherowl/features/settings/data/repositories/settings_repository.dart';
 import 'package:cipherowl/features/settings/presentation/bloc/settings_bloc.dart';
 
@@ -188,6 +190,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 const SizedBox(height: 16),
 
+                // ?? Browser Extension ??????????????????????????????????????????
+                _SectionTitle('������ ��������'),
+                _ActionCard(
+                  icon: Icons.extension_outlined,
+                  iconColor: const Color(0xFF06D6A0),
+                  title: '��� ������ ��������',
+                  subtitle: 'Chrome / Firefox — ��� ���� ������',
+                  onTap: _showBrowserExtensionSheet,
+                ),
+
+                const SizedBox(height: 16),
+
                 // ?? Advanced ?????????????????????????????????????????????
                 _SectionTitle('��������'),
                 _ActionCard(
@@ -269,6 +283,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // Duress password dialog — prompts for new password (empty = clear)
+  Future<void> _showBrowserExtensionSheet() async {
+    final browserSync = context.read<BrowserAutofillSyncService>();
+    final messenger = ScaffoldMessenger.of(context);
+    final keyHex = await browserSync.exportSyncKeyHex();
+
+    if (!mounted) return;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppConstants.surfaceDark,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (sheetCtx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              const Icon(Icons.extension_outlined,
+                  color: Color(0xFF06D6A0), size: 22),
+              const SizedBox(width: 10),
+              const Text('ربط امتداد المتصفح',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700)),
+            ]),
+            const SizedBox(height: 12),
+            if (keyHex == null)
+              const Text(
+                'لم يتم إنشاء مفتاح المزامنة بعد.\n'
+                'افتح الخزينة على الأقل مرة واحدة لتفعيل المزامنة السحابية.',
+                style: TextStyle(color: Colors.white60, fontSize: 13),
+              )
+            else ...[
+              const Text(
+                'انسخ المفتاح أدناه والصقه في امتداد CipherOwl داخل المتصفح.\n'
+                'احتفظ به في مكان آمن — من يملكه يستطيع الوصول إلى بيانات الخزينة.',
+                style: TextStyle(color: Colors.white60, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppConstants.cardDark,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                      color: const Color(0xFF06D6A0).withAlpha(76)),
+                ),
+                child: SelectableText(
+                  keyHex,
+                  style: const TextStyle(
+                    color: Color(0xFF06D6A0),
+                    fontFamily: 'SpaceMono',
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF06D6A0),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.copy, size: 18),
+                  label: const Text('نسخ المفتاح'),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: keyHex));
+                    Navigator.pop(sheetCtx);
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('تم نسخ مفتاح الربط'),
+                        backgroundColor: Color(0xFF06D6A0),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showDuressPasswordDialog() {
     final ctrl = TextEditingController();
     bool obscure = true;
@@ -368,8 +476,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: AppConstants.errorRed),
             onPressed: () async {
               Navigator.pop(context);
+              final authBloc = context.read<AuthBloc>();
               await context.read<SettingsRepository>().loadAll(); // noop, wipe later
-              context.read<AuthBloc>().add(const AuthVaultLocked());
+              authBloc.add(const AuthVaultLocked());
             },
             child: const Text('��� �������',
                 style: TextStyle(color: Colors.white)),

@@ -14,6 +14,7 @@ import 'features/gamification/presentation/bloc/gamification_bloc.dart';
 import 'features/security_center/presentation/bloc/security_bloc.dart';
 import 'features/settings/data/repositories/settings_repository.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
+import 'features/autofill/browser_autofill_sync_service.dart';
 import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -26,6 +27,7 @@ class CipherOwlApp extends StatelessWidget {
     // db is already created and encrypted — passed from main().
     final vaultRepo = VaultRepository(db);
     final vaultCrypto = VaultCryptoService();
+    final browserSync = BrowserAutofillSyncService();
     final settingsRepo = SettingsRepository(db);
 
     return MultiRepositoryProvider(
@@ -33,6 +35,7 @@ class CipherOwlApp extends StatelessWidget {
         RepositoryProvider<SmartVaultDatabase>.value(value: db),
         RepositoryProvider<VaultRepository>.value(value: vaultRepo),
         RepositoryProvider<VaultCryptoService>.value(value: vaultCrypto),
+        RepositoryProvider<BrowserAutofillSyncService>.value(value: browserSync),
         RepositoryProvider<SettingsRepository>.value(value: settingsRepo),
       ],
       child: MultiBlocProvider(
@@ -44,7 +47,11 @@ class CipherOwlApp extends StatelessWidget {
           lazy: false,
         ),
         BlocProvider<VaultBloc>(
-          create: (_) => VaultBloc(repository: vaultRepo),
+          create: (_) => VaultBloc(
+            repository: vaultRepo,
+            cryptoService: vaultCrypto,
+            browserSyncService: browserSync,
+          ),
           lazy: true,
         ),
         BlocProvider<SettingsBloc>(
