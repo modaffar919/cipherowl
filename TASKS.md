@@ -130,15 +130,15 @@
 |---|---|
 | 🟠 | `cipherowl-w7f` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ░░░░░░░░░░░░░░░░░░░░ 0/7 |
+| **التقدم** | ██████████████░░░░░░ 5/7 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔴 | Configure Row Level Security RLS on all tables | `cipherowl-8tj` | P0 · حرج |
-| 🔴 | Implement zero-knowledge sync protocol | `cipherowl-2qq` | P0 · حرج |
-| 🟠 | Create Supabase project and update config keys | `cipherowl-zig` | P1 · عالي |
-| 🟠 | Create Supabase SQL schema profiles encrypted_vaults | `cipherowl-6i8` | P1 · عالي |
-| 🟠 | Implement Supabase Auth email and social login | `cipherowl-op4` | P1 · عالي |
+| ✅ | ~~Configure Row Level Security RLS on all tables~~ | `cipherowl-8tj` | P0 · حرج |
+| ✅ | ~~Implement zero-knowledge sync protocol~~ | `cipherowl-2qq` | P0 · حرج |
+| ✅ | ~~Create Supabase project and update config keys~~ | `cipherowl-zig` | P1 · عالي |
+| ✅ | ~~Create Supabase SQL schema profiles encrypted_vaults~~ | `cipherowl-6i8` | P1 · عالي |
+| ✅ | ~~Implement Supabase Auth email and social login~~ | `cipherowl-op4` | P1 · عالي |
 | 🔵 | Create Edge Functions breach check and notifications | `cipherowl-rhy` | P2 · متوسط |
 | 🔵 | Implement FIDO2 WebAuthn credential registration | `cipherowl-9rp` | P2 · متوسط |
 
