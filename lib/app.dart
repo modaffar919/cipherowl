@@ -17,6 +17,9 @@ import 'features/settings/presentation/bloc/settings_bloc.dart';
 import 'features/autofill/browser_autofill_sync_service.dart';
 import 'features/vault/data/repositories/vault_repository.dart';
 import 'features/vault/presentation/bloc/vault_bloc.dart';
+import 'features/enterprise/data/repositories/org_repository.dart';
+import 'features/enterprise/presentation/bloc/org_bloc.dart';
+import 'core/supabase/supabase_client_provider.dart';
 
 class CipherOwlApp extends StatelessWidget {
   final SmartVaultDatabase db;
@@ -29,6 +32,7 @@ class CipherOwlApp extends StatelessWidget {
     final vaultCrypto = VaultCryptoService();
     final browserSync = BrowserAutofillSyncService();
     final settingsRepo = SettingsRepository(db);
+    final orgRepo = OrgRepository(SupabaseClientProvider.client);
 
     return MultiRepositoryProvider(
       providers: [
@@ -37,6 +41,7 @@ class CipherOwlApp extends StatelessWidget {
         RepositoryProvider<VaultCryptoService>.value(value: vaultCrypto),
         RepositoryProvider<BrowserAutofillSyncService>.value(value: browserSync),
         RepositoryProvider<SettingsRepository>.value(value: settingsRepo),
+        RepositoryProvider<OrgRepository>.value(value: orgRepo),
       ],
       child: MultiBlocProvider(
       providers: [
@@ -66,6 +71,10 @@ class CipherOwlApp extends StatelessWidget {
         BlocProvider<GamificationBloc>(
           create: (_) => GamificationBloc()..add(const GamificationStarted()),
           lazy: false,
+        ),
+        BlocProvider<OrgBloc>(
+          create: (_) => OrgBloc(orgRepo),
+          lazy: true,
         ),
       ],
       child: ScreenUtilInit(

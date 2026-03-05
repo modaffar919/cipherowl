@@ -17,6 +17,8 @@ import '../../features/face_track/presentation/screens/face_setup_screen.dart';
 import '../../features/vault/presentation/screens/import_export_screen.dart';
 import '../../features/sharing/presentation/screens/sharing_screen.dart';
 import '../../features/enterprise/presentation/screens/enterprise_screen.dart';
+import '../../features/enterprise/presentation/screens/admin_dashboard_screen.dart';
+import '../../features/enterprise/presentation/screens/sso_settings_screen.dart';
 import '../../features/auth/presentation/screens/fido2_management_screen.dart';
 import '../constants/app_constants.dart';
 
@@ -197,6 +199,20 @@ abstract class AppRouter {
         path: AppConstants.routeEnterprise,
         pageBuilder: (context, state) =>
             _slideRight(state, const EnterpriseScreen()),
+      ),
+
+      // ── Admin Dashboard ───────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeAdminDashboard,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const AdminDashboardScreen()),
+      ),
+
+      // ── SSO Settings ──────────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeSsoSettings,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const SsoSettingsScreen()),
       ),
 
       // ── FIDO2 Management ────────────────────────────────

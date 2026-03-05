@@ -140,8 +140,10 @@ abstract class AppConstants {
   static const String routeSettings      = '/settings';
   static const String routeFaceSetup     = '/face-setup';
   static const String routeRecoverySetup = '/recovery-setup';
-  static const String routeSharing       = '/sharing';
-  static const String routeEnterprise    = '/enterprise';
-  static const String routeImportExport  = '/import-export';
-  static const String routeFido2Manage   = '/fido2-manage';
+  static const String routeSharing          = '/sharing';
+  static const String routeEnterprise       = '/enterprise';
+  static const String routeAdminDashboard   = '/enterprise/admin';
+  static const String routeSsoSettings      = '/enterprise/sso';
+  static const String routeImportExport     = '/import-export';
+  static const String routeFido2Manage      = '/fido2-manage';
 }
