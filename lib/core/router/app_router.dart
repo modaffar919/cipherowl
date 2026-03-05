@@ -20,6 +20,67 @@ import '../../features/enterprise/presentation/screens/enterprise_screen.dart';
 import '../../features/auth/presentation/screens/fido2_management_screen.dart';
 import '../constants/app_constants.dart';
 
+// ── Transition helpers ───────────────────────────────────────────────────────
+
+/// Fade + slide from right (default drill-down transition).
+Page<T> _slideRight<T>(GoRouterState state, Widget child) =>
+    CustomTransitionPage<T>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 320),
+      reverseTransitionDuration: const Duration(milliseconds: 280),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final slide = Tween<Offset>(
+          begin: const Offset(0.06, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+        return SlideTransition(
+          position: slide,
+          child: FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn),
+            child: child,
+          ),
+        );
+      },
+    );
+
+/// Fade only (top-level tab-like navigation).
+Page<T> _fade<T>(GoRouterState state, Widget child) =>
+    CustomTransitionPage<T>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 280),
+      reverseTransitionDuration: const Duration(milliseconds: 240),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(
+        opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+        child: child,
+      ),
+    );
+
+/// Slide up from bottom (modal / auxiliary screens).
+Page<T> _slideUp<T>(GoRouterState state, Widget child) =>
+    CustomTransitionPage<T>(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 360),
+      reverseTransitionDuration: const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final slide = Tween<Offset>(
+          begin: const Offset(0, 0.08),
+          end: Offset.zero,
+        ).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+        return SlideTransition(
+          position: slide,
+          child: FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn),
+            child: child,
+          ),
+        );
+      },
+    );
+
 abstract class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: AppConstants.routeSplash,
@@ -28,50 +89,58 @@ abstract class AppRouter {
       // ── Splash ──────────────────────────────────────────
       GoRoute(
         path: AppConstants.routeSplash,
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) => _fade(state, const SplashScreen()),
       ),
 
       // ── Onboarding ──────────────────────────────────────
       GoRoute(
         path: AppConstants.routeOnboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder: (context, state) => _fade(state, const OnboardingScreen()),
       ),
 
       // ── Setup (First Time) ──────────────────────────────
       GoRoute(
         path: AppConstants.routeSetup,
-        builder: (context, state) => const SetupScreen(),
+        pageBuilder: (context, state) => _slideRight(state, const SetupScreen()),
       ),
 
       // ── Lock Screen ──────────────────────────────────────
       GoRoute(
         path: AppConstants.routeLock,
-        builder: (context, state) => const LockScreen(),
+        pageBuilder: (context, state) => _fade(state, const LockScreen()),
       ),
 
       // ── Main App Shell ───────────────────────────────────
       GoRoute(
         path: AppConstants.routeDashboard,
-        builder: (context, state) => const DashboardScreen(),
+        pageBuilder: (context, state) => _fade(state, const DashboardScreen()),
         routes: [
           GoRoute(
             path: 'vault',
-            builder: (context, state) => const VaultListScreen(),
+            pageBuilder: (context, state) =>
+                _slideRight(state, const VaultListScreen()),
             routes: [
               GoRoute(
                 path: 'add',
-                builder: (context, state) => const AddEditItemScreen(),
+                pageBuilder: (context, state) =>
+                    _slideUp(state, const AddEditItemScreen()),
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) => VaultItemDetailScreen(
-                  itemId: state.pathParameters['id']!,
+                pageBuilder: (context, state) => _slideRight(
+                  state,
+                  VaultItemDetailScreen(
+                    itemId: state.pathParameters['id']!,
+                  ),
                 ),
                 routes: [
                   GoRoute(
                     path: 'edit',
-                    builder: (context, state) => AddEditItemScreen(
-                      itemId: state.pathParameters['id'],
+                    pageBuilder: (context, state) => _slideUp(
+                      state,
+                      AddEditItemScreen(
+                        itemId: state.pathParameters['id'],
+                      ),
                     ),
                   ),
                 ],
@@ -84,55 +153,66 @@ abstract class AppRouter {
       // ── Generator ───────────────────────────────────────
       GoRoute(
         path: AppConstants.routeGenerator,
-        builder: (context, state) => const GeneratorScreen(),
+        pageBuilder: (context, state) =>
+            _slideUp(state, const GeneratorScreen()),
       ),
 
       // ── Security Center ──────────────────────────────────
       GoRoute(
         path: AppConstants.routeSecurityCenter,
-        builder: (context, state) => const SecurityCenterScreen(),
+        pageBuilder: (context, state) =>
+            _slideRight(state, const SecurityCenterScreen()),
       ),
 
       // ── Academy ─────────────────────────────────────────
       GoRoute(
         path: AppConstants.routeAcademy,
-        builder: (context, state) => const AcademyScreen(),
+        pageBuilder: (context, state) =>
+            _slideRight(state, const AcademyScreen()),
       ),
 
       // ── Settings ─────────────────────────────────────────
       GoRoute(
         path: AppConstants.routeSettings,
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) =>
+            _slideRight(state, const SettingsScreen()),
       ),
 
       // ── Face Setup ──────────────────────────────────────
       GoRoute(
         path: AppConstants.routeFaceSetup,
-        builder: (context, state) => const FaceSetupScreen(),
+        pageBuilder: (context, state) =>
+            _slideUp(state, const FaceSetupScreen()),
       ),
 
       // ── Sharing ─────────────────────────────────────────
       GoRoute(
         path: AppConstants.routeSharing,
-        builder: (context, state) => const SharingScreen(),
+        pageBuilder: (context, state) =>
+            _slideUp(state, const SharingScreen()),
       ),
 
       // ── Enterprise ──────────────────────────────────────
       GoRoute(
         path: AppConstants.routeEnterprise,
-        builder: (context, state) => const EnterpriseScreen(),
+        pageBuilder: (context, state) =>
+            _slideRight(state, const EnterpriseScreen()),
       ),
 
       // ── FIDO2 Management ────────────────────────────────
       GoRoute(
         path: AppConstants.routeFido2Manage,
-        builder: (context, state) => const Fido2ManagementScreen(),
+        pageBuilder: (context, state) =>
+            _slideRight(state, const Fido2ManagementScreen()),
       ),
+
       // ── Import / Export ───────────────────────────────────────
       GoRoute(
         path: AppConstants.routeImportExport,
-        builder: (context, state) => const ImportExportScreen(),
-      ),    ],
+        pageBuilder: (context, state) =>
+            _slideRight(state, const ImportExportScreen()),
+      ),
+    ],
 
     // ── Error handler ────────────────────────────────────
     errorBuilder: (context, state) => const _ErrorScreen(),

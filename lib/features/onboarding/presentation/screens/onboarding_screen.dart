@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/shared/widgets/owl_mascot.dart';
 
 /// Onboarding - shown only on first install (3 pages)
 class OnboardingScreen extends StatefulWidget {
@@ -16,21 +17,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _pages = [
     _OnboardPage(
-      emoji: '🦉',
+      owlState: OwlState.idle,
       titleAr: 'حارسك الرقمي',
       titleEn: 'Your Digital Guardian',
       bodyAr: 'CipherOwl يحمي كل كلمات مرورك\nبتشفير عسكري AES-256-GCM',
       color: AppConstants.primaryCyan,
     ),
     _OnboardPage(
-      emoji: '👁️',
+      owlState: OwlState.watching,
       titleAr: 'Face-Track Lock',
       titleEn: 'Continuous Face Lock',
       bodyAr: 'يراقب وجهك كل 300ms.\nيقفل فوراً إذا غادرت الشاشة.',
       color: AppConstants.accentGold,
     ),
     _OnboardPage(
-      emoji: '🏆',
+      owlState: OwlState.success,
       titleAr: 'اربح وأنت تحمي نفسك',
       titleEn: 'Earn While Staying Safe',
       bodyAr: 'اكسب نقاط وشارات وارتقِ من\nمبتدئ إلى أسطوري.',
@@ -117,14 +118,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _OnboardPage extends StatelessWidget {
-  final String emoji;
+  final OwlState owlState;
   final String titleAr;
   final String titleEn;
   final String bodyAr;
   final Color color;
 
   const _OnboardPage({
-    required this.emoji,
+    required this.owlState,
     required this.titleAr,
     required this.titleEn,
     required this.bodyAr,
@@ -138,21 +139,8 @@ class _OnboardPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Illustration area (TODO: replace with Rive animation)
-          Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: color.withOpacity(0.2), width: 1),
-              gradient: RadialGradient(
-                colors: [color.withOpacity(0.08), Colors.transparent],
-              ),
-            ),
-            child: Center(
-              child: Text(emoji, style: const TextStyle(fontSize: 80)),
-            ),
-          ),
+          // Owl mascot animation
+          OwlMascotWidget(state: owlState, size: 200),
           const SizedBox(height: 48),
           Text(
             titleAr,

@@ -276,10 +276,20 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
         children: [
           // Header
           Row(children: [
-            Container(
-              width: 64, height: 64,
-              decoration: BoxDecoration(color: AppConstants.surfaceDark, borderRadius: BorderRadius.circular(16)),
-              child: Center(child: Text(_catIcon(entry.category), style: const TextStyle(fontSize: 30))),
+            Hero(
+              tag: 'vault-icon-${entry.id}',
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppConstants.surfaceDark,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(_catIcon(entry.category),
+                      style: const TextStyle(fontSize: 30)),
+                ),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

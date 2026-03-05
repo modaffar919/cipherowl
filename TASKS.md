@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 69 &nbsp;|&nbsp; 🔴 مفتوحة: 48 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 73 &nbsp;|&nbsp; 🔴 مفتوحة: 44 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -206,10 +206,10 @@
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
-| 🔵 | Create Rive owl mascot animations states | `cipherowl-e0k` | P2 · متوسط |
-| 🔵 | Implement Hero and custom page transitions | `cipherowl-zaq` | P2 · متوسط |
-| 🔵 | Replace OnboardingScreen emoji placeholders with Rive animations | `cipherowl-n0p` | P2 · متوسط |
-| 🔵 | Create Lottie transition animations | `cipherowl-at2` | P2 · متوسط |
+| ✅ | Create Rive owl mascot animations states | `cipherowl-e0k` | P2 · متوسط |
+| ✅ | Implement Hero and custom page transitions | `cipherowl-zaq` | P2 · متوسط |
+| ✅ | Replace OnboardingScreen emoji placeholders with Rive animations | `cipherowl-n0p` | P2 · متوسط |
+| ✅ | Create Lottie transition animations | `cipherowl-at2` | P2 · متوسط |
 
 ---
 

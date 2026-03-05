@@ -348,16 +348,19 @@ class _VaultCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: AppConstants.surfaceDark,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(entry.category.emoji,
-                      style: const TextStyle(fontSize: 22)),
+              Hero(
+                tag: 'vault-icon-${entry.id}',
+                child: Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: AppConstants.surfaceDark,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(entry.category.emoji,
+                        style: const TextStyle(fontSize: 22)),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
