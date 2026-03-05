@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 64 &nbsp;|&nbsp; 🔴 مفتوحة: 53 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-05 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 65 &nbsp;|&nbsp; 🔴 مفتوحة: 52 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
 
 ---
 
@@ -300,12 +300,12 @@
 |---|---|
 | 🟠 | `cipherowl-gbw` |
 | **الأولوية** | P1 · عالي |
-| **التقدم** | ███████░░░░░░░░░░░░░ 1/3 |
+| **التقدم** | █████████████░░░░░░░ 2/3 |
 
 | الحالة | المهمة | ID | الأولوية |
 |:------:|--------|:--:|:--------:|
 | ✅ | ~~Security audit OWASP MASVS penetration testing~~ | `cipherowl-d5r` | P0 · حرج |
-| 🟠 | Write widget tests for all 15 screens | `cipherowl-bbt` | P1 · عالي |
+| ✅ | ~~Write widget tests for all 15 screens~~ | `cipherowl-bbt` | P1 · عالي |
 | 🟠 | Write integration tests end-to-end flows | `cipherowl-8ij` | P1 · عالي |
 
 ---

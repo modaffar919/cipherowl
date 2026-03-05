@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meta/meta.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'vault_list_screen.dart';
@@ -11,7 +12,11 @@ import '../../../settings/presentation/screens/settings_screen.dart';
 /// Main Dashboard — entry point that shows VaultListScreen by default,
 /// with a persistent bottom navigation bar
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  /// Override the tab screens in tests to avoid platform-channel / Rust calls.
+  @visibleForTesting
+  final List<Widget>? tabScreens;
+
+  const DashboardScreen({super.key, this.tabScreens});
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -40,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
-      body: IndexedStack(index: _selectedIndex, children: _screens),
+      body: IndexedStack(index: _selectedIndex, children: widget.tabScreens ?? _screens),
       bottomNavigationBar: _CipherBottomNav(
         selectedIndex: _selectedIndex,
         destinations: _destinations,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:meta/meta.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/face_track/data/services/face_detector_service.dart';
@@ -15,13 +16,19 @@ import 'package:cipherowl/features/face_track/data/services/face_verification_se
 import 'package:cipherowl/features/face_track/presentation/bloc/face_enrollment_bloc.dart';
 
 /// Entry-point that creates the BLoC and wraps [_FaceSetupView].
+///
+/// [createBloc] can be supplied in tests to inject a pre-built
+/// [FaceEnrollmentBloc] without initialising real camera / TFLite.
 class FaceSetupScreen extends StatelessWidget {
-  const FaceSetupScreen({super.key});
+  @visibleForTesting
+  final FaceEnrollmentBloc Function()? createBloc;
+
+  const FaceSetupScreen({super.key, this.createBloc});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => FaceEnrollmentBloc(
+      create: (_) => createBloc?.call() ?? FaceEnrollmentBloc(
         detector: FaceDetectorService(),
         embedding: FaceEmbeddingService(),
         verification: FaceVerificationService(),
@@ -71,21 +78,25 @@ class _FaceSetupViewState extends State<_FaceSetupView>
   }
 
   Future<void> _initCamera() async {
-    final cameras = await availableCameras();
-    _camera = cameras.firstWhere(
-      (c) => c.lensDirection == CameraLensDirection.front,
-      orElse: () => cameras.first,
-    );
-    _cameraCtrl = CameraController(
-      _camera!,
-      ResolutionPreset.medium,
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420,
-    );
-    await _cameraCtrl!.initialize();
-    if (!mounted) return;
-    _cameraCtrl!.startImageStream(_onCameraImage);
-    setState(() => _cameraReady = true);
+    try {
+      final cameras = await availableCameras();
+      _camera = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
+      );
+      _cameraCtrl = CameraController(
+        _camera!,
+        ResolutionPreset.medium,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.yuv420,
+      );
+      await _cameraCtrl!.initialize();
+      if (!mounted) return;
+      _cameraCtrl!.startImageStream(_onCameraImage);
+      setState(() => _cameraReady = true);
+    } catch (_) {
+      // Camera unavailable (e.g. in widget tests or simulator without camera)
+    }
   }
 
   void _onCameraImage(CameraImage image) {

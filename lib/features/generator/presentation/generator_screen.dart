@@ -4,12 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:meta/meta.dart';
+
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.dart';
 
 /// Password & Passphrase Generator
 class GeneratorScreen extends StatefulWidget {
-  const GeneratorScreen({super.key});
+  /// Optionally override the [GeneratorBloc] factory for testing.
+  /// When non-null, the real Rust-backed bloc is NOT created.
+  @visibleForTesting
+  final GeneratorBloc Function()? createBloc;
+
+  const GeneratorScreen({super.key, this.createBloc});
   @override
   State<GeneratorScreen> createState() => _GeneratorScreenState();
 }
@@ -33,7 +40,7 @@ class _GeneratorScreenState extends State<GeneratorScreen>
   @override
   Widget build(BuildContext context) {
     return BlocProvider<GeneratorBloc>(
-      create: (_) => GeneratorBloc(),
+      create: (_) => widget.createBloc?.call() ?? GeneratorBloc(),
       child: Scaffold(
         backgroundColor: AppConstants.backgroundDark,
         body: SafeArea(
