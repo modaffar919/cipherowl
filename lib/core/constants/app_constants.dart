@@ -28,6 +28,8 @@ abstract class AppConstants {
   static const Color successGreen     = Color(0xFF00E676);
   static const Color warningAmber     = Color(0xFFFFAB00);
   static const Color warningOrange    = Color(0xFFFF6D00);
+  static const Color accentPurple     = Color(0xFFB388FF);
+  static const Color accentGreen      = Color(0xFF00E676);
 
   // ── Text Colors ──────────────────────────────────────────
   static const Color textPrimary   = Color(0xFFE8EAF6);
@@ -154,6 +156,9 @@ abstract class AppConstants {
   static const String routeImportExport     = '/import-export';
   static const String routeFido2Manage      = '/fido2-manage';
   static const String routeNotifications    = '/notifications';
+  static const String routePasswordHealth  = '/password-health';
+  static const String routeEmergencyAccess = '/emergency-access';
+  static const String routeMagicLink       = '/magic-link';
 
   // Academy sub-routes
   static const String routeAcademyModule  = '/academy/module/:id';

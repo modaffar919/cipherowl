@@ -9,6 +9,9 @@ import 'package:cipherowl/src/rust/api.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
+import 'package:cipherowl/core/database/smartvault_database.dart';
+import 'package:cipherowl/features/vault/data/repositories/vault_repository.dart';
+import 'package:cipherowl/features/vault/data/services/attachment_service.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -317,6 +320,16 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
           // Security info
           _buildSecurityCard(entry, fmt),
 
+          const SizedBox(height: 16),
+
+          // Version history
+          _VersionHistorySection(itemId: entry.id),
+
+          const SizedBox(height: 16),
+
+          // Attachments
+          _AttachmentsSection(itemId: entry.id),
+
           const SizedBox(height: 80),
         ],
       ),
@@ -453,6 +466,289 @@ class _VaultItemDetailScreenState extends State<VaultItemDetailScreen> {
           color: Colors.white38,
         ),
       ]),
+    );
+  }
+}
+
+// ─── Version History Section ──────────────────────────────────────────────────
+
+class _VersionHistorySection extends StatefulWidget {
+  final String itemId;
+  const _VersionHistorySection({required this.itemId});
+
+  @override
+  State<_VersionHistorySection> createState() => _VersionHistorySectionState();
+}
+
+class _VersionHistorySectionState extends State<_VersionHistorySection> {
+  List<VaultItemVersionInfo>? _versions;
+  bool _expanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersions();
+  }
+
+  Future<void> _loadVersions() async {
+    try {
+      final repo = context.read<VaultRepository>();
+      final versions = await repo.getVersionHistory(widget.itemId);
+      if (mounted) setState(() => _versions = versions);
+    } catch (_) {
+      // VaultRepository might not be provided — gracefully degrade
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_versions == null || _versions!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final fmt = DateFormat('yyyy/MM/dd HH:mm', 'ar');
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppConstants.cardDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppConstants.borderDark),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Row(
+              children: [
+                const Icon(Icons.history, color: AppConstants.primaryCyan, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0639\u062F\u064A\u0644\u0627\u062A (${_versions!.length})', // تاريخ التعديلات
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  color: Colors.white38,
+                ),
+              ],
+            ),
+          ),
+          if (_expanded) ...[
+            const SizedBox(height: 12),
+            ...(_versions!.take(10).map((v) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: AppConstants.primaryCyan,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'v${v.version} \u2014 ${v.changeType}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        fmt.format(v.changedAt),
+                        style: const TextStyle(
+                          color: Colors.white30,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ))),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Attachments Section ──────────────────────────────────────────────────────
+
+class _AttachmentsSection extends StatefulWidget {
+  final String itemId;
+  const _AttachmentsSection({required this.itemId});
+
+  @override
+  State<_AttachmentsSection> createState() => _AttachmentsSectionState();
+}
+
+class _AttachmentsSectionState extends State<_AttachmentsSection> {
+  List<VaultAttachment>? _attachments;
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  AttachmentService? _service() {
+    try {
+      return context.read<AttachmentService>();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _load() async {
+    final svc = _service();
+    if (svc == null) return;
+    final list = await svc.listAttachments(widget.itemId);
+    if (mounted) setState(() => _attachments = list);
+  }
+
+  Future<void> _pickFile() async {
+    final svc = _service();
+    if (svc == null) return;
+    setState(() => _loading = true);
+    try {
+      await svc.pickAndAttach(widget.itemId);
+      await _load();
+    } on AttachmentTooLargeException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('\u0627\u0644\u0645\u0644\u0641 \u0643\u0628\u064A\u0631 \u062C\u062F\u0627\u064B: ${AttachmentService.formatFileSize(e.actualBytes)}')),
+        );
+      }
+    } catch (_) {
+      // user cancelled or error
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _delete(VaultAttachment att) async {
+    final svc = _service();
+    if (svc == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppConstants.cardDark,
+        title: const Text('\u062D\u0630\u0641 \u0627\u0644\u0645\u0631\u0641\u0642', style: TextStyle(color: Colors.white)), // حذف المرفق
+        content: Text(
+          '\u0647\u0644 \u062A\u0631\u064A\u062F \u062D\u0630\u0641 "${att.fileName}"\u061F', // هل تريد حذف "..."؟
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('\u0625\u0644\u063A\u0627\u0621')), // إلغاء
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('\u062D\u0630\u0641', style: TextStyle(color: AppConstants.errorRed)), // حذف
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await svc.deleteAttachment(att.id);
+      await _load();
+    }
+  }
+
+  IconData _iconForMime(String mime) {
+    if (mime.startsWith('image/')) return Icons.image;
+    if (mime == 'application/pdf') return Icons.picture_as_pdf;
+    if (mime.startsWith('text/')) return Icons.description;
+    return Icons.attach_file;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Don't render if provider not available
+    if (_service() == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppConstants.cardDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppConstants.borderDark),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.attach_file, color: AppConstants.primaryCyan, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '\u0627\u0644\u0645\u0631\u0641\u0642\u0627\u062A (${_attachments?.length ?? 0})', // المرفقات
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+              if (_loading)
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppConstants.primaryCyan),
+                )
+              else
+                IconButton(
+                  icon: const Icon(Icons.add, color: AppConstants.primaryCyan, size: 20),
+                  onPressed: _pickFile,
+                  tooltip: '\u0625\u0636\u0627\u0641\u0629 \u0645\u0631\u0641\u0642', // إضافة مرفق
+                ),
+            ],
+          ),
+          if (_attachments != null && _attachments!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ...(_attachments!.map((att) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Icon(_iconForMime(att.mimeType), color: Colors.white54, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              att.fileName,
+                              style: const TextStyle(color: Colors.white, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              AttachmentService.formatFileSize(att.fileSize),
+                              style: const TextStyle(color: Colors.white38, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.white38, size: 18),
+                        onPressed: () => _delete(att),
+                      ),
+                    ],
+                  ),
+                ))),
+          ] else if (_attachments != null) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0631\u0641\u0642\u0627\u062A', // لا توجد مرفقات
+              style: TextStyle(color: Colors.white38, fontSize: 13),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

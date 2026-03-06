@@ -345,7 +345,10 @@ class _VaultCard extends StatelessWidget {
         ),
       ),
       onDismissed: (_) => onDelete(),
-      child: GestureDetector(
+      child: Semantics(
+        label: '${entry.title}, ${entry.category.labelAr}${entry.username != null ? ', ${entry.username}' : ''}',
+        button: true,
+        child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
@@ -389,7 +392,10 @@ class _VaultCard extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: onFavorite,
-                          child: Icon(
+                          child: Semantics(
+                            label: entry.isFavorite ? '\u0625\u0632\u0627\u0644\u0629 \u0645\u0646 \u0627\u0644\u0645\u0641\u0636\u0644\u0629' : '\u0625\u0636\u0627\u0641\u0629 \u0625\u0644\u0649 \u0627\u0644\u0645\u0641\u0636\u0644\u0629',
+                            button: true,
+                            child: Icon(
                             entry.isFavorite
                                 ? Icons.star
                                 : Icons.star_outline,
@@ -397,6 +403,7 @@ class _VaultCard extends StatelessWidget {
                                 ? AppConstants.accentGold
                                 : Colors.white24,
                             size: 18,
+                          ),
                           ),
                         ),
                       ],
@@ -442,6 +449,7 @@ class _VaultCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

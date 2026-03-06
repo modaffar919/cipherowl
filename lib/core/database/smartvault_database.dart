@@ -127,6 +127,66 @@ class SecurityLogs extends Table {
       dateTime().named('created_at').withDefault(currentDateAndTime)();
 }
 
+/// Vault item version history — stores encrypted snapshots before updates.
+///
+/// Each row is an immutable snapshot of a VaultItem row taken *before*
+/// a mutation.  The [encryptedSnapshot] is a JSON blob encrypted with
+/// AES-256-GCM (same key as the vault item itself).
+class VaultItemVersions extends Table {
+  /// Auto-incrementing version row ID.
+  IntColumn get id => integer().named('id').autoIncrement()();
+
+  /// The vault item this version belongs to.
+  TextColumn get itemId => text().named('item_id')();
+
+  /// Monotonically increasing version number per item.
+  IntColumn get version => integer().named('version')();
+
+  /// AES-256-GCM encrypted JSON snapshot of the full item state.
+  BlobColumn get encryptedSnapshot =>
+      blob().named('encrypted_snapshot')();
+
+  /// What kind of change triggered the snapshot.
+  TextColumn get changeType =>
+      text().named('change_type').withDefault(const Constant('update'))();
+
+  DateTimeColumn get changedAt =>
+      dateTime().named('changed_at').withDefault(currentDateAndTime)();
+}
+
+/// Encrypted file attachments linked to vault items.
+///
+/// The actual file blob is stored on disk at [localPath] (encrypted).
+/// Metadata is kept here for indexing and sync.
+class VaultAttachments extends Table {
+  /// UUID v4 primary key.
+  TextColumn get id => text().named('id')();
+
+  /// The vault item this attachment belongs to.
+  TextColumn get itemId => text().named('item_id')();
+
+  /// Original filename (e.g. 'invoice.pdf').
+  TextColumn get fileName => text().named('file_name')();
+
+  /// MIME type (e.g. 'application/pdf', 'image/png').
+  TextColumn get mimeType => text().named('mime_type')();
+
+  /// Original file size in bytes (before encryption).
+  IntColumn get fileSize => integer().named('file_size')();
+
+  /// Relative path to the encrypted file on local storage.
+  TextColumn get localPath => text().named('local_path')();
+
+  /// Supabase Storage object path (null if not yet synced).
+  TextColumn get remotePath => text().named('remote_path').nullable()();
+
+  DateTimeColumn get createdAt =>
+      dateTime().named('created_at').withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Key-value store for user preferences and app state.
 ///
 /// Values are stored as JSON strings.  Sensitive values (e.g. Argon2 salt)
@@ -145,10 +205,39 @@ class UserSettings extends Table {
   Set<Column> get primaryKey => {key};
 }
 
+/// Queued offline operations — persisted until connectivity returns.
+///
+/// Each row represents a single mutation that needs to be pushed to
+/// Supabase when the device goes back online.
+class PendingOperations extends Table {
+  /// Auto-incrementing ID (execution order).
+  IntColumn get id => integer().named('id').autoIncrement()();
+
+  /// Operation type: 'upsert', 'delete', 'attachment_upload', etc.
+  TextColumn get operationType => text().named('operation_type')();
+
+  /// JSON-encoded payload for the operation.
+  TextColumn get payload => text().named('payload')();
+
+  /// Related vault item ID (nullable for non-item operations).
+  TextColumn get itemId => text().named('item_id').nullable()();
+
+  /// Number of failed retry attempts.
+  IntColumn get retryCount =>
+      integer().named('retry_count').withDefault(const Constant(0))();
+
+  /// Status: 'pending', 'processing', 'failed'.
+  TextColumn get status =>
+      text().named('status').withDefault(const Constant('pending'))();
+
+  DateTimeColumn get createdAt =>
+      dateTime().named('created_at').withDefault(currentDateAndTime)();
+}
+
 // ─── Database ────────────────────────────────────────────────────────────────
 
 @DriftDatabase(
-  tables: [VaultItems, SecurityLogs, UserSettings],
+  tables: [VaultItems, VaultItemVersions, VaultAttachments, SecurityLogs, UserSettings, PendingOperations],
   daos: [VaultDao, SettingsDao, SecurityLogDao],
 )
 class SmartVaultDatabase extends _$SmartVaultDatabase {
@@ -164,8 +253,11 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
   ///   v1 — Initial schema: VaultItems, SecurityLogs, UserSettings
   ///   v2 — VaultItems: added [strengthScore], [syncedAt], [lastAccessedAt]
   ///          and [encryptedTotpSecret] columns (back-filled with NULL).
+  ///   v3 — Added VaultItemVersions table for edit history / rollback.
+  ///   v4 — Added VaultAttachments table for encrypted file attachments.
+  ///   v5 — Added PendingOperations table for offline queue.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -184,6 +276,15 @@ class SmartVaultDatabase extends _$SmartVaultDatabase {
               await m.addColumn(vaultItems, vaultItems.syncedAt);
               await m.addColumn(vaultItems, vaultItems.lastAccessedAt);
               await m.addColumn(vaultItems, vaultItems.encryptedTotpSecret);
+            }
+            if (from < 3) {
+              await m.createTable(vaultItemVersions);
+            }
+            if (from < 4) {
+              await m.createTable(vaultAttachments);
+            }
+            if (from < 5) {
+              await m.createTable(pendingOperations);
             }
           });
           await customStatement('PRAGMA foreign_keys = ON');

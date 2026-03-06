@@ -58,6 +58,30 @@ class SupabaseAuthService {
   Future<void> sendPasswordResetEmail(String email) =>
       _client.auth.resetPasswordForEmail(email);
 
+  // ── Magic Link (Passwordless) ──────────────────────────────────────────────
+
+  /// Send a magic link to the user's email.
+  ///
+  /// Supabase sends a one-time link. When clicked, the app receives
+  /// the session via deep-link (`com.cipherowl.app://login-callback`).
+  ///
+  /// This only authenticates the **cloud session** — the user still
+  /// needs to verify their master password to decrypt the local vault.
+  Future<void> sendMagicLink(String email) =>
+      _client.auth.signInWithOtp(
+        email: email,
+        emailRedirectTo: 'com.cipherowl.app://login-callback',
+      );
+
+  /// Verify a magic link token received via deep-link callback.
+  ///
+  /// Call this when the app is opened from a magic link URL.
+  Future<AuthResponse> verifyMagicLinkToken({
+    required String token,
+    OtpType type = OtpType.magiclink,
+  }) =>
+      _client.auth.verifyOTP(token: token, type: type);
+
   // ── OAuth ──────────────────────────────────────────────────────────────────
 
   /// Sign in with Google OAuth.

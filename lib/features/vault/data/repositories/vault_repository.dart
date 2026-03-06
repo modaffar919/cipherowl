@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -71,7 +73,21 @@ class VaultRepository {
   }
 
   /// Update an existing vault entry. Bumps [updatedAt] automatically.
+  /// Saves a version snapshot of the previous state for rollback.
   Future<void> updateItem(VaultEntry entry) async {
+    // Save version snapshot before overwriting
+    final existing = await _db.vaultDao.findItemById(entry.id);
+    if (existing != null) {
+      final ver = await _db.vaultDao.nextVersion(entry.id);
+      final snapshot = _serializeSnapshot(existing);
+      await _db.vaultDao.saveVersion(
+        itemId: entry.id,
+        version: ver,
+        encryptedSnapshot: Uint8List.fromList(utf8.encode(snapshot)),
+        changeType: 'update',
+      );
+    }
+
     final updated = entry.copyWith(updatedAt: DateTime.now());
     await _db.vaultDao.upsertItem(_toCompanion(updated));
     await _db.securityLogDao.logEvent(
@@ -104,6 +120,43 @@ class VaultRepository {
   /// Cache the zxcvbn strength score from the Rust analyser.
   Future<void> updateStrengthScore(String id, int score) =>
       _db.vaultDao.updateStrengthScore(id, score);
+
+  // ── Version History ──────────────────────────────────────────────────────
+
+  /// Get all version snapshots for an item, newest first.
+  Future<List<VaultItemVersionInfo>> getVersionHistory(String itemId) async {
+    final rows = await _db.vaultDao.getVersions(itemId);
+    return rows
+        .map((r) => VaultItemVersionInfo(
+              id: r.id,
+              itemId: r.itemId,
+              version: r.version,
+              changeType: r.changeType,
+              changedAt: r.changedAt,
+            ))
+        .toList();
+  }
+
+  /// Restore a vault item to a previous version snapshot.
+  Future<VaultEntry?> restoreVersion(String itemId, int versionId) async {
+    final rows = await _db.vaultDao.getVersions(itemId);
+    final target = rows.where((r) => r.id == versionId).firstOrNull;
+    if (target == null) return null;
+
+    final json = utf8.decode(target.encryptedSnapshot);
+    final map = jsonDecode(json) as Map<String, dynamic>;
+    final restored = _entryFromSnapshot(map);
+
+    // Save current state as a version before restoring
+    await updateItem(restored);
+    return restored;
+  }
+
+  /// Delete old versions beyond 90 days.
+  Future<int> pruneOldVersions(String itemId, {int days = 90}) {
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    return _db.vaultDao.pruneVersions(itemId, cutoff);
+  }
 
   // ── Mapping helpers ──────────────────────────────────────────────────────
 
@@ -151,4 +204,64 @@ class VaultRepository {
         lastAccessedAt: Value(e.lastAccessedAt),
         syncedAt: Value(e.syncedAt),
       );
+
+  /// Serialize a VaultItem row to JSON string for version snapshots.
+  String _serializeSnapshot(VaultItem row) {
+    return jsonEncode({
+      'id': row.id,
+      'user_id': row.userId,
+      'title': row.title,
+      'username': row.username,
+      'url': row.url,
+      'category': row.category,
+      'is_favorite': row.isFavorite,
+      'strength_score': row.strengthScore,
+      'created_at': row.createdAt.toIso8601String(),
+      'updated_at': row.updatedAt.toIso8601String(),
+      'last_accessed_at': row.lastAccessedAt?.toIso8601String(),
+      'synced_at': row.syncedAt?.toIso8601String(),
+    });
+  }
+
+  /// Reconstruct a VaultEntry from a snapshot JSON map.
+  VaultEntry _entryFromSnapshot(Map<String, dynamic> map) {
+    return VaultEntry(
+      id: map['id'] as String,
+      userId: map['user_id'] as String,
+      title: map['title'] as String,
+      username: map['username'] as String?,
+      url: map['url'] as String?,
+      category: VaultCategory.values.firstWhere(
+        (c) => c.name == (map['category'] as String? ?? 'login'),
+        orElse: () => VaultCategory.login,
+      ),
+      isFavorite: map['is_favorite'] as bool? ?? false,
+      strengthScore: map['strength_score'] as int? ?? -1,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      updatedAt: DateTime.parse(map['updated_at'] as String),
+      lastAccessedAt: map['last_accessed_at'] != null
+          ? DateTime.parse(map['last_accessed_at'] as String)
+          : null,
+      syncedAt: map['synced_at'] != null
+          ? DateTime.parse(map['synced_at'] as String)
+          : null,
+    );
+  }
+}
+
+/// Lightweight info about a vault item version (no snapshot blob).
+class VaultItemVersionInfo {
+  final int id;
+  final String itemId;
+  final int version;
+  final String changeType;
+  final DateTime changedAt;
+
+  const VaultItemVersionInfo({
+    required this.id,
+    required this.itemId,
+    required this.version,
+    required this.changeType,
+    required this.changedAt,
+  });
 }

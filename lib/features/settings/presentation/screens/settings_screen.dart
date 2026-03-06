@@ -201,6 +201,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: '���� ���������� ������ ������',
                   onTap: _showDuressPasswordDialog,
                 ),
+                _ActionCard(
+                  icon: Icons.emergency,
+                  iconColor: const Color(0xFFFF6D00),
+                  title: '\u0648\u0635\u0648\u0644 \u0627\u0644\u0637\u0648\u0627\u0631\u0626',
+                  subtitle: '\u0625\u062F\u0627\u0631\u0629 \u062C\u0647\u0627\u062A \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0627\u0644\u0645\u0648\u062B\u0648\u0642\u0629',
+                  onTap: () => context.push(AppConstants.routeEmergencyAccess),
+                ),
 
                 const SizedBox(height: 16),
 

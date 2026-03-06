@@ -11,6 +11,8 @@ import '../../features/vault/presentation/screens/vault_item_detail_screen.dart'
 import '../../features/vault/presentation/screens/add_edit_item_screen.dart';
 import '../../features/generator/presentation/generator_screen.dart';
 import '../../features/security_center/presentation/screens/security_center_screen.dart';
+import '../../features/security_center/presentation/screens/password_health_screen.dart';
+import '../../features/emergency/presentation/screens/emergency_access_screen.dart';
 import '../../features/academy/presentation/screens/academy_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/face_track/presentation/screens/face_setup_screen.dart';
@@ -30,6 +32,7 @@ import '../../features/academy/presentation/screens/quiz_screen.dart';
 import '../../features/gamification/presentation/screens/badges_screen.dart';
 import '../../features/academy/presentation/screens/daily_challenge_screen.dart';
 import '../../features/geofence/presentation/screens/geofence_settings_screen.dart';
+import '../../features/auth/presentation/screens/magic_link_screen.dart';
 import '../../features/travel_mode/presentation/screens/travel_mode_screen.dart';
 import '../constants/app_constants.dart';
 
@@ -180,6 +183,27 @@ abstract class AppRouter {
         path: AppConstants.routeSecurityCenter,
         pageBuilder: (context, state) =>
             _slideRight(state, const SecurityCenterScreen()),
+      ),
+
+      // ── Password Health ──────────────────────────────────
+      GoRoute(
+        path: AppConstants.routePasswordHealth,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const PasswordHealthScreen()),
+      ),
+
+      // ── Emergency Access ─────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeEmergencyAccess,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const EmergencyAccessScreen()),
+      ),
+
+      // ── Magic Link ──────────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeMagicLink,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const MagicLinkScreen()),
       ),
 
       // ── Academy ─────────────────────────────────────────

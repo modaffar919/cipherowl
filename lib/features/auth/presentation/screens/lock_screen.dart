@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -74,6 +75,7 @@ class _LockScreenState extends State<LockScreen>
         if (state is AuthAuthenticated) {
           _passwordController.clear();
           context.go(AppConstants.routeDashboard);
+          SemanticsService.sendAnnouncement(View.of(context), '\u062A\u0645 \u0641\u062A\u062D \u0627\u0644\u062E\u0632\u0646\u0629', TextDirection.rtl); // تم فتح الخزنة
         } else if (state is AuthDuressAuthenticated) {
           // Duress password — navigate to dashboard, VaultBloc will serve empty vault
           _passwordController.clear();
@@ -342,6 +344,15 @@ class _LockScreenState extends State<LockScreen>
               color: AppConstants.accentGold,
               onTap: _fido2Unlock,
             ),
+            const SizedBox(width: 24),
+            // Magic Link
+            _AuthOptionButton(
+              icon: Icons.mail_outline_rounded,
+              labelAr: 'رابط سحري',
+              labelEn: 'Link',
+              color: AppConstants.accentPurple,
+              onTap: () => context.push(AppConstants.routeMagicLink),
+            ),
           ],
         ),
       ],
@@ -382,7 +393,10 @@ class _AuthOptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      label: '$labelAr - $labelEn',
+      button: true,
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         width: 80,
@@ -395,7 +409,7 @@ class _AuthOptionButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 26),
+            Icon(icon, color: color, size: 26, semanticLabel: labelAr),
             const SizedBox(height: 4),
             Text(
               labelAr,
@@ -404,6 +418,7 @@ class _AuthOptionButton extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

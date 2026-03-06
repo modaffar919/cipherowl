@@ -103,7 +103,9 @@ class _PasswordTab extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(
+                  Semantics(
+                    label: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u0645\u064F\u0648\u0644\u0651\u062F\u0629: ${state.password}',
+                    child: Text(
                     state.password,
                     style: const TextStyle(
                       color: AppConstants.primaryCyan,
@@ -112,6 +114,7 @@ class _PasswordTab extends StatelessWidget {
                       letterSpacing: 1,
                     ),
                     textAlign: TextAlign.center,
+                  ),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -270,7 +273,8 @@ class _PassphraseTabState extends State<_PassphraseTab> {
           ),
           child: Column(
             children: [
-              Text(_result, style: const TextStyle(color: AppConstants.accentGold, fontSize: 16, fontWeight: FontWeight.w600, letterSpacing: 1), textAlign: TextAlign.center),
+              Text(_result, style: const TextStyle(color: AppConstants.accentGold, fontSize: 16, fontWeight: FontWeight.w600, letterSpacing: 1), textAlign: TextAlign.center,
+              semanticsLabel: '\u0639\u0628\u0627\u0631\u0629 \u0627\u0644\u0645\u0631\u0648\u0631: $_result'),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -332,13 +336,17 @@ class _IconBtn extends StatelessWidget {
   final VoidCallback onTap;
   const _IconBtn({required this.icon, required this.color, required this.onTap});
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => Semantics(
+    label: icon == Icons.refresh ? '\u062A\u062D\u062F\u064A\u062B' : (icon == Icons.copy ? '\u0646\u0633\u062E' : ''),
+    button: true,
+    child: GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
       child: Icon(icon, color: color, size: 18),
     ),
+  ),
   );
 }
 

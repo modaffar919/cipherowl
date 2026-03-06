@@ -7,7 +7,7 @@ part 'vault_dao.g.dart';
 /// Data Access Object for [VaultItems] table.
 ///
 /// All write operations bump [VaultItem.updatedAt] so incremental sync works.
-@DriftAccessor(tables: [VaultItems])
+@DriftAccessor(tables: [VaultItems, VaultItemVersions, VaultAttachments])
 class VaultDao extends DatabaseAccessor<SmartVaultDatabase>
     with _$VaultDaoMixin {
   VaultDao(super.db);
@@ -130,4 +130,69 @@ class VaultDao extends DatabaseAccessor<SmartVaultDatabase>
       (update(vaultItems)..where((t) => t.id.equals(id))).write(
         VaultItemsCompanion(lastAccessedAt: Value(DateTime.now())),
       );
+
+  // ── Version History ─────────────────────────────────────────────────────
+
+  /// Save an encrypted snapshot of an item before mutation.
+  Future<void> saveVersion({
+    required String itemId,
+    required int version,
+    required Uint8List encryptedSnapshot,
+    String changeType = 'update',
+  }) =>
+      into(vaultItemVersions).insert(VaultItemVersionsCompanion(
+        itemId: Value(itemId),
+        version: Value(version),
+        encryptedSnapshot: Value(encryptedSnapshot),
+        changeType: Value(changeType),
+        changedAt: Value(DateTime.now()),
+      ));
+
+  /// Get the next version number for an item.
+  Future<int> nextVersion(String itemId) async {
+    final maxVersion = vaultItemVersions.version.max();
+    final query = selectOnly(vaultItemVersions)
+      ..addColumns([maxVersion])
+      ..where(vaultItemVersions.itemId.equals(itemId));
+    final row = await query.getSingle();
+    return (row.read(maxVersion) ?? 0) + 1;
+  }
+
+  /// Get all versions for an item, newest first.
+  Future<List<VaultItemVersion>> getVersions(String itemId) =>
+      (select(vaultItemVersions)
+            ..where((t) => t.itemId.equals(itemId))
+            ..orderBy([(t) => OrderingTerm.desc(t.version)]))
+          .get();
+
+  /// Delete versions older than [cutoff] for an item.
+  Future<int> pruneVersions(String itemId, DateTime cutoff) =>
+      (delete(vaultItemVersions)
+            ..where((t) =>
+                t.itemId.equals(itemId) &
+                t.changedAt.isSmallerThanValue(cutoff)))
+          .go();
+
+  // ── Attachments ─────────────────────────────────────────────────────────
+
+  /// Insert a new attachment record.
+  Future<void> insertAttachment(VaultAttachmentsCompanion attachment) =>
+      into(vaultAttachments).insert(attachment);
+
+  /// Get all attachments for a vault item.
+  Future<List<VaultAttachment>> getAttachments(String itemId) =>
+      (select(vaultAttachments)
+            ..where((t) => t.itemId.equals(itemId))
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+          .get();
+
+  /// Delete a single attachment by ID.
+  Future<int> deleteAttachment(String attachmentId) =>
+      (delete(vaultAttachments)..where((t) => t.id.equals(attachmentId)))
+          .go();
+
+  /// Delete all attachments for a vault item.
+  Future<int> deleteAttachmentsForItem(String itemId) =>
+      (delete(vaultAttachments)..where((t) => t.itemId.equals(itemId)))
+          .go();
 }

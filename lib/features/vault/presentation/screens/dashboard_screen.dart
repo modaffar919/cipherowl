@@ -97,7 +97,11 @@ class _CipherBottomNav extends StatelessWidget {
             children: List.generate(destinations.length, (i) {
               final active = selectedIndex == i;
               final item = destinations[i];
-              return GestureDetector(
+              return Semantics(
+                label: item.labelAr,
+                selected: active,
+                button: true,
+                child: GestureDetector(
                 onTap: () => onTap(i),
                 behavior: HitTestBehavior.opaque,
                 child: SizedBox(
@@ -116,6 +120,7 @@ class _CipherBottomNav extends StatelessWidget {
                           active ? item.activeIcon : item.icon,
                           color: active ? AppConstants.primaryCyan : Colors.white38,
                           size: 22,
+                          semanticLabel: item.labelAr,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -130,6 +135,7 @@ class _CipherBottomNav extends StatelessWidget {
                     ],
                   ),
                 ),
+              ),
               );
             }),
           ),

@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/security_center/presentation/bloc/security_bloc.dart';
 import '../../../vault/presentation/bloc/vault_bloc.dart';
@@ -162,6 +164,31 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                 // Recommendations
                 SliverToBoxAdapter(
                   child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          context.push(AppConstants.routePasswordHealth),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppConstants.primaryCyan,
+                        side: BorderSide(
+                          color: AppConstants.primaryCyan.withValues(alpha: 0.3),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      icon: const Icon(Icons.health_and_safety, size: 20),
+                      label: const Text(
+                        '\u0635\u062D\u0629 \u0643\u0644\u0645\u0627\u062A \u0627\u0644\u0645\u0631\u0648\u0631', // صحة كلمات المرور
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SliverToBoxAdapter(
+                  child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +243,9 @@ class _SecurityShield extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Semantics(
+      label: '\u0646\u0642\u0627\u0637 \u0627\u0644\u0623\u0645\u0627\u0646 $score \u0645\u0646 100',
+      child: SizedBox(
       width: 200,
       height: 200,
       child: Stack(
@@ -262,6 +291,7 @@ class _SecurityShield extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -305,7 +335,9 @@ class _LayerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ratio = layer.current / layer.max;
-    return Container(
+    return Semantics(
+      label: '${layer.name}: ${layer.current} \u0645\u0646 ${layer.max}',
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -346,6 +378,7 @@ class _LayerCard extends StatelessWidget {
                   color: _color, fontWeight: FontWeight.w700, fontSize: 13)),
         ],
       ),
+    ),
     );
   }
 }
@@ -379,7 +412,9 @@ class _RecommendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Semantics(
+      label: '$title. $body. +$xp XP',
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -417,6 +452,7 @@ class _RecommendCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

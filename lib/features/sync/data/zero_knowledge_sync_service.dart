@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../src/rust/api.dart';
 import '../../vault/domain/entities/vault_entry.dart';
 import '../domain/sync_result.dart';
+import '../domain/three_way_merge.dart';
 
 /// Zero-knowledge sync service for CipherOwl.
 ///
@@ -18,7 +19,8 @@ import '../domain/sync_result.dart';
 ///    sync key. Only the base-64 ciphertext is sent to Supabase.
 /// 3. To download: the ciphertext is fetched, decrypted locally, and
 ///    deserialised back to [VaultEntry].
-/// 4. Conflict resolution — **last write wins** on [VaultEntry.updatedAt].
+/// 4. Conflict resolution — **field-level 3-way merge** using base
+///    snapshots. Falls back to last-write-wins when no base is available.
 class ZeroKnowledgeSyncService {
   static const String _syncKeyStorageKey = 'cipher_sync_key';
   static const String _table = 'encrypted_vaults';
@@ -26,25 +28,35 @@ class ZeroKnowledgeSyncService {
 
   final FlutterSecureStorage _storage;
   final SupabaseClient _client;
+  final ThreeWayMergeEngine _mergeEngine;
 
   ZeroKnowledgeSyncService({
     FlutterSecureStorage? storage,
     SupabaseClient? client,
+    ThreeWayMergeEngine? mergeEngine,
   })  : _storage = storage ?? const FlutterSecureStorage(),
-        _client = client ?? Supabase.instance.client;
+        _client = client ?? Supabase.instance.client,
+        _mergeEngine = mergeEngine ?? const ThreeWayMergeEngine();
 
   // ── Public API ────────────────────────────────────────────────────────────
 
   /// Pull new/updated entries from Supabase and push local unsynced changes.
   ///
-  /// [localItems]    — all local [VaultEntry] rows (from [VaultRepository]).
-  /// [onMerge]       — callback to persist merged [VaultEntry] list locally.
-  /// [sinceLastSync] — only fetch server rows updated after this timestamp.
+  /// [localItems]     — all local [VaultEntry] rows (from [VaultRepository]).
+  /// [baseSnapshots]  — last-synced state of each item (keyed by id).
+  ///                    Used as the common ancestor for 3-way merge.
+  /// [onMerge]        — callback to persist merged [VaultEntry] list locally.
+  /// [onConflicts]    — callback to present conflicts to the user.
+  ///                    Must return the resolved entries. If null, local wins.
+  /// [sinceLastSync]  — only fetch server rows updated after this timestamp.
   ///
   /// Returns [SyncSkipped] if the user is not signed in to cloud.
   Future<SyncResult> sync({
     required List<VaultEntry> localItems,
     required Future<void> Function(List<VaultEntry> merged) onMerge,
+    Map<String, VaultEntry> baseSnapshots = const {},
+    Future<List<VaultEntry>> Function(List<MergeConflict> conflicts)?
+        onConflicts,
     DateTime? sinceLastSync,
   }) async {
     final user = _client.auth.currentUser;
@@ -84,8 +96,26 @@ class ZeroKnowledgeSyncService {
         if (entry != null) remoteEntries.add(entry);
       }
 
-      // 3. Merge: prefer newer updatedAt
-      final merged = _merge(localItems, remoteEntries);
+      // 3. Merge: field-level 3-way merge using base snapshots
+      final batchResult = _mergeEngine.mergeBatch(
+        bases: baseSnapshots,
+        local: localItems,
+        remote: remoteEntries,
+      );
+
+      final merged = [...batchResult.resolved];
+
+      // Handle conflicts — ask user or default to local-wins
+      if (batchResult.hasConflicts) {
+        if (onConflicts != null) {
+          final resolved = await onConflicts(batchResult.conflicts);
+          merged.addAll(resolved);
+        } else {
+          // Default: keep local version for conflicts
+          merged.addAll(batchResult.conflicts.map((c) => c.local));
+        }
+      }
+
       await onMerge(merged);
 
       // 4. Update sync_metadata
@@ -152,21 +182,6 @@ class ZeroKnowledgeSyncService {
     } catch (_) {
       return null; // corrupted or encrypted with a different key
     }
-  }
-
-  /// Last-write-wins merge: for each id, keep the entry with the later updatedAt.
-  List<VaultEntry> _merge(
-      List<VaultEntry> local, List<VaultEntry> remote) {
-    final map = <String, VaultEntry>{
-      for (final e in local) e.id: e,
-    };
-    for (final r in remote) {
-      final l = map[r.id];
-      if (l == null || r.updatedAt.isAfter(l.updatedAt)) {
-        map[r.id] = r;
-      }
-    }
-    return map.values.toList();
   }
 
   Future<void> _updateSyncMeta(String userId, int totalItems) async {

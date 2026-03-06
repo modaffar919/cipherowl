@@ -34,6 +34,13 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep-link: Supabase OAuth / Magic Link callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="com.cipherowl.app" android:host="login-callback"/>
+            </intent-filter>
         </activity>
         <!-- ── CipherOwl AutofillService (API 26+) ──────────────────────────
              Provides username/password autofill for apps and browsers.
