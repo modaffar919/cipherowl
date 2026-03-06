@@ -141,5 +141,6 @@ tasks.whenTaskAdded {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     // MASVS-STORAGE-1: EncryptedSharedPreferences for the autofill credential cache
-    implementation("androidx.security:security-crypto:1.0.0")
+    // MasterKey API requires 1.1.0-alpha06+
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

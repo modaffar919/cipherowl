@@ -109,5 +109,28 @@
   "earnedXP": "+{xp} XP",
   "scoreOutOf100": "/ 100",
   "cipherowlEnterprise": "CipherOwl Enterprise",
-  "cipherowlSecurity": "CipherOwl Security"
+  "cipherowlSecurity": "CipherOwl Security",
+
+  "geoFencing": "Geo-Fencing",
+  "safeZones": "Safe Zones",
+  "addSafeZone": "Add Safe Zone",
+  "safeZoneName": "Zone Name",
+  "useCurrentLocation": "Use Current Location",
+  "geoFenceActive": "Active — Monitoring Location",
+  "geoFenceInactive": "Inactive",
+  "leftSafeZone": "Left safe zone — vault locked",
+  "insideSafeZone": "Inside safe zone ✓",
+  "deleteZone": "Delete Zone",
+  "monitoringEnabled": "Auto-lock monitoring enabled",
+  "noSafeZones": "No safe zones yet",
+  "geoFencePermissionDenied": "Location permission denied. Grant it in system settings.",
+  "geoFenceRadius": "Radius (meters)",
+
+  "travelMode": "Travel Mode",
+  "travelModeDescription": "Hides selected vault categories at borders or in high-surveillance areas",
+  "travelModeActive": "Active — Selected categories hidden",
+  "travelModeInactive": "Inactive",
+  "hiddenCategories": "Hidden Categories",
+  "travelModeCategories": "Select categories to hide while travelling",
+  "travelModeHint": "Data is encrypted and safe — not deleted"
 }

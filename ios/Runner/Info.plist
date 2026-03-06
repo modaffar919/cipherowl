@@ -83,6 +83,12 @@
 <key>NSPhotoLibraryUsageDescription</key>
 <string>CipherOwl يحتاج الوصول للصور لاستيراد رموز QR الخاصة بالمصادقة الثنائية.</string>
 
+<!-- Location: Geo-Fencing auto-lock -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>CipherOwl يستخدم موقعك لتفعيل القفل التلقائي عند مغادرة المناطق الآمنة المحددة.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>CipherOwl يستخدم موقعك في الخلفية لتفعيل القفل التلقائي عند مغادرة المناطق الآمنة.</string>
+
 <!-- Photo Library add-only: save QR codes -->
 <key>NSPhotoLibraryAddUsageDescription</key>
 <string>CipherOwl يحفظ رموز QR في مكتبة الصور لمشاركة إعدادات المصادقة الثنائية.</string>

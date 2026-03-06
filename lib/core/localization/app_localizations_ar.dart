@@ -310,4 +310,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cipherowlSecurity => 'CipherOwl Security';
+
+  @override
+  String get geoFencing => 'السياج الجغرافي';
+
+  @override
+  String get safeZones => 'المناطق الآمنة';
+
+  @override
+  String get addSafeZone => 'إضافة منطقة آمنة';
+
+  @override
+  String get safeZoneName => 'اسم المنطقة';
+
+  @override
+  String get useCurrentLocation => 'استخدم موقعي الحالي';
+
+  @override
+  String get geoFenceActive => 'مُفعَّل — جارٍ مراقبة الموقع';
+
+  @override
+  String get geoFenceInactive => 'غير مُفعَّل';
+
+  @override
+  String get leftSafeZone => 'غادرت المنطقة الآمنة — تم قفل الخزنة';
+
+  @override
+  String get insideSafeZone => 'داخل منطقة آمنة ✓';
+
+  @override
+  String get deleteZone => 'حذف المنطقة';
+
+  @override
+  String get monitoringEnabled => 'مراقبة القفل التلقائي مُفعَّلة';
+
+  @override
+  String get noSafeZones => 'لا توجد مناطق آمنة بعد';
+
+  @override
+  String get geoFencePermissionDenied =>
+      'تم رفض إذن الموقع. امنحه من إعدادات النظام.';
+
+  @override
+  String get geoFenceRadius => 'نطاق الأمان (متر)';
+
+  @override
+  String get travelMode => 'وضع السفر';
+
+  @override
+  String get travelModeDescription =>
+      'يُخفي فئات محددة من الخزنة عند الحدود أو في المناطق الحساسة';
+
+  @override
+  String get travelModeActive => 'مُفعَّل — الفئات المحددة مخفية';
+
+  @override
+  String get travelModeInactive => 'غير مُفعَّل';
+
+  @override
+  String get hiddenCategories => 'الفئات المخفية';
+
+  @override
+  String get travelModeCategories =>
+      'اختر الفئات التي تريد إخفاءها أثناء السفر';
+
+  @override
+  String get travelModeHint => 'البيانات مشفّرة وآمنة — لا يتم حذفها';
 }

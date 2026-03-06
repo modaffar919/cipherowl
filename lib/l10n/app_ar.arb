@@ -306,5 +306,28 @@
   "@cipherowlEnterprise": { "description": "Enterprise product name" },
 
   "cipherowlSecurity": "CipherOwl Security",
-  "@cipherowlSecurity": { "description": "Security product variant name" }
+  "@cipherowlSecurity": { "description": "Security product variant name" },
+
+  "geoFencing": "السياج الجغرافي",
+  "safeZones": "المناطق الآمنة",
+  "addSafeZone": "إضافة منطقة آمنة",
+  "safeZoneName": "اسم المنطقة",
+  "useCurrentLocation": "استخدم موقعي الحالي",
+  "geoFenceActive": "مُفعَّل — جارٍ مراقبة الموقع",
+  "geoFenceInactive": "غير مُفعَّل",
+  "leftSafeZone": "غادرت المنطقة الآمنة — تم قفل الخزنة",
+  "insideSafeZone": "داخل منطقة آمنة ✓",
+  "deleteZone": "حذف المنطقة",
+  "monitoringEnabled": "مراقبة القفل التلقائي مُفعَّلة",
+  "noSafeZones": "لا توجد مناطق آمنة بعد",
+  "geoFencePermissionDenied": "تم رفض إذن الموقع. امنحه من إعدادات النظام.",
+  "geoFenceRadius": "نطاق الأمان (متر)",
+
+  "travelMode": "وضع السفر",
+  "travelModeDescription": "يُخفي فئات محددة من الخزنة عند الحدود أو في المناطق الحساسة",
+  "travelModeActive": "مُفعَّل — الفئات المحددة مخفية",
+  "travelModeInactive": "غير مُفعَّل",
+  "hiddenCategories": "الفئات المخفية",
+  "travelModeCategories": "اختر الفئات التي تريد إخفاءها أثناء السفر",
+  "travelModeHint": "البيانات مشفّرة وآمنة — لا يتم حذفها"
 }

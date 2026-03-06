@@ -24,6 +24,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsDarkWebToggled>(_onDarkWebToggled);
     on<SettingsAutoFillToggled>(_onAutoFillToggled);
     on<SettingsLanguageChanged>(_onLanguageChanged);
+    on<SettingsGeoFenceToggled>(_onGeoFenceToggled);
+    on<SettingsTravelModeToggled>(_onTravelModeToggled);
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -107,5 +109,23 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final next = s.copyWith(language: code);
     emit(SettingsLoaded(next));
     await _repo.setLanguage(code);
+  }
+
+  Future<void> _onGeoFenceToggled(
+      SettingsGeoFenceToggled event, Emitter<SettingsState> emit) async {
+    final s = _current;
+    if (s == null) return;
+    final next = s.copyWith(geoFenceEnabled: !s.geoFenceEnabled);
+    emit(SettingsLoaded(next));
+    await _repo.setGeoFenceEnabled(next.geoFenceEnabled);
+  }
+
+  Future<void> _onTravelModeToggled(
+      SettingsTravelModeToggled event, Emitter<SettingsState> emit) async {
+    final s = _current;
+    if (s == null) return;
+    final next = s.copyWith(travelModeEnabled: !s.travelModeEnabled);
+    emit(SettingsLoaded(next));
+    await _repo.setTravelModeEnabled(next.travelModeEnabled);
   }
 }

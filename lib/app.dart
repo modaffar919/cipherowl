@@ -24,6 +24,8 @@ import 'features/notifications/data/services/fcm_service.dart';
 import 'features/notifications/presentation/bloc/notification_bloc.dart';
 import 'features/notifications/presentation/bloc/notification_event.dart';
 import 'features/academy/presentation/bloc/academy_bloc.dart';
+import 'features/geofence/presentation/bloc/geofence_bloc.dart';
+import 'features/travel_mode/presentation/bloc/travel_mode_bloc.dart';
 import 'core/supabase/supabase_client_provider.dart';
 
 class CipherOwlApp extends StatefulWidget {
@@ -124,6 +126,14 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
         ),
         BlocProvider<NotificationBloc>.value(value: _notifBloc),
         BlocProvider<AcademyBloc>.value(value: _academyBloc),
+        BlocProvider<GeofenceBloc>(
+          create: (_) => GeofenceBloc()..add(const GeofenceStarted()),
+          lazy: false,
+        ),
+        BlocProvider<TravelModeBloc>(
+          create: (_) => TravelModeBloc()..add(const TravelModeStarted()),
+          lazy: false,
+        ),
       ],
       child: ScreenUtilInit(
       designSize: const Size(390, 844), // iPhone 14 base

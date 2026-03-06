@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/travel_mode/presentation/bloc/travel_mode_bloc.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 
@@ -64,7 +65,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
       },
       builder: (context, state) {
         final isLoaded = state is VaultLoaded;
-        final items = isLoaded ? state.filteredItems : <VaultEntry>[];
+        final rawItems = isLoaded ? state.filteredItems : <VaultEntry>[];
+
+        // ── Travel Mode filtering ───────────────────────────────────────────
+        final tmState = context.watch<TravelModeBloc>().state;
+        final items = (tmState is TravelModeLoaded && tmState.isEnabled)
+            ? rawItems
+                .where((e) => !tmState.hiddenCategories.contains(e.category.name))
+                .toList()
+            : rawItems;
         final totalCount = isLoaded ? state.allItems.length : 0;
         final securityScore = isLoaded ? state.securityScore : 0;
         final selectedCategory = isLoaded ? state.categoryFilter : null;
@@ -227,8 +236,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 SliverFillRemaining(
                   child: _EmptyPlaceholder(
                     hasFilter: isLoaded &&
-                        ((state as VaultLoaded).searchQuery.isNotEmpty ||
-                            (state).categoryFilter != null),
+                        (state.searchQuery.isNotEmpty ||
+                            state.categoryFilter != null),
                     totalCount: totalCount,
                   ),
                 )

@@ -1,6 +1,6 @@
 ﻿# 🎯 مشروع CipherOwl — لوحة التتبع الكاملة
 
-> **آخر تحديث:** 2026-03-06 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 77 &nbsp;|&nbsp; 🔴 مفتوحة: 40 &nbsp;|&nbsp; 📱 آخر بناء APK: 149.6MB ✅
+> **آخر تحديث:** 2026-03-06 &nbsp;|&nbsp; **إجمالي المهام:** 117 &nbsp;|&nbsp; ✅ منجزة: 79 &nbsp;|&nbsp; 🔴 مفتوحة: 38 &nbsp;|&nbsp; 📱 آخر بناء APK: 2026-03-06 ✅
 
 ---
 
@@ -11,7 +11,7 @@
 | 🔴 P0 · حرج | 4 | 25 |
 | 🟠 P1 · عالي | 24 | 21 |
 | 🔵 P2 · متوسط | 23 | 5 |
-| ⬜ P3 · منخفض | 6 | 0 |
+| ⬜ P3 · منخفض | 4 | 2 |
 
 ---
 
@@ -332,10 +332,10 @@
 |:------:|--------|:--:|:--------:|
 | ✅ | ~~Implement password import export CSV Chrome Firefox Bitwarden~~ | `cipherowl-dyn` | P1 · عالي |
 | ✅ | ~~Create app icons and splash screens from logo~~ | `cipherowl-fce` | P1 · عالي |
-| ⬜ | Implement Geo-Fencing auto-lock outside safe zones | `cipherowl-tbc` | P3 · منخفض |
-| ⬜ | Implement Travel Mode hide vault categories at borders | `cipherowl-tju` | P3 · منخفض |
+| ✅ | ~~Implement Geo-Fencing auto-lock outside safe zones~~ | `cipherowl-tbc` | P3 · منخفض |
+| ✅ | ~~Implement Travel Mode hide vault categories at borders~~ | `cipherowl-tju` | P3 · منخفض |
 
 ---
 
-*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01 · آخر مزامنة يدوية: 2026-03-06*
+*تم التوليد تلقائياً من [bd (beads)](https://github.com/nicholasgasior/beads) — 2026-03-04 02:01 · آخر مزامنة يدوية: 2026-03-06 — ✅ ALL 4 UNCLASSIFIED TASKS COMPLETE*
 

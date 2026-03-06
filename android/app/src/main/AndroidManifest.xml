@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- ── Location permissions (Geo-Fencing auto-lock) ───────────────────── -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- ACCESS_BACKGROUND_LOCATION lets the fence keep working when the app is
+         in the background.  Requires a compelling justification at review time. -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <application
         android:label="cipherowl"
         android:name="${applicationName}"

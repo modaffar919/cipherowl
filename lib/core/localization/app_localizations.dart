@@ -673,6 +673,132 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'CipherOwl Security'**
   String get cipherowlSecurity;
+
+  /// No description provided for @geoFencing.
+  ///
+  /// In ar, this message translates to:
+  /// **'السياج الجغرافي'**
+  String get geoFencing;
+
+  /// No description provided for @safeZones.
+  ///
+  /// In ar, this message translates to:
+  /// **'المناطق الآمنة'**
+  String get safeZones;
+
+  /// No description provided for @addSafeZone.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة منطقة آمنة'**
+  String get addSafeZone;
+
+  /// No description provided for @safeZoneName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المنطقة'**
+  String get safeZoneName;
+
+  /// No description provided for @useCurrentLocation.
+  ///
+  /// In ar, this message translates to:
+  /// **'استخدم موقعي الحالي'**
+  String get useCurrentLocation;
+
+  /// No description provided for @geoFenceActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُفعَّل — جارٍ مراقبة الموقع'**
+  String get geoFenceActive;
+
+  /// No description provided for @geoFenceInactive.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مُفعَّل'**
+  String get geoFenceInactive;
+
+  /// No description provided for @leftSafeZone.
+  ///
+  /// In ar, this message translates to:
+  /// **'غادرت المنطقة الآمنة — تم قفل الخزنة'**
+  String get leftSafeZone;
+
+  /// No description provided for @insideSafeZone.
+  ///
+  /// In ar, this message translates to:
+  /// **'داخل منطقة آمنة ✓'**
+  String get insideSafeZone;
+
+  /// No description provided for @deleteZone.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف المنطقة'**
+  String get deleteZone;
+
+  /// No description provided for @monitoringEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراقبة القفل التلقائي مُفعَّلة'**
+  String get monitoringEnabled;
+
+  /// No description provided for @noSafeZones.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مناطق آمنة بعد'**
+  String get noSafeZones;
+
+  /// No description provided for @geoFencePermissionDenied.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض إذن الموقع. امنحه من إعدادات النظام.'**
+  String get geoFencePermissionDenied;
+
+  /// No description provided for @geoFenceRadius.
+  ///
+  /// In ar, this message translates to:
+  /// **'نطاق الأمان (متر)'**
+  String get geoFenceRadius;
+
+  /// No description provided for @travelMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع السفر'**
+  String get travelMode;
+
+  /// No description provided for @travelModeDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُخفي فئات محددة من الخزنة عند الحدود أو في المناطق الحساسة'**
+  String get travelModeDescription;
+
+  /// No description provided for @travelModeActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُفعَّل — الفئات المحددة مخفية'**
+  String get travelModeActive;
+
+  /// No description provided for @travelModeInactive.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مُفعَّل'**
+  String get travelModeInactive;
+
+  /// No description provided for @hiddenCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئات المخفية'**
+  String get hiddenCategories;
+
+  /// No description provided for @travelModeCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الفئات التي تريد إخفاءها أثناء السفر'**
+  String get travelModeCategories;
+
+  /// No description provided for @travelModeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'البيانات مشفّرة وآمنة — لا يتم حذفها'**
+  String get travelModeHint;
 }
 
 class _AppLocalizationsDelegate

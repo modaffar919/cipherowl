@@ -45,3 +45,13 @@ class SettingsLanguageChanged extends SettingsEvent {
   final String code;
   const SettingsLanguageChanged(this.code);
 }
+
+/// Toggle geo-fence auto-lock monitoring.
+class SettingsGeoFenceToggled extends SettingsEvent {
+  const SettingsGeoFenceToggled();
+}
+
+/// Toggle Travel Mode (hide selected vault categories at borders).
+class SettingsTravelModeToggled extends SettingsEvent {
+  const SettingsTravelModeToggled();
+}

@@ -313,4 +313,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cipherowlSecurity => 'CipherOwl Security';
+
+  @override
+  String get geoFencing => 'Geo-Fencing';
+
+  @override
+  String get safeZones => 'Safe Zones';
+
+  @override
+  String get addSafeZone => 'Add Safe Zone';
+
+  @override
+  String get safeZoneName => 'Zone Name';
+
+  @override
+  String get useCurrentLocation => 'Use Current Location';
+
+  @override
+  String get geoFenceActive => 'Active — Monitoring Location';
+
+  @override
+  String get geoFenceInactive => 'Inactive';
+
+  @override
+  String get leftSafeZone => 'Left safe zone — vault locked';
+
+  @override
+  String get insideSafeZone => 'Inside safe zone ✓';
+
+  @override
+  String get deleteZone => 'Delete Zone';
+
+  @override
+  String get monitoringEnabled => 'Auto-lock monitoring enabled';
+
+  @override
+  String get noSafeZones => 'No safe zones yet';
+
+  @override
+  String get geoFencePermissionDenied =>
+      'Location permission denied. Grant it in system settings.';
+
+  @override
+  String get geoFenceRadius => 'Radius (meters)';
+
+  @override
+  String get travelMode => 'Travel Mode';
+
+  @override
+  String get travelModeDescription =>
+      'Hides selected vault categories at borders or in high-surveillance areas';
+
+  @override
+  String get travelModeActive => 'Active — Selected categories hidden';
+
+  @override
+  String get travelModeInactive => 'Inactive';
+
+  @override
+  String get hiddenCategories => 'Hidden Categories';
+
+  @override
+  String get travelModeCategories =>
+      'Select categories to hide while travelling';
+
+  @override
+  String get travelModeHint => 'Data is encrypted and safe — not deleted';
 }

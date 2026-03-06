@@ -61,6 +61,22 @@ class SettingsRepository {
   Future<void> setLanguage(String code) =>
       _db.settingsDao.setSetting('${_prefix}language', code);
 
+  // ── Location Security ─────────────────────────────────────────────────────
+
+  Future<bool> getGeoFenceEnabled() =>
+      _db.settingsDao.getBool('${_prefix}geofence_enabled', defaultValue: false);
+
+  Future<void> setGeoFenceEnabled(bool v) =>
+      _db.settingsDao.setBool('${_prefix}geofence_enabled', v);
+
+  // ── Travel Mode ───────────────────────────────────────────────────────────
+
+  Future<bool> getTravelModeEnabled() =>
+      _db.settingsDao.getBool('${_prefix}travel_mode_enabled', defaultValue: false);
+
+  Future<void> setTravelModeEnabled(bool v) =>
+      _db.settingsDao.setBool('${_prefix}travel_mode_enabled', v);
+
   // ── Load all at once ──────────────────────────────────────────────────────
 
   Future<AppSettings> loadAll() async {
@@ -72,6 +88,8 @@ class SettingsRepository {
       getDarkWebMonitor(),
       getAutoFill(),
       getLanguage() as Future<dynamic>,
+      getGeoFenceEnabled(),
+      getTravelModeEnabled(),
     ]);
     return AppSettings(
       faceTrack: results[0] as bool,
@@ -81,6 +99,8 @@ class SettingsRepository {
       darkWebMonitor: results[4] as bool,
       autoFill: results[5] as bool,
       language: results[6] as String,
+      geoFenceEnabled: results[7] as bool,
+      travelModeEnabled: results[8] as bool,
     );
   }
 }
@@ -94,6 +114,8 @@ class AppSettings {
   final bool darkWebMonitor;
   final bool autoFill;
   final String language;
+  final bool geoFenceEnabled;
+  final bool travelModeEnabled;
 
   const AppSettings({
     required this.faceTrack,
@@ -103,6 +125,8 @@ class AppSettings {
     required this.darkWebMonitor,
     required this.autoFill,
     required this.language,
+    this.geoFenceEnabled = false,
+    this.travelModeEnabled = false,
   });
 
   AppSettings copyWith({
@@ -113,6 +137,8 @@ class AppSettings {
     bool? darkWebMonitor,
     bool? autoFill,
     String? language,
+    bool? geoFenceEnabled,
+    bool? travelModeEnabled,
   }) {
     return AppSettings(
       faceTrack: faceTrack ?? this.faceTrack,
@@ -122,6 +148,8 @@ class AppSettings {
       darkWebMonitor: darkWebMonitor ?? this.darkWebMonitor,
       autoFill: autoFill ?? this.autoFill,
       language: language ?? this.language,
+      geoFenceEnabled: geoFenceEnabled ?? this.geoFenceEnabled,
+      travelModeEnabled: travelModeEnabled ?? this.travelModeEnabled,
     );
   }
 }

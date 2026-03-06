@@ -27,6 +27,12 @@ abstract class AppConstants {
   static const Color errorRed         = Color(0xFFFF3D57);
   static const Color successGreen     = Color(0xFF00E676);
   static const Color warningAmber     = Color(0xFFFFAB00);
+  static const Color warningOrange    = Color(0xFFFF6D00);
+
+  // ── Text Colors ──────────────────────────────────────────
+  static const Color textPrimary   = Color(0xFFE8EAF6);
+  static const Color textSecondary = Color(0xFF8892B0);
+  static const Color borderColor   = Color(0xFF2A3250); // alias for borderDark
 
   // ── Security Score Colors ─────────────────────────────────
   static const Color scoreExcellent = Color(0xFF00E676); // 80-100

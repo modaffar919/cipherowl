@@ -27,6 +27,8 @@ import '../../features/academy/presentation/screens/module_detail_screen.dart';
 import '../../features/academy/presentation/screens/quiz_screen.dart';
 import '../../features/gamification/presentation/screens/badges_screen.dart';
 import '../../features/academy/presentation/screens/daily_challenge_screen.dart';
+import '../../features/geofence/presentation/screens/geofence_settings_screen.dart';
+import '../../features/travel_mode/presentation/screens/travel_mode_screen.dart';
 import '../constants/app_constants.dart';
 
 // ── Transition helpers ───────────────────────────────────────────────────────
@@ -272,6 +274,20 @@ abstract class AppRouter {
         path: AppConstants.routeAcademyDaily,
         pageBuilder: (context, state) =>
             _slideUp(state, const DailyChallengeScreen()),
+      ),
+
+      // ── Geo-Fencing ───────────────────────────────────────
+      GoRoute(
+        path: '/geofence',
+        pageBuilder: (context, state) =>
+            _slideRight(state, const GeofenceSettingsScreen()),
+      ),
+
+      // ── Travel Mode ───────────────────────────────────────
+      GoRoute(
+        path: '/travel-mode',
+        pageBuilder: (context, state) =>
+            _slideRight(state, const TravelModeScreen()),
       ),
     ],
 

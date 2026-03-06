@@ -118,6 +118,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: '${_settings.lockTimeout} �����',
                   onTap: _showTimeoutPicker,
                 ),
+                _ActionCard(
+                  icon: Icons.location_on_outlined,
+                  iconColor: AppConstants.primaryCyan,
+                  title: '������ ����������',
+                  subtitle: '��� ����� ���� ������� ������',
+                  onTap: () => context.go('/geofence'),
+                ),
+                _ActionCard(
+                  icon: Icons.flight_takeoff_outlined,
+                  iconColor: AppConstants.warningAmber,
+                  title: '��� ������',
+                  subtitle: '����� ����� ���� ������ ������',
+                  onTap: () => context.go('/travel-mode'),
+                ),
 
                 const SizedBox(height: 16),
 
