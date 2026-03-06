@@ -8,11 +8,15 @@ import 'core/constants/app_constants.dart';
 import 'core/database/database_key_service.dart';
 import 'core/database/smartvault_database.dart';
 import 'core/firebase/firebase_service.dart';
+import 'core/monitoring/app_monitor.dart';
 import 'features/notifications/data/services/fcm_service.dart';
 import 'src/rust/frb_generated.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── App health monitoring ──────────────────────────────
+  AppMonitor.instance.init();
 
   // ── Rust FFI init (must be first) ──────────────────────
   await RustLib.init();
@@ -61,5 +65,9 @@ class _AppBlocObserver extends BlocObserver {
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
     super.onError(bloc, error, stackTrace);
     debugPrint('[BLoC Error] ${bloc.runtimeType}: $error');
+    AppMonitor.instance.logSecurityEvent(
+      'bloc_error',
+      metadata: {'bloc': '${bloc.runtimeType}', 'error': '$error'},
+    );
   }
 }
