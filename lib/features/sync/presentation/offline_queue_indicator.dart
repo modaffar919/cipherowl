@@ -8,13 +8,27 @@ import 'package:cipherowl/features/sync/data/offline_queue_service.dart';
 /// Place this in the dashboard or app bar to give users visibility
 /// into unsynchronised changes.
 class OfflineQueueIndicator extends StatelessWidget {
-  final OfflineQueueService queueService;
-  const OfflineQueueIndicator({super.key, required this.queueService});
+  final OfflineQueueService? queueService;
+
+  /// Directly supply a stream for testing without a real service.
+  @visibleForTesting
+  final Stream<int>? pendingStream;
+
+  /// Optional callback for the refresh button (defaults to queueService.drainQueue).
+  @visibleForTesting
+  final VoidCallback? onRefresh;
+
+  const OfflineQueueIndicator({
+    super.key,
+    this.queueService,
+    this.pendingStream,
+    this.onRefresh,
+  }) : assert(queueService != null || pendingStream != null);
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<int>(
-      stream: queueService.watchPendingCount(),
+      stream: pendingStream ?? queueService!.watchPendingCount(),
       builder: (context, snapshot) {
         final count = snapshot.data ?? 0;
         if (count == 0) return const SizedBox.shrink();
@@ -33,7 +47,7 @@ class OfflineQueueIndicator extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '$count \u0639\u0645\u0644\u064A\u0629 \u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629', // عملية بانتظار المزامنة
+                  '$count \u0639\u0645\u0644\u064A\u0629 \u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629',
                   style: const TextStyle(
                     color: AppConstants.warningAmber,
                     fontSize: 12,
@@ -42,7 +56,7 @@ class OfflineQueueIndicator extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => queueService.drainQueue(),
+                onTap: onRefresh ?? () => queueService?.drainQueue(),
                 child: const Icon(Icons.refresh, color: AppConstants.warningAmber, size: 18),
               ),
             ],

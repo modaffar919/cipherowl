@@ -16,8 +16,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({
     AuthRepository? authRepository,
     IntruderSnapshotService? snapshotService,
+    BackgroundFaceMonitor? faceMonitor,
   })  : _authRepository = authRepository ?? AuthRepository(),
         _snapshotService = snapshotService ?? IntruderSnapshotService(),
+        _faceMonitor = faceMonitor,
         super(const AuthInitial()) {
     on<AuthAppStarted>(_onAppStarted);
     on<AuthMasterPasswordSubmitted>(_onMasterPasswordSubmitted);

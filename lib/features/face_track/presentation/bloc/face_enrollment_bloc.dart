@@ -24,7 +24,7 @@ class FaceEnrollmentBloc
   final FaceDetectorService _detector;
   final FaceEmbeddingService _embedding;
   final FaceVerificationService _verification;
-  final LivenessDetectionService _liveness = LivenessDetectionService();
+  final LivenessDetectionService _liveness;
 
   static const List<FacePose> _poses = FacePose.values; // front,left,right,up,down
   final List<List<double>> _captures = [];
@@ -33,9 +33,11 @@ class FaceEnrollmentBloc
     required FaceDetectorService detector,
     required FaceEmbeddingService embedding,
     required FaceVerificationService verification,
+    LivenessDetectionService? liveness,
   }) : _detector = detector,
        _embedding = embedding,
        _verification = verification,
+       _liveness = liveness ?? LivenessDetectionService(),
        super(const FaceEnrollmentInitial()) {
     on<FaceEnrollmentInitialized>(_onInitialized);
     on<FaceEnrollmentCaptureRequested>(_onCaptureRequested);

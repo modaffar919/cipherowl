@@ -5,28 +5,34 @@ import 'package:mocktail/mocktail.dart';
 import 'package:cipherowl/features/auth/data/repositories/auth_repository.dart';
 import 'package:cipherowl/features/auth/data/services/intruder_snapshot_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/face_track/data/services/background_face_monitor.dart';
 
-// ── Mocks ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Mocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class MockAuthRepository extends Mock implements AuthRepository {}
 class MockIntruderSnapshotService extends Mock implements IntruderSnapshotService {}
+class MockBackgroundFaceMonitor extends Mock implements BackgroundFaceMonitor {}
 
 void main() {
   late MockAuthRepository mockRepo;
   late MockIntruderSnapshotService mockSnapshotService;
+  late MockBackgroundFaceMonitor mockFaceMonitor;
 
   setUp(() {
     mockRepo = MockAuthRepository();
     mockSnapshotService = MockIntruderSnapshotService();
+    mockFaceMonitor = MockBackgroundFaceMonitor();
+    when(() => mockFaceMonitor.start()).thenAnswer((_) async {});
+    when(() => mockFaceMonitor.stop()).thenAnswer((_) async {});
   });
 
   group('AuthBloc', () {
-    // ── AuthAppStarted ──────────────────────────────────────────────────────
+    // â”€â”€ AuthAppStarted â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthAppStarted', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthChecking, AuthLocked] when setup is complete',
         build: () {
           when(() => mockRepo.isSetupComplete()).thenAnswer((_) async => true);
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthAppStarted()),
         expect: () => const [AuthChecking(), AuthLocked()],
@@ -36,7 +42,7 @@ void main() {
         'emits [AuthChecking, AuthFirstTimeSetup] when setup not done',
         build: () {
           when(() => mockRepo.isSetupComplete()).thenAnswer((_) async => false);
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthAppStarted()),
         expect: () => const [AuthChecking(), AuthFirstTimeSetup()],
@@ -47,21 +53,21 @@ void main() {
         build: () {
           when(() => mockRepo.isSetupComplete())
               .thenThrow(Exception('db error'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthAppStarted()),
         expect: () => const [AuthChecking(), AuthFirstTimeSetup()],
       );
     });
 
-    // ── AuthMasterPasswordSubmitted ─────────────────────────────────────────
+    // â”€â”€ AuthMasterPasswordSubmitted â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthMasterPasswordSubmitted', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthUnlocking, AuthAuthenticated] on correct password',
         build: () {
           when(() => mockRepo.verifyMasterPassword(any()))
               .thenAnswer((_) async => VerifyResult.success());
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) =>
             bloc.add(const AuthMasterPasswordSubmitted('correct123')),
@@ -74,7 +80,7 @@ void main() {
           when(() => mockRepo.verifyMasterPassword(any()))
               .thenAnswer((_) async =>
                   VerifyResult.failed(attempts: 1, remainingAttempts: 4));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
         expect: () => [
@@ -91,7 +97,7 @@ void main() {
           when(() => mockRepo.verifyMasterPassword(any())).thenAnswer((_) async =>
               VerifyResult.locked(const Duration(minutes: 5),
                   isNewLockout: true));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
         expect: () => [
@@ -112,7 +118,7 @@ void main() {
         build: () {
           when(() => mockRepo.verifyMasterPassword(any()))
               .thenThrow(Exception('network'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('pass')),
         expect: () => [
@@ -122,14 +128,14 @@ void main() {
       );
     });
 
-    // ── AuthSetupCompleted ──────────────────────────────────────────────────
+    // â”€â”€ AuthSetupCompleted â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthSetupCompleted', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthUnlocking, AuthAuthenticated] after saving password',
         build: () {
           when(() => mockRepo.saveMasterPassword(any()))
               .thenAnswer((_) async {});
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) =>
             bloc.add(const AuthSetupCompleted('NewP@ss1!')),
@@ -141,7 +147,7 @@ void main() {
         build: () {
           when(() => mockRepo.saveMasterPassword(any()))
               .thenThrow(Exception('disk full'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) =>
             bloc.add(const AuthSetupCompleted('P@ss!')),
@@ -152,14 +158,14 @@ void main() {
       );
     });
 
-    // ── AuthBiometricRequested ──────────────────────────────────────────────
+    // â”€â”€ AuthBiometricRequested â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthBiometricRequested', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthBiometricInProgress, AuthAuthenticated] on success',
         build: () {
           when(() => mockRepo.authenticateWithBiometric())
               .thenAnswer((_) async => BiometricResult.success());
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthBiometricRequested()),
         expect: () => const [AuthBiometricInProgress(), AuthAuthenticated()],
@@ -171,7 +177,7 @@ void main() {
           when(() => mockRepo.authenticateWithBiometric())
               .thenAnswer((_) async =>
                   BiometricResult.failed('fingerprint mismatch'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthBiometricRequested()),
         expect: () => const [AuthBiometricInProgress(), AuthLocked()],
@@ -183,7 +189,7 @@ void main() {
           when(() => mockRepo.authenticateWithBiometric())
               .thenAnswer((_) async =>
                   BiometricResult.unavailable('no sensor'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthBiometricRequested()),
         expect: () => [
@@ -193,7 +199,7 @@ void main() {
       );
     });
 
-    // ── AuthVaultLocked / AuthErrorDismissed ────────────────────────────────
+    // â”€â”€ AuthVaultLocked / AuthErrorDismissed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthVaultLocked', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLocked]',
@@ -212,7 +218,7 @@ void main() {
       );
     });
 
-    // ── AuthFido2Requested ─────────────────────────────────────────────────
+    // â”€â”€ AuthFido2Requested â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthFido2Requested', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthFido2InProgress, AuthAuthenticated] on success',
@@ -220,7 +226,7 @@ void main() {
           when(() => mockRepo.authenticateWithFido2())
               .thenAnswer((_) async =>
                   Fido2AuthResult.success(credentialId: 'cred-1'));
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthFido2Requested()),
         expect: () => const [AuthFido2InProgress(), AuthAuthenticated()],
@@ -231,7 +237,7 @@ void main() {
         build: () {
           when(() => mockRepo.authenticateWithFido2())
               .thenAnswer((_) async => Fido2AuthResult.noCredentials());
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthFido2Requested()),
         expect: () => [
@@ -244,26 +250,26 @@ void main() {
         'emits [AuthFido2InProgress, AuthFido2Error] on failed verification',
         build: () {
           when(() => mockRepo.authenticateWithFido2())
-              .thenAnswer((_) async => Fido2AuthResult.failed('التحقق فشل'));
-          return AuthBloc(authRepository: mockRepo);
+              .thenAnswer((_) async => Fido2AuthResult.failed('ط§ظ„طھط­ظ‚ظ‚ ظپط´ظ„'));
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthFido2Requested()),
         expect: () => [
           const AuthFido2InProgress(),
           isA<AuthFido2Error>()
-              .having((s) => s.message, 'message', 'التحقق فشل'),
+              .having((s) => s.message, 'message', 'ط§ظ„طھط­ظ‚ظ‚ ظپط´ظ„'),
         ],
       );
     });
 
-    // ── Duress authentication ──────────────────────────────────────────────
+    // â”€â”€ Duress authentication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('Duress authentication', () {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthUnlocking, AuthDuressAuthenticated] on duress password',
         build: () {
           when(() => mockRepo.verifyMasterPassword(any()))
               .thenAnswer((_) async => VerifyResult.duress());
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) =>
             bloc.add(const AuthMasterPasswordSubmitted('duress123')),
@@ -271,14 +277,14 @@ void main() {
       );
     });
 
-    // ── AuthDuressPasswordSet ──────────────────────────────────────────────
+    // â”€â”€ AuthDuressPasswordSet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('AuthDuressPasswordSet', () {
       blocTest<AuthBloc, AuthState>(
         'calls saveDuressPassword with provided password (no state changes)',
         build: () {
           when(() => mockRepo.saveDuressPassword(any()))
               .thenAnswer((_) async {});
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthDuressPasswordSet('secret')),
         expect: () => const <AuthState>[],
@@ -291,7 +297,7 @@ void main() {
         build: () {
           when(() => mockRepo.saveDuressPassword(any()))
               .thenAnswer((_) async {});
-          return AuthBloc(authRepository: mockRepo);
+          return AuthBloc(authRepository: mockRepo, faceMonitor: mockFaceMonitor);
         },
         act: (bloc) => bloc.add(const AuthDuressPasswordSet(null)),
         expect: () => const <AuthState>[],
@@ -300,7 +306,7 @@ void main() {
       );
     });
 
-    // ── Intruder snapshot ──────────────────────────────────────────────────
+    // â”€â”€ Intruder snapshot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     group('Intruder snapshot', () {
       blocTest<AuthBloc, AuthState>(
         'calls captureAsync when shouldCaptureSnapshot is true',
@@ -314,8 +320,7 @@ void main() {
           when(() => mockSnapshotService.captureAsync()).thenReturn(null);
           return AuthBloc(
             authRepository: mockRepo,
-            snapshotService: mockSnapshotService,
-          );
+            snapshotService: mockSnapshotService, faceMonitor: mockFaceMonitor,);
         },
         act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
         expect: () => [const AuthUnlocking(), isA<AuthFailed>()],
@@ -334,8 +339,7 @@ void main() {
                   ));
           return AuthBloc(
             authRepository: mockRepo,
-            snapshotService: mockSnapshotService,
-          );
+            snapshotService: mockSnapshotService, faceMonitor: mockFaceMonitor,);
         },
         act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
         expect: () => [const AuthUnlocking(), isA<AuthFailed>()],

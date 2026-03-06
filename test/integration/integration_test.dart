@@ -1,4 +1,4 @@
-// Integration tests — EPIC-15 (cipherowl-8ij)
+// Integration tests â€” EPIC-15 (cipherowl-8ij)
 //
 // These tests exercise end-to-end multi-BLoC flows that mirror real user
 // journeys: authentication, vault CRUD, security scoring, academy module
@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cipherowl/features/auth/data/repositories/auth_repository.dart';
 import 'package:cipherowl/features/auth/data/services/intruder_snapshot_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/face_track/data/services/background_face_monitor.dart';
 import 'package:cipherowl/features/vault/data/repositories/vault_repository.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
@@ -29,12 +30,15 @@ import 'package:cipherowl/features/academy/presentation/bloc/academy_bloc.dart';
 import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.dart';
 import 'package:cipherowl/src/rust/api.dart' show ApiGeneratorConfig;
 
-// ── Mocks ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Mocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockIntruderSnapshotService extends Mock
     implements IntruderSnapshotService {}
+
+class MockBackgroundFaceMonitor extends Mock
+    implements BackgroundFaceMonitor {}
 
 class MockVaultRepository extends Mock implements VaultRepository {}
 
@@ -42,7 +46,7 @@ class MockSettingsRepository extends Mock implements SettingsRepository {}
 
 class FakeVaultEntry extends Fake implements VaultEntry {}
 
-// ── Stub password generator (avoids Rust FFI in tests) ───────────────────────
+// â”€â”€ Stub password generator (avoids Rust FFI in tests) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 String _stubGenerator({required ApiGeneratorConfig config}) {
   final len = config.length.toInt();
@@ -50,7 +54,7 @@ String _stubGenerator({required ApiGeneratorConfig config}) {
   return (chars * ((len ~/ chars.length) + 1)).substring(0, len);
 }
 
-// ── Domain helpers ────────────────────────────────────────────────────────────
+// â”€â”€ Domain helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const _userId = 'local_user';
 
@@ -85,67 +89,71 @@ const _defaultSettings = AppSettings(
   language: 'ar',
 );
 
-// ════════════════════════════════════════════════════════════════════════════
-// FLOW 1 — Authentication lifecycle
-// ════════════════════════════════════════════════════════════════════════════
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+// FLOW 1 â€” Authentication lifecycle
+// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeVaultEntry());
   });
 
-  // ── 1. Auth complete lifecycle ─────────────────────────────────────────────
+  // â”€â”€ 1. Auth complete lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   group('Auth lifecycle flow', () {
     late MockAuthRepository authRepo;
     late MockIntruderSnapshotService snapshotService;
+    late MockBackgroundFaceMonitor mockFaceMonitor;
 
     setUp(() {
       authRepo = MockAuthRepository();
       snapshotService = MockIntruderSnapshotService();
+      mockFaceMonitor = MockBackgroundFaceMonitor();
+      when(() => mockFaceMonitor.start()).thenAnswer((_) async {});
+      when(() => mockFaceMonitor.stop()).thenAnswer((_) async {});
     });
 
-    // 1-a: fresh install → first-time setup
+    // 1-a: fresh install â†’ first-time setup
     blocTest<AuthBloc, AuthState>(
-      'fresh install: AppStarted → FirstTimeSetup',
+      'fresh install: AppStarted â†’ FirstTimeSetup',
       build: () {
         when(() => authRepo.isSetupComplete()).thenAnswer((_) async => false);
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) => bloc.add(const AuthAppStarted()),
       expect: () => [const AuthChecking(), const AuthFirstTimeSetup()],
     );
 
-    // 1-b: returning user → locked
+    // 1-b: returning user â†’ locked
     blocTest<AuthBloc, AuthState>(
-      'returning user: AppStarted → Locked',
+      'returning user: AppStarted â†’ Locked',
       build: () {
         when(() => authRepo.isSetupComplete()).thenAnswer((_) async => true);
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) => bloc.add(const AuthAppStarted()),
       expect: () => [const AuthChecking(), const AuthLocked()],
     );
 
-    // 1-c: correct password → authenticated
+    // 1-c: correct password â†’ authenticated
     blocTest<AuthBloc, AuthState>(
-      'correct password: Locked → Authenticated',
+      'correct password: Locked â†’ Authenticated',
       build: () {
         when(() => authRepo.verifyMasterPassword(any()))
             .thenAnswer((_) async => VerifyResult.success());
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) =>
           bloc.add(const AuthMasterPasswordSubmitted('CorrectPass123!')),
       expect: () => [const AuthUnlocking(), const AuthAuthenticated()],
     );
 
-    // 1-d: wrong password → failed with attempt count
+    // 1-d: wrong password â†’ failed with attempt count
     blocTest<AuthBloc, AuthState>(
       'wrong password: AuthFailed carrying attempt count',
       build: () {
@@ -154,7 +162,7 @@ void main() {
                 VerifyResult.failed(attempts: 1, remainingAttempts: 4));
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) => bloc.add(const AuthMasterPasswordSubmitted('wrong')),
       expect: () => [
@@ -164,15 +172,15 @@ void main() {
       ],
     );
 
-    // 1-e: authenticate then lock vault  → Locked
+    // 1-e: authenticate then lock vault  â†’ Locked
     blocTest<AuthBloc, AuthState>(
-      'lock vault after authentication → AuthLocked',
+      'lock vault after authentication â†’ AuthLocked',
       build: () {
         when(() => authRepo.verifyMasterPassword(any()))
             .thenAnswer((_) async => VerifyResult.success());
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) async {
         bloc.add(const AuthMasterPasswordSubmitted('secret'));
@@ -186,24 +194,24 @@ void main() {
       ],
     );
 
-    // 1-f: error during startup → fallback to FirstTimeSetup
+    // 1-f: error during startup â†’ fallback to FirstTimeSetup
     blocTest<AuthBloc, AuthState>(
-      'repository error on startup → FirstTimeSetup fallback',
+      'repository error on startup â†’ FirstTimeSetup fallback',
       build: () {
         when(() => authRepo.isSetupComplete())
             .thenThrow(Exception('database locked'));
         return AuthBloc(
             authRepository: authRepo,
-            snapshotService: snapshotService);
+            snapshotService: snapshotService, faceMonitor: mockFaceMonitor,);
       },
       act: (bloc) => bloc.add(const AuthAppStarted()),
       expect: () => [const AuthChecking(), const AuthFirstTimeSetup()],
     );
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 2 — Vault CRUD pipeline
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 2 â€” Vault CRUD pipeline
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
   group('Vault CRUD pipeline', () {
     late MockVaultRepository vaultRepo;
@@ -224,7 +232,7 @@ void main() {
 
     tearDown(() => stream.close());
 
-    // 2-a: start → items received → VaultLoaded
+    // 2-a: start â†’ items received â†’ VaultLoaded
     blocTest<VaultBloc, VaultState>(
       'start: emits VaultLoading then VaultLoaded when items arrive',
       build: () => VaultBloc(repository: vaultRepo),
@@ -321,15 +329,15 @@ void main() {
     );
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 3 — Security score reflects vault strength
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 3 â€” Security score reflects vault strength
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
   group('Security score pipeline', () {
-    // 3-a: all strong items → high score
-    // L1=40(all strong) + L2=0(no TOTP) + L3=15(fresh) + L4=15 + L5=3 + L6=5 = 78 ≥ 70
+    // 3-a: all strong items â†’ high score
+    // L1=40(all strong) + L2=0(no TOTP) + L3=15(fresh) + L4=15 + L5=3 + L6=5 = 78 â‰¥ 70
     blocTest<SecurityBloc, SecurityState>(
-      'all strong recent passwords: score ≥ 70',
+      'all strong recent passwords: score â‰¥ 70',
       build: SecurityBloc.new,
       act: (bloc) => bloc.add(SecurityScoreRequested(
         List.generate(5,
@@ -344,7 +352,7 @@ void main() {
       ],
     );
 
-    // 3-b: all weak items → low score
+    // 3-b: all weak items â†’ low score
     blocTest<SecurityBloc, SecurityState>(
       'all weak passwords: score < 50 and recommendations generated',
       build: SecurityBloc.new,
@@ -409,13 +417,13 @@ void main() {
     );
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 4 — Academy → Gamification cross-BLoC XP/badge bridge
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 4 â€” Academy â†’ Gamification cross-BLoC XP/badge bridge
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-  group('Academy ↔ Gamification integration', () {
+  group('Academy â†” Gamification integration', () {
     setUp(() {
-      // AcademyBloc calls SharedPreferences — provide empty mock storage.
+      // AcademyBloc calls SharedPreferences â€” provide empty mock storage.
       SharedPreferences.setMockInitialValues({});
     });
 
@@ -505,7 +513,7 @@ void main() {
         ..add(const AcademyStarted());
       await Future.delayed(Duration.zero);
 
-      // mod_phishing = 50 XP, mod_malware = 50 XP → 100 XP total
+      // mod_phishing = 50 XP, mod_malware = 50 XP â†’ 100 XP total
       for (final modId in ['mod_phishing', 'mod_malware']) {
         acadBloc.add(AcademyModuleOpened(modId));
         await Future.delayed(Duration.zero);
@@ -568,11 +576,11 @@ void main() {
     });
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 5 — Daily challenge awards XP
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 5 â€” Daily challenge awards XP
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
-  group('Daily challenge → Gamification XP flow', () {
+  group('Daily challenge â†’ Gamification XP flow', () {
     setUp(() => SharedPreferences.setMockInitialValues({}));
 
     test('answering daily challenge awards XP to GamificationBloc', () async {
@@ -621,9 +629,9 @@ void main() {
     });
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 6 — Settings multi-toggle persistence chain
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 6 â€” Settings multi-toggle persistence chain
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
   group('Settings multi-toggle flow', () {
     late MockSettingsRepository settingsRepo;
@@ -642,9 +650,9 @@ void main() {
       when(() => settingsRepo.setLanguage(any())).thenAnswer((_) async {});
     });
 
-    // 6-a: start → loaded → toggle faceTrack → faceTrack flips
+    // 6-a: start â†’ loaded â†’ toggle faceTrack â†’ faceTrack flips
     blocTest<SettingsBloc, SettingsState>(
-      'load → toggle FaceTrack: faceTrack flipped to false',
+      'load â†’ toggle FaceTrack: faceTrack flipped to false',
       build: () => SettingsBloc(repository: settingsRepo),
       act: (bloc) async {
         bloc.add(const SettingsStarted());
@@ -660,7 +668,7 @@ void main() {
 
     // 6-b: change language persists
     blocTest<SettingsBloc, SettingsState>(
-      'change language to en → persisted and reflected in state',
+      'change language to en â†’ persisted and reflected in state',
       build: () => SettingsBloc(repository: settingsRepo),
       act: (bloc) async {
         bloc.add(const SettingsStarted());
@@ -679,7 +687,7 @@ void main() {
 
     // 6-c: lock timeout change persisted
     blocTest<SettingsBloc, SettingsState>(
-      'change lock timeout to 15 min → persisted',
+      'change lock timeout to 15 min â†’ persisted',
       build: () => SettingsBloc(repository: settingsRepo),
       act: (bloc) async {
         bloc.add(const SettingsStarted());
@@ -696,9 +704,9 @@ void main() {
       },
     );
 
-    // 6-d: multiple toggles in sequence — verify all repo calls
+    // 6-d: multiple toggles in sequence â€” verify all repo calls
     blocTest<SettingsBloc, SettingsState>(
-      'multiple toggles: biometric → duress → autofill all persisted',
+      'multiple toggles: biometric â†’ duress â†’ autofill all persisted',
       build: () => SettingsBloc(repository: settingsRepo),
       act: (bloc) async {
         bloc.add(const SettingsStarted());
@@ -717,9 +725,9 @@ void main() {
     );
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 7 — Generator config round-trip
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 7 â€” Generator config round-trip
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
   group('Generator config round-trip', () {
     // 7-a: initial password is non-empty after constructor's auto-refresh
@@ -771,12 +779,12 @@ void main() {
     });
   });
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // FLOW 8 — GamificationBloc XP levelling
-  // ════════════════════════════════════════════════════════════════════════════
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+  // FLOW 8 â€” GamificationBloc XP levelling
+  // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
   group('GamificationBloc XP levelling', () {
-    // 8-a: XP cross level-2 threshold (500 XP) → level 2
+    // 8-a: XP cross level-2 threshold (500 XP) â†’ level 2
     blocTest<GamificationBloc, GamificationState>(
       'earning 500 XP crosses level 2 threshold',
       build: GamificationBloc.new,

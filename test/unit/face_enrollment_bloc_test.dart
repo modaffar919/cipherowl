@@ -14,6 +14,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:cipherowl/features/face_track/data/services/face_detector_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_embedding_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_verification_service.dart';
+import 'package:cipherowl/features/face_track/data/services/liveness_detection_service.dart';
 import 'package:cipherowl/features/face_track/presentation/bloc/face_enrollment_bloc.dart';
 
 // â”€â”€ Mocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -24,6 +25,9 @@ class MockFaceEmbeddingService extends Mock implements FaceEmbeddingService {}
 
 class MockFaceVerificationService extends Mock
     implements FaceVerificationService {}
+
+class MockLivenessDetectionService extends Mock
+    implements LivenessDetectionService {}
 
 // Using a Fake avoids constructing a real CameraImage (platform-dependent).
 class _FakeCameraImage extends Fake implements CameraImage {}
@@ -37,20 +41,24 @@ List<double> _embedding() => List.filled(128, 0.1);
 /// Creates fresh mocks with dispose stubs always set, builds the bloc.
 ({FaceEnrollmentBloc bloc, MockFaceDetectorService detector,
     MockFaceEmbeddingService embedding,
-    MockFaceVerificationService verification})
+    MockFaceVerificationService verification,
+    MockLivenessDetectionService liveness})
     _freshMocks() {
   final detector = MockFaceDetectorService();
   final embedding = MockFaceEmbeddingService();
   final verification = MockFaceVerificationService();
+  final liveness = MockLivenessDetectionService();
   when(() => detector.dispose()).thenAnswer((_) async {});
   when(() => embedding.dispose()).thenReturn(null);
+  when(() => liveness.isLive).thenReturn(true);
   final bloc = FaceEnrollmentBloc(
     detector: detector,
     embedding: embedding,
     verification: verification,
+    liveness: liveness,
   );
   return (bloc: bloc, detector: detector, embedding: embedding,
-      verification: verification);
+      verification: verification, liveness: liveness);
 }
 
 // â”€â”€ Tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

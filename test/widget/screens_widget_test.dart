@@ -43,6 +43,7 @@ import 'package:cipherowl/features/security_center/presentation/bloc/security_bl
 import 'package:cipherowl/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
 import 'package:cipherowl/features/academy/presentation/bloc/academy_bloc.dart';
+import 'package:cipherowl/features/travel_mode/presentation/bloc/travel_mode_bloc.dart';
 
 // ── Mock declarations ─────────────────────────────────────────────────────────
 
@@ -67,6 +68,9 @@ class _MockGeneratorBloc extends MockBloc<GeneratorEvent, GeneratorState>
 
 class _MockAcademyBloc extends MockBloc<AcademyEvent, AcademyState>
     implements AcademyBloc {}
+
+class _MockTravelModeBloc extends MockBloc<TravelModeEvent, TravelModeState>
+    implements TravelModeBloc {}
 
 class _MockFaceEnrollmentBloc
     extends MockBloc<FaceEnrollmentEvent, FaceEnrollmentState>
@@ -96,8 +100,15 @@ Widget _appWithBlocs(
   required _MockSettingsRepository settingsRepo,
   _MockGamificationBloc? gamificationBloc,
   _MockAcademyBloc? academyBloc,
-}) =>
-    MaterialApp(
+  _MockTravelModeBloc? travelModeBloc,
+}) {
+    final tmBloc = travelModeBloc ?? _MockTravelModeBloc();
+    if (travelModeBloc == null) {
+      when(() => tmBloc.state).thenReturn(const TravelModeInitial());
+      when(() => tmBloc.stream)
+          .thenAnswer((_) => Stream.value(const TravelModeInitial()));
+    }
+    return MaterialApp(
       home: Directionality(
         textDirection: TextDirection.rtl,
         child: MultiRepositoryProvider(
@@ -110,6 +121,7 @@ Widget _appWithBlocs(
               BlocProvider<VaultBloc>.value(value: vaultBloc),
               BlocProvider<SecurityBloc>.value(value: securityBloc),
               BlocProvider<SettingsBloc>.value(value: settingsBloc),
+              BlocProvider<TravelModeBloc>.value(value: tmBloc),
               if (gamificationBloc != null)
                 BlocProvider<GamificationBloc>.value(value: gamificationBloc),
               if (academyBloc != null)
@@ -121,6 +133,7 @@ Widget _appWithBlocs(
       ),
       debugShowCheckedModeBanner: false,
     );
+}
 
 // ── Test data ─────────────────────────────────────────────────────────────────
 
@@ -389,10 +402,12 @@ void main() {
   group('VaultListScreen', () {
     late _MockAuthBloc authBloc;
     late _MockVaultBloc vaultBloc;
+    late _MockTravelModeBloc travelModeBloc;
 
     setUp(() {
       authBloc = _MockAuthBloc();
       vaultBloc = _MockVaultBloc();
+      travelModeBloc = _MockTravelModeBloc();
       when(() => authBloc.state).thenReturn(const AuthAuthenticated());
       when(() => authBloc.stream)
           .thenAnswer((_) => Stream.value(const AuthAuthenticated()));
@@ -400,11 +415,16 @@ void main() {
           .thenReturn(const VaultLoaded(allItems: []));
       when(() => vaultBloc.stream)
           .thenAnswer((_) => Stream.value(const VaultLoaded(allItems: [])));
+      when(() => travelModeBloc.state)
+          .thenReturn(const TravelModeInitial());
+      when(() => travelModeBloc.stream)
+          .thenAnswer((_) => Stream.value(const TravelModeInitial()));
     });
 
     tearDown(() {
       authBloc.close();
       vaultBloc.close();
+      travelModeBloc.close();
     });
 
     testWidgets('renders empty vault list', (tester) async {
@@ -413,6 +433,7 @@ void main() {
           providers: [
             BlocProvider<AuthBloc>.value(value: authBloc),
             BlocProvider<VaultBloc>.value(value: vaultBloc),
+            BlocProvider<TravelModeBloc>.value(value: travelModeBloc),
           ],
           child: const VaultListScreen(),
         )),
@@ -435,6 +456,7 @@ void main() {
           providers: [
             BlocProvider<AuthBloc>.value(value: authBloc),
             BlocProvider<VaultBloc>.value(value: vaultBloc),
+            BlocProvider<TravelModeBloc>.value(value: travelModeBloc),
           ],
           child: const VaultListScreen(),
         )),
