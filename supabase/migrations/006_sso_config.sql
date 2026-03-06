@@ -1,9 +1,9 @@
--- Migration 005: SSO Configuration
+-- Migration 006: SSO Configuration
 -- Stores enterprise SSO configs (OIDC, SAML, LDAP) per organisation.
 
-create table if not exists sso_configs (
+create table if not exists public.sso_configs (
   id                  uuid primary key,
-  org_id              uuid not null references organisations(id) on delete cascade,
+  org_id              uuid not null references public.organisations(id) on delete cascade,
   provider            text not null check (provider in ('oidc', 'saml', 'ldap')),
   is_enabled          boolean not null default false,
 
@@ -28,23 +28,23 @@ create table if not exists sso_configs (
   unique (org_id, provider)
 );
 
-alter table sso_configs enable row level security;
+alter table public.sso_configs enable row level security;
 
 -- Only org admins can read/write SSO configs
-create policy "select_sso_configs" on sso_configs
+create policy "select_sso_configs" on public.sso_configs
   for select using (
     org_id in (
-      select org_id from org_members
+      select org_id from public.org_members
       where user_id = auth.uid()
         and role = 'admin'
         and is_active = true
     )
   );
 
-create policy "upsert_sso_configs" on sso_configs
+create policy "upsert_sso_configs" on public.sso_configs
   for all using (
     org_id in (
-      select org_id from org_members
+      select org_id from public.org_members
       where user_id = auth.uid()
         and role = 'admin'
         and is_active = true
