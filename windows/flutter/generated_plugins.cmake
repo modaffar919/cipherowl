@@ -12,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   rive_native
   share_plus
+  system_tray
   url_launcher_windows
 )
 

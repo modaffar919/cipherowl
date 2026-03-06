@@ -1,0 +1,32 @@
+[package]
+name = "smartvault_core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+smartvault_core = { path = ".." }
+
+[[bin]]
+name = "fuzz_aes_decrypt"
+path = "fuzz_targets/fuzz_aes_decrypt.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_argon2"
+path = "fuzz_targets/fuzz_argon2.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_totp"
+path = "fuzz_targets/fuzz_totp.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_bip39"
+path = "fuzz_targets/fuzz_bip39.rs"
+doc = false

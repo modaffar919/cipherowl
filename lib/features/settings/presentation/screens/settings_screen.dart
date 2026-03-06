@@ -58,7 +58,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
 
-    return Scaffold(
+    return BlocListener<SettingsBloc, SettingsState>(
+      listener: (context, state) {
+        if (state is SettingsAccountDeleted) {
+          context.read<AuthBloc>().add(const AuthVaultLocked());
+          if (context.mounted) {
+            context.go('/');
+          }
+        } else if (state is SettingsError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      listenWhen: (prev, curr) =>
+          curr is SettingsAccountDeleted || curr is SettingsError,
+      child: Scaffold(
       backgroundColor: AppConstants.backgroundDark,
       body: CustomScrollView(
         slivers: [
@@ -256,6 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -479,29 +495,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _confirmDeleteAll() {
+    final confirmController = TextEditingController();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppConstants.surfaceDark,
-        title: const Text('��� �� �������ʿ',
+        title: const Text('حذف كل البيانات؟',
             style: TextStyle(color: Colors.white)),
-        content: const Text(
-            '���� ��� ���� ������� ������� ���� ������� ���������.',
-            style: TextStyle(color: Colors.white60)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+                'سيتم حذف جميع البيانات المحلية وبيانات السحابية نهائياً. هذا الإجراء لا يمكن التراجع عنه.',
+                style: TextStyle(color: Colors.white60)),
+            const SizedBox(height: 16),
+            const Text('اكتب "حذف" للتأكيد:',
+                style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            TextField(
+              controller: confirmController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppConstants.errorRed)),
+                hintText: 'حذف',
+                hintStyle: const TextStyle(color: Colors.white24),
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('�����')),
+              child: const Text('إلغاء')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppConstants.errorRed),
-            onPressed: () async {
+            onPressed: () {
+              if (confirmController.text.trim() != 'حذف') return;
               Navigator.pop(context);
-              final authBloc = context.read<AuthBloc>();
-              await context.read<SettingsRepository>().loadAll(); // noop, wipe later
-              authBloc.add(const AuthVaultLocked());
+              context
+                  .read<SettingsBloc>()
+                  .add(const SettingsAccountDeleteRequested());
             },
-            child: const Text('��� �������',
+            child: const Text('حذف البيانات',
                 style: TextStyle(color: Colors.white)),
           ),
         ],

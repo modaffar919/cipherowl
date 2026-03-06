@@ -26,6 +26,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsLanguageChanged>(_onLanguageChanged);
     on<SettingsGeoFenceToggled>(_onGeoFenceToggled);
     on<SettingsTravelModeToggled>(_onTravelModeToggled);
+    on<SettingsAccountDeleteRequested>(_onAccountDeleteRequested);
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -127,5 +128,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final next = s.copyWith(travelModeEnabled: !s.travelModeEnabled);
     emit(SettingsLoaded(next));
     await _repo.setTravelModeEnabled(next.travelModeEnabled);
+  }
+
+  Future<void> _onAccountDeleteRequested(
+      SettingsAccountDeleteRequested event,
+      Emitter<SettingsState> emit) async {
+    emit(const SettingsAccountDeleting());
+    try {
+      await _repo.deleteAccount();
+      emit(const SettingsAccountDeleted());
+    } catch (e) {
+      emit(SettingsError('فشل حذف الحساب: $e'));
+    }
   }
 }

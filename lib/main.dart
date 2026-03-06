@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +12,7 @@ import 'core/database/database_key_service.dart';
 import 'core/database/smartvault_database.dart';
 import 'core/firebase/firebase_service.dart';
 import 'core/monitoring/app_monitor.dart';
+import 'core/platform/system_tray_service.dart';
 import 'features/notifications/data/services/fcm_service.dart';
 import 'src/rust/frb_generated.dart';
 
@@ -56,6 +60,17 @@ void main() async {
   // ── Encrypted database init ─────────────────────────
   final dbKey = await DatabaseKeyService.getDatabaseKey();
   final db = SmartVaultDatabase(encryptionKey: dbKey);
+
+  // ── Desktop system tray (Windows / macOS / Linux) ───
+  SystemTrayService? trayService;
+  if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+    trayService = SystemTrayService(
+      onShowApp: () {}, // wired up after app is running
+      onLockVault: () {},
+      onQuit: () => exit(0),
+    );
+    await trayService.init();
+  }
 
   runApp(CipherOwlApp(db: db));
 }

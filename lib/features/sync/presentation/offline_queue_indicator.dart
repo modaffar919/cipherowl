@@ -23,12 +23,15 @@ class OfflineQueueIndicator extends StatelessWidget {
     this.queueService,
     this.pendingStream,
     this.onRefresh,
-  }) : assert(queueService != null || pendingStream != null);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final stream = pendingStream ?? queueService?.watchPendingCount();
+    if (stream == null) return const SizedBox.shrink();
+
     return StreamBuilder<int>(
-      stream: pendingStream ?? queueService!.watchPendingCount(),
+      stream: stream,
       builder: (context, snapshot) {
         final count = snapshot.data ?? 0;
         if (count == 0) return const SizedBox.shrink();

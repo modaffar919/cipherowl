@@ -1,4 +1,6 @@
 import 'package:cipherowl/core/database/smartvault_database.dart';
+import 'package:cipherowl/core/supabase/supabase_client_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Typed settings repository backed by [SettingsDao] (SQLCipher key-value).
 ///
@@ -76,6 +78,43 @@ class SettingsRepository {
 
   Future<void> setTravelModeEnabled(bool v) =>
       _db.settingsDao.setBool('${_prefix}travel_mode_enabled', v);
+
+  // ── GDPR Account Deletion ─────────────────────────────────────────────
+
+  /// Permanently deletes the user's account and all associated data.
+  ///
+  /// 1. Calls the `delete-account` Edge Function (server-side cascade delete).
+  /// 2. Wipes local SecureStorage.
+  /// 3. Drops the local Drift database.
+  ///
+  /// Throws on failure so the caller can show an error.
+  Future<void> deleteAccount() async {
+    final client = SupabaseClientProvider.client;
+    final session = client.auth.currentSession;
+
+    if (session != null) {
+      // Call Edge Function for server-side deletion.
+      final response = await client.functions.invoke(
+        'delete-account',
+        body: {'confirmation': 'DELETE'},
+      );
+
+      if (response.status != 200) {
+        final error = response.data is Map
+            ? (response.data as Map)['error'] ?? 'Unknown error'
+            : 'Server error';
+        throw Exception('Account deletion failed: $error');
+      }
+    }
+
+    // Wipe local secure storage.
+    const storage = FlutterSecureStorage();
+    await storage.deleteAll();
+
+    // Drop the local database.
+    // The database will be re-created on next app launch.
+    await _db.close();
+  }
 
   // ── Load all at once ──────────────────────────────────────────────────────
 

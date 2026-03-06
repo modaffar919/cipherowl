@@ -55,3 +55,8 @@ class SettingsGeoFenceToggled extends SettingsEvent {
 class SettingsTravelModeToggled extends SettingsEvent {
   const SettingsTravelModeToggled();
 }
+
+/// GDPR Art.17: Request permanent account and data deletion.
+class SettingsAccountDeleteRequested extends SettingsEvent {
+  const SettingsAccountDeleteRequested();
+}

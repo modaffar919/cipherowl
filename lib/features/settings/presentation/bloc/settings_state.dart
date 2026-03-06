@@ -24,3 +24,13 @@ class SettingsError extends SettingsState {
   final String message;
   const SettingsError(this.message);
 }
+
+/// Account deletion is in progress.
+class SettingsAccountDeleting extends SettingsState {
+  const SettingsAccountDeleting();
+}
+
+/// Account has been permanently deleted.
+class SettingsAccountDeleted extends SettingsState {
+  const SettingsAccountDeleted();
+}

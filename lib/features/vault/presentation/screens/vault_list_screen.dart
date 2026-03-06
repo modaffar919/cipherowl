@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:cipherowl/features/sync/presentation/offline_queue_indicator.dart';
 import 'package:cipherowl/features/travel_mode/presentation/bloc/travel_mode_bloc.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
@@ -216,6 +217,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 ),
               ),
 
+
+              // -- Sync Status Indicator --
+              SliverToBoxAdapter(
+                child: OfflineQueueIndicator(),
+              ),
               // â”€â”€ Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (state is VaultLoading)
                 const SliverFillRemaining(

@@ -2,16 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-/// Detects rooted/jailbroken devices and emulator environments.
+import 'debugger_detection_service.dart';
+
+/// Detects rooted/jailbroken devices, emulator environments, and debuggers.
 ///
 /// OWASP MASVS-RESILIENCE-1: The app detects and responds to the presence
 /// of a rooted or jailbroken device.
+/// OWASP MASVS-RESILIENCE-2: The app detects and responds to debuggers.
 class DeviceIntegrityService {
   /// Cached result after first check.
   bool? _isCompromised;
 
-  /// Returns `true` if the device appears to be rooted, jailbroken, or an
-  /// emulator. Result is cached after the first call.
+  final DebuggerDetectionService _debuggerDetection;
+
+  DeviceIntegrityService({DebuggerDetectionService? debuggerDetection})
+      : _debuggerDetection =
+            debuggerDetection ?? DebuggerDetectionService();
+
+  /// Returns `true` if the device appears to be rooted, jailbroken, an
+  /// emulator, or has a debugger attached. Result is cached after the first call.
   Future<bool> isDeviceCompromised() async {
     if (_isCompromised != null) return _isCompromised!;
 
@@ -32,6 +41,11 @@ class DeviceIntegrityService {
     } catch (_) {
       // If detection fails, assume safe to avoid false positives.
       _isCompromised = false;
+    }
+
+    // Check for debugger (release mode only).
+    if (_isCompromised == false) {
+      _isCompromised = await _debuggerDetection.isDebuggerAttached();
     }
 
     return _isCompromised!;

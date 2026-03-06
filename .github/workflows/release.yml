@@ -1,0 +1,55 @@
+name: Release — Create GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git tag --sort=-v:refname | head -n 2 | tail -1)
+          if [ -z "$PREV_TAG" ]; then
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "## Changes since $PREV_TAG" > changelog.md
+          echo "" >> changelog.md
+          git log "$PREV_TAG"..HEAD --pretty=format:"- %s (%h)" >> changelog.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: changelog.md
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true
+
+  collect-artifacts:
+    name: Collect Build Artifacts
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for CD workflows
+        run: echo "Artifacts are uploaded by cd-android, cd-ios, cd-web, and cd-desktop workflows"
+
+      - name: Note
+        run: |
+          echo "Build artifacts are available as workflow artifacts in their respective CD runs."
+          echo "To attach them to the release, use the GitHub API or manual upload."

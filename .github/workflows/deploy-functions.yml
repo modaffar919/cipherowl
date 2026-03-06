@@ -1,0 +1,44 @@
+name: Deploy — Supabase Edge Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+  workflow_dispatch:
+
+env:
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+jobs:
+  deploy-functions:
+    name: Deploy Edge Functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref ${{ env.SUPABASE_PROJECT_REF }}
+
+      - name: Deploy all Edge Functions
+        run: |
+          for dir in supabase/functions/*/; do
+            fn_name=$(basename "$dir")
+            if [ -f "$dir/index.ts" ]; then
+              echo "Deploying function: $fn_name"
+              supabase functions deploy "$fn_name" --no-verify-jwt=false
+            fi
+          done
+
+      - name: Run migrations (if changed)
+        if: contains(github.event.head_commit.message, '[migrate]')
+        run: supabase db push
