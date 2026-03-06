@@ -1,8 +1,8 @@
-import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'package:cipherowl/core/platform/platform_info.dart';
 
 import '../../../../core/supabase/supabase_client_provider.dart';
 import '../../domain/entities/app_notification.dart';
@@ -153,7 +153,7 @@ class LocalNotificationService {
     await _plugin.initialize(settings: settings);
 
     // Create high-priority channel for security alerts (Android 8+).
-    if (Platform.isAndroid) {
+    if (PlatformInfo.isAndroid) {
       const channel = AndroidNotificationChannel(
         'cipherowl_security',
         'تنبيهات الأمان',

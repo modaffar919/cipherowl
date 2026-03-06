@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/core/platform/responsive_layout.dart';
 import 'vault_list_screen.dart';
 import '../../../security_center/presentation/screens/security_center_screen.dart';
 import '../../../generator/presentation/generator_screen.dart';
@@ -41,9 +42,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final layout = layoutTypeOf(width);
+    final screens = widget.tabScreens ?? _screens;
+
+    // Tablet / Desktop → NavigationRail
+    if (layout != LayoutType.compact) {
+      return Scaffold(
+        backgroundColor: AppConstants.backgroundDark,
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (i) => setState(() => _selectedIndex = i),
+              extended: layout == LayoutType.large,
+              backgroundColor: AppConstants.surfaceDark,
+              indicatorColor: AppConstants.primaryCyan.withValues(alpha: 0.15),
+              selectedIconTheme: const IconThemeData(color: AppConstants.primaryCyan),
+              unselectedIconTheme: const IconThemeData(color: Colors.white38),
+              selectedLabelTextStyle: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w600),
+              unselectedLabelTextStyle: const TextStyle(color: Colors.white38),
+              labelType: layout == LayoutType.large
+                  ? NavigationRailLabelType.none
+                  : NavigationRailLabelType.all,
+              destinations: _destinations
+                  .map((d) => NavigationRailDestination(
+                        icon: Icon(d.icon),
+                        selectedIcon: Icon(d.activeIcon),
+                        label: Text(d.labelAr),
+                      ))
+                  .toList(),
+            ),
+            Container(width: 1, color: AppConstants.borderDark),
+            Expanded(
+              child: IndexedStack(index: _selectedIndex, children: screens),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Mobile → BottomNavigationBar
     return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
-      body: IndexedStack(index: _selectedIndex, children: widget.tabScreens ?? _screens),
+      body: IndexedStack(index: _selectedIndex, children: screens),
       bottomNavigationBar: _CipherBottomNav(
         selectedIndex: _selectedIndex,
         destinations: _destinations,

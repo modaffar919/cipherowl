@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:cipherowl/core/platform/platform_info.dart';
 import 'package:cipherowl/core/supabase/supabase_client_provider.dart';
 import 'package:cipherowl/src/rust/api.dart';
 
@@ -65,11 +65,13 @@ class Fido2CredentialService {
     );
 
     // 4. Register public key in Supabase
-    final deviceOs = Platform.isAndroid
+    final deviceOs = PlatformInfo.isAndroid
         ? 'android'
-        : Platform.isIOS
+        : PlatformInfo.isIOS
             ? 'ios'
-            : 'other';
+            : PlatformInfo.isWeb
+                ? 'web'
+                : 'desktop';
 
     await _supabase.from(_table).insert({
       'id': credentialId,

@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/core/platform/platform_info.dart';
 import 'package:cipherowl/features/auth/data/services/fido2_credential_service.dart';
 
 /// Screen for managing FIDO2 passkeys (list, add, delete).
@@ -33,9 +32,12 @@ class _Fido2ManagementScreenState extends State<Fido2ManagementScreen> {
   }
 
   String get _deviceName {
-    if (Platform.isAndroid) return 'Android';
-    if (Platform.isIOS) return 'iPhone';
-    return 'هذا الجهاز';
+    if (PlatformInfo.isAndroid) return 'Android';
+    if (PlatformInfo.isIOS) return 'iPhone';
+    if (PlatformInfo.isWindows) return 'Windows';
+    if (PlatformInfo.isMacOS) return 'macOS';
+    if (PlatformInfo.isWeb) return 'Web';
+    return '\u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632';
   }
 
   // ── Add credential ─────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/services.dart';
 
+import 'package:cipherowl/core/platform/platform_info.dart';
 import 'autofill_credential.dart';
 
 /// Bridge between the Dart/Flutter vault layer and the platform AutoFill service.
@@ -31,7 +31,7 @@ class AutofillBridge {
 
   // ── Supported platforms ──────────────────────────────────────────────────
 
-  static bool get _supported => Platform.isAndroid || Platform.isIOS;
+  static bool get _supported => PlatformInfo.isMobile;
 
   // ── Public API ───────────────────────────────────────────────────────────
 
