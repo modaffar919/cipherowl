@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -135,7 +135,7 @@ class _EmptyState extends StatelessWidget {
         Container(
           width: 80, height: 80,
           decoration: BoxDecoration(
-            color: AppConstants.primaryCyan.withOpacity(0.12),
+            color: AppConstants.primaryCyan.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.business, color: AppConstants.primaryCyan, size: 40),
@@ -218,10 +218,10 @@ class _OrgTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isSelected ? AppConstants.primaryCyan.withOpacity(0.15) : Colors.transparent,
+        color: isSelected ? AppConstants.primaryCyan.withValues(alpha: 0.15) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isSelected ? AppConstants.primaryCyan.withOpacity(0.5) : Colors.transparent,
+          color: isSelected ? AppConstants.primaryCyan.withValues(alpha: 0.5) : Colors.transparent,
         ),
       ),
       child: Row(
@@ -229,7 +229,7 @@ class _OrgTile extends StatelessWidget {
           Container(
             width: 34, height: 34,
             decoration: BoxDecoration(
-              color: AppConstants.primaryCyan.withOpacity(0.15),
+              color: AppConstants.primaryCyan.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.business, color: AppConstants.primaryCyan, size: 18),
@@ -280,7 +280,7 @@ class _OrgDetail extends StatelessWidget {
                     Container(
                       width: 48, height: 48,
                       decoration: BoxDecoration(
-                        color: AppConstants.primaryCyan.withOpacity(0.15),
+                        color: AppConstants.primaryCyan.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.business, color: AppConstants.primaryCyan, size: 26),
@@ -302,9 +302,9 @@ class _OrgDetail extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Row(children: [
-                  _StatChip(label: '\ أعضاء', icon: Icons.people),
+                  _StatChip(label: ' أعضاء', icon: Icons.people),
                   const SizedBox(width: 10),
-                  _StatChip(label: '\ خزائن', icon: Icons.lock_outline),
+                  _StatChip(label: ' خزائن', icon: Icons.lock_outline),
                 ]),
                 const SizedBox(height: 24),
               ],
@@ -559,7 +559,7 @@ class _VaultTile extends StatelessWidget {
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: AppConstants.accentGold.withOpacity(0.12),
+              color: AppConstants.accentGold.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(Icons.lock_outline, color: AppConstants.accentGold, size: 18),
@@ -606,7 +606,7 @@ class _MemberTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: AppConstants.primaryCyan.withOpacity(0.15),
+            backgroundColor: AppConstants.primaryCyan.withValues(alpha: 0.15),
             child: Text(
               member.displayName.isNotEmpty ? member.displayName[0].toUpperCase() : '?',
               style: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w700),

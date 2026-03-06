@@ -6,7 +6,7 @@ import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
 import 'package:cipherowl/features/autofill/autofill_bridge.dart';
 import 'package:cipherowl/features/autofill/autofill_credential.dart';
 import 'package:cipherowl/features/autofill/browser_autofill_sync_service.dart';
-import 'package:cipherowl/features/sync/data/zero_knowledge_sync_service.dart';
+import '../../../sync/data/zero_knowledge_sync_service.dart';
 import 'package:cipherowl/features/sync/domain/sync_result.dart';
 import 'package:cipherowl/features/vault/data/repositories/vault_repository.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
@@ -268,18 +268,19 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
       },
     );
 
-    if (state is! VaultLoaded) return;
+    final loadedState = state;
+    if (loadedState is! VaultLoaded) return;
     switch (result) {
       case SyncSuccess(:final pushed, :final pulled):
-        emit((state as VaultLoaded).copyWith(
+        emit(loadedState.copyWith(
           isSyncing: false,
           lastSyncAt: DateTime.now(),
           message: 'تمّت المزامنة ✓  (رُفع: $pushed | نُزِّل: $pulled)',
         ));
       case SyncSkipped():
-        emit((state as VaultLoaded).copyWith(isSyncing: false));
+        emit(loadedState.copyWith(isSyncing: false));
       case SyncFailure(:final message):
-        emit((state as VaultLoaded).copyWith(
+        emit(loadedState.copyWith(
           isSyncing: false,
           message: 'فشلت المزامنة: $message',
           isError: true,

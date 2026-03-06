@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../constants/app_constants.dart';
 
@@ -13,17 +12,15 @@ class AppTheme {
     primaryColor: AppConstants.primaryCyan,
 
     colorScheme: const ColorScheme.dark(
-      background:   AppConstants.backgroundDark,
       surface:      AppConstants.surfaceDark,
       primary:      AppConstants.primaryCyan,
       secondary:    AppConstants.accentGold,
       error:        AppConstants.errorRed,
-      onBackground: Colors.white,
       onSurface:    Colors.white,
       onPrimary:    AppConstants.backgroundDark,
     ),
 
-    // ── AppBar ──────────────────────────────────────────────
+    // â”€â”€ AppBar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     appBarTheme: const AppBarTheme(
       backgroundColor: AppConstants.backgroundDark,
       elevation: 0,
@@ -37,7 +34,7 @@ class AppTheme {
       ),
     ),
 
-    // ── Cards ───────────────────────────────────────────────
+    // â”€â”€ Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     cardTheme: CardThemeData(
       color: AppConstants.cardDark,
       elevation: 0,
@@ -48,7 +45,7 @@ class AppTheme {
       margin: EdgeInsets.zero,
     ),
 
-    // ── Input Fields ────────────────────────────────────────
+    // â”€â”€ Input Fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppConstants.surfaceDark,
@@ -70,10 +67,10 @@ class AppTheme {
         borderSide: const BorderSide(color: AppConstants.errorRed),
       ),
       labelStyle: const TextStyle(color: AppConstants.silver),
-      hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
     ),
 
-    // ── Elevated Buttons ────────────────────────────────────
+    // â”€â”€ Elevated Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppConstants.primaryCyan,
@@ -91,7 +88,7 @@ class AppTheme {
       ),
     ),
 
-    // ── Outlined Buttons ────────────────────────────────────
+    // â”€â”€ Outlined Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppConstants.primaryCyan,
@@ -107,25 +104,25 @@ class AppTheme {
       ),
     ),
 
-    // ── Text Buttons ────────────────────────────────────────
+    // â”€â”€ Text Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppConstants.primaryCyan,
       ),
     ),
 
-    // ── Bottom Navigation ────────────────────────────────────
+    // â”€â”€ Bottom Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppConstants.surfaceDark,
-      indicatorColor: AppConstants.primaryCyan.withOpacity(0.15),
-      iconTheme: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      indicatorColor: AppConstants.primaryCyan.withValues(alpha: 0.15),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: AppConstants.primaryCyan, size: 24);
         }
-        return IconThemeData(color: Colors.white.withOpacity(0.5), size: 24);
+        return IconThemeData(color: Colors.white.withValues(alpha: 0.5), size: 24);
       }),
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const TextStyle(
             color: AppConstants.primaryCyan,
             fontSize: 12,
@@ -133,44 +130,44 @@ class AppTheme {
           );
         }
         return TextStyle(
-          color: Colors.white.withOpacity(0.5),
+          color: Colors.white.withValues(alpha: 0.5),
           fontSize: 12,
         );
       }),
     ),
 
-    // ── Divider ──────────────────────────────────────────────
+    // â”€â”€ Divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     dividerTheme: const DividerThemeData(
       color: AppConstants.borderDark,
       thickness: 1,
     ),
 
-    // ── Chips ────────────────────────────────────────────────
+    // â”€â”€ Chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     chipTheme: ChipThemeData(
       backgroundColor: AppConstants.surfaceDark,
-      selectedColor: AppConstants.primaryCyan.withOpacity(0.2),
+      selectedColor: AppConstants.primaryCyan.withValues(alpha: 0.2),
       labelStyle: const TextStyle(color: Colors.white, fontSize: 13),
       side: const BorderSide(color: AppConstants.borderDark),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
 
-    // ── Switch ───────────────────────────────────────────────
+    // â”€â”€ Switch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return AppConstants.backgroundDark;
         }
         return AppConstants.silver;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return AppConstants.primaryCyan;
         }
         return AppConstants.borderDark;
       }),
     ),
 
-    // ── Typography ───────────────────────────────────────────
+    // â”€â”€ Typography â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     textTheme: _buildTextTheme(),
   );
 
@@ -200,7 +197,7 @@ class AppTheme {
   }
 }
 
-// ── Color Extensions ──────────────────────────────────────────
+// â”€â”€ Color Extensions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 extension ColorExtension on Color {
   Color withLuminance(double luminance) {
     final hsl = HSLColor.fromColor(this);

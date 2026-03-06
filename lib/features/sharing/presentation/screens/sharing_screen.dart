@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 
-/// Secure Sharing Screen — share vault items via X25519 encrypted link
+/// Secure Sharing Screen â€” share vault items via X25519 encrypted link
 class SharingScreen extends StatefulWidget {
   const SharingScreen({super.key});
   @override
@@ -17,7 +17,7 @@ class _SharingScreenState extends State<SharingScreen> {
   String? _generatedLink;
 
   static const _expiryOptions = [1, 6, 24, 48, 168]; // hours
-  static const _expiryLabels = {1: 'ساعة', 6: '6 ساعات', 24: 'يوم', 48: 'يومان', 168: 'أسبوع'};
+  static const _expiryLabels = {1: 'ط³ط§ط¹ط©', 6: '6 ط³ط§ط¹ط§طھ', 24: 'ظٹظˆظ…', 48: 'ظٹظˆظ…ط§ظ†', 168: 'ط£ط³ط¨ظˆط¹'};
 
   // Shared items (TODO: load from vault)
   static final _sharedItems = [
@@ -31,7 +31,7 @@ class _SharingScreenState extends State<SharingScreen> {
       backgroundColor: AppConstants.backgroundDark,
       appBar: AppBar(
         backgroundColor: AppConstants.backgroundDark,
-        title: const Text('المشاركة الآمنة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        title: const Text('ط§ظ„ظ…ط´ط§ط±ظƒط© ط§ظ„ط¢ظ…ظ†ط©', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -40,9 +40,9 @@ class _SharingScreenState extends State<SharingScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppConstants.primaryCyan.withOpacity(0.05),
+              color: AppConstants.primaryCyan.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.2)),
+              border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.2)),
             ),
             child: const Row(
               children: [
@@ -50,7 +50,7 @@ class _SharingScreenState extends State<SharingScreen> {
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'مشفر بـ X25519 — لا يمكن لأحد رؤية محتوى الرابط حتى نحن',
+                    'ظ…ط´ظپط± ط¨ظ€ X25519 â€” ظ„ط§ ظٹظ…ظƒظ† ظ„ط£ط­ط¯ ط±ط¤ظٹط© ظ…ط­طھظˆظ‰ ط§ظ„ط±ط§ط¨ط· ط­طھظ‰ ظ†ط­ظ†',
                     style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ),
@@ -59,7 +59,7 @@ class _SharingScreenState extends State<SharingScreen> {
           ),
 
           const SizedBox(height: 24),
-          const Text('إنشاء رابط مشاركة', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+          const Text('ط¥ظ†ط´ط§ط، ط±ط§ط¨ط· ظ…ط´ط§ط±ظƒط©', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
 
           TextField(
@@ -67,7 +67,7 @@ class _SharingScreenState extends State<SharingScreen> {
             style: const TextStyle(color: Colors.white),
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
-              labelText: 'البريد الإلكتروني للمستلم',
+              labelText: 'ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ظ„ظ„ظ…ط³طھظ„ظ…',
               hintText: 'friend@example.com',
               prefixIcon: Icon(Icons.email_outlined, size: 18, color: Colors.white38),
             ),
@@ -76,7 +76,7 @@ class _SharingScreenState extends State<SharingScreen> {
           const SizedBox(height: 16),
 
           // Expiry
-          const Text('مدة الصلاحية', style: TextStyle(color: Colors.white70, fontSize: 13)),
+          const Text('ظ…ط¯ط© ط§ظ„طµظ„ط§ط­ظٹط©', style: TextStyle(color: Colors.white70, fontSize: 13)),
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -89,9 +89,9 @@ class _SharingScreenState extends State<SharingScreen> {
                     margin: const EdgeInsets.only(left: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: sel ? AppConstants.primaryCyan.withOpacity(0.15) : AppConstants.surfaceDark,
+                      color: sel ? AppConstants.primaryCyan.withValues(alpha: 0.15) : AppConstants.surfaceDark,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: sel ? AppConstants.primaryCyan.withOpacity(0.5) : AppConstants.borderDark),
+                      border: Border.all(color: sel ? AppConstants.primaryCyan.withValues(alpha: 0.5) : AppConstants.borderDark),
                     ),
                     child: Text(_expiryLabels[h]!,
                         style: TextStyle(color: sel ? AppConstants.primaryCyan : Colors.white60, fontSize: 13)),
@@ -104,14 +104,14 @@ class _SharingScreenState extends State<SharingScreen> {
           const SizedBox(height: 16),
 
           // Options
-          _OptionSwitch(label: 'استخدام لمرة واحدة', value: _oneTimeUse, color: AppConstants.primaryCyan, onChanged: (v) => setState(() => _oneTimeUse = v)),
-          _OptionSwitch(label: 'تطلب رمز PIN', value: _requirePin, color: AppConstants.accentGold, onChanged: (v) => setState(() => _requirePin = v)),
+          _OptionSwitch(label: 'ط§ط³طھط®ط¯ط§ظ… ظ„ظ…ط±ط© ظˆط§ط­ط¯ط©', value: _oneTimeUse, color: AppConstants.primaryCyan, onChanged: (v) => setState(() => _oneTimeUse = v)),
+          _OptionSwitch(label: 'طھط·ظ„ط¨ ط±ظ…ط² PIN', value: _requirePin, color: AppConstants.accentGold, onChanged: (v) => setState(() => _requirePin = v)),
 
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: _generate,
             icon: const Icon(Icons.link, size: 18),
-            label: const Text('إنشاء رابط آمن'),
+            label: const Text('ط¥ظ†ط´ط§ط، ط±ط§ط¨ط· ط¢ظ…ظ†'),
           ),
 
           if (_generatedLink != null) ...[
@@ -119,9 +119,9 @@ class _SharingScreenState extends State<SharingScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppConstants.successGreen.withOpacity(0.05),
+                color: AppConstants.successGreen.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppConstants.successGreen.withOpacity(0.3)),
+                border: Border.all(color: AppConstants.successGreen.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +129,7 @@ class _SharingScreenState extends State<SharingScreen> {
                   Row(children: [
                     const Icon(Icons.check_circle, color: AppConstants.successGreen, size: 16),
                     const SizedBox(width: 6),
-                    const Text('تم إنشاء الرابط', style: TextStyle(color: AppConstants.successGreen, fontWeight: FontWeight.w600)),
+                    const Text('طھظ… ط¥ظ†ط´ط§ط، ط§ظ„ط±ط§ط¨ط·', style: TextStyle(color: AppConstants.successGreen, fontWeight: FontWeight.w600)),
                   ]),
                   const SizedBox(height: 8),
                   Text(_generatedLink!, style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'SpaceMono')),
@@ -137,7 +137,7 @@ class _SharingScreenState extends State<SharingScreen> {
                   ElevatedButton.icon(
                     onPressed: () {}, // copy
                     icon: const Icon(Icons.copy, size: 14),
-                    label: const Text('نسخ الرابط'),
+                    label: const Text('ظ†ط³ط® ط§ظ„ط±ط§ط¨ط·'),
                     style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
                   ),
                 ],
@@ -146,10 +146,10 @@ class _SharingScreenState extends State<SharingScreen> {
           ],
 
           const SizedBox(height: 32),
-          const Text('الروابط النشطة', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+          const Text('ط§ظ„ط±ظˆط§ط¨ط· ط§ظ„ظ†ط´ط·ط©', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
 
-          ..._sharedItems.map((i) => _SharedItemCard(item: i)).toList(),
+          ..._sharedItems.map((i) => _SharedItemCard(item: i)),
         ],
       ),
     );
@@ -195,10 +195,10 @@ class _SharedItemCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: active ? AppConstants.successGreen.withOpacity(0.1) : AppConstants.errorRed.withOpacity(0.1),
+              color: active ? AppConstants.successGreen.withValues(alpha: 0.1) : AppConstants.errorRed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(active ? 'نشط' : 'منتهي',
+            child: Text(active ? 'ظ†ط´ط·' : 'ظ…ظ†طھظ‡ظٹ',
                 style: TextStyle(color: active ? AppConstants.successGreen : AppConstants.errorRed, fontSize: 11, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -215,7 +215,7 @@ class _OptionSwitch extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14))),
-      Switch(value: value, onChanged: onChanged, activeColor: color),
+      Switch(value: value, onChanged: onChanged, activeThumbColor: color),
     ],
   );
 }

@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/security_center/presentation/bloc/security_bloc.dart';
-import 'package:cipherowl/features/vault/presentation/bloc/vault_bloc.dart';
+import '../../../vault/presentation/bloc/vault_bloc.dart';
 
-/// Security Center — interactive shield showing real security score from SecurityBloc.
+/// Security Center ï¿½ interactive shield showing real security score from SecurityBloc.
 class SecurityCenterScreen extends StatefulWidget {
   const SecurityCenterScreen({super.key});
   @override
@@ -70,7 +70,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
               backgroundColor: AppConstants.backgroundDark,
               appBar: AppBar(
                 backgroundColor: AppConstants.backgroundDark,
-                title: const Text('ãÑßÒ ÇáÇãÇä',
+                title: const Text('ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w700)),
               ),
@@ -107,7 +107,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                 SliverAppBar(
                   backgroundColor: AppConstants.backgroundDark,
                   pinned: true,
-                  title: const Text('ãÑßÒ ÇáÇãÇä',
+                  title: const Text('ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w700)),
                   centerTitle: false,
@@ -123,7 +123,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                           pulse: _pulseCtrl,
                           rotation: _rotCtrl),
                       const SizedBox(height: 8),
-                      const Text('ÏÑÌÉ ÇáÇãÇä ÇáßáíÉ',
+                      const Text('ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
                           style:
                               TextStyle(color: Colors.white60, fontSize: 14)),
                       const SizedBox(height: 4),
@@ -139,7 +139,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            '$itemCount ÍÓÇÈ ãÍÝæÙ',
+                            '$itemCount ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½',
                             style: const TextStyle(
                                 color: Colors.white38, fontSize: 12),
                           ),
@@ -166,7 +166,7 @@ class _SecurityCenterScreenState extends State<SecurityCenterScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('ÇáÊæÕíÇÊ',
+                        const Text('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

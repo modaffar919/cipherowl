@@ -543,7 +543,7 @@ class _ToggleCard extends StatelessWidget {
         trailing: Switch(
             value: value,
             onChanged: (_) => onChanged(),
-            activeColor: AppConstants.primaryCyan),
+            activeThumbColor: AppConstants.primaryCyan),
         onTap: onChanged,
       );
 }

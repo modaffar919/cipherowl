@@ -20,8 +20,8 @@ class SsoConfigService {
         .eq('org_id', orgId)
         .eq('provider', provider.name)
         .limit(1);
-    if ((rows as List).isEmpty) return null;
-    return SsoConfig.fromJson(rows.first as Map<String, dynamic>);
+    if (rows.isEmpty) return null;
+    return SsoConfig.fromJson(rows.first);
   }
 
   Future<SsoConfig> saveConfig(SsoConfig config) async {

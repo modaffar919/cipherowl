@@ -20,7 +20,7 @@ class BadgesScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'إنجازاتي',
+          'ط¥ظ†ط¬ط§ط²ط§طھظٹ',
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
         ),
@@ -37,7 +37,7 @@ class BadgesScreen extends StatelessWidget {
 
           return CustomScrollView(
             slivers: [
-              // ── Summary Header ─────────────────────────────────────────
+              // â”€â”€ Summary Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               SliverToBoxAdapter(
                 child: Padding(
                   padding:
@@ -47,17 +47,17 @@ class BadgesScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppConstants.accentGold.withOpacity(0.15),
-                          AppConstants.primaryCyan.withOpacity(0.08),
+                          AppConstants.accentGold.withValues(alpha: 0.15),
+                          AppConstants.primaryCyan.withValues(alpha: 0.08),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: AppConstants.accentGold.withOpacity(0.2)),
+                          color: AppConstants.accentGold.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
-                        const Text('🏆',
+                        const Text('ًںڈ†',
                             style: TextStyle(fontSize: 40)),
                         const SizedBox(width: 16),
                         Column(
@@ -71,7 +71,7 @@ class BadgesScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w800),
                             ),
                             const Text(
-                              'شارة مفتوحة',
+                              'ط´ط§ط±ط© ظ…ظپطھظˆط­ط©',
                               style: TextStyle(
                                   color: Colors.white54, fontSize: 13),
                             ),
@@ -86,7 +86,7 @@ class BadgesScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Grid ──────────────────────────────────────────────────
+              // â”€â”€ Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
                 sliver: SliverGrid(
@@ -111,7 +111,7 @@ class BadgesScreen extends StatelessWidget {
   }
 }
 
-// ── Level chip ────────────────────────────────────────────────────────────────
+// â”€â”€ Level chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _LevelChip extends StatelessWidget {
   final int level;
@@ -134,7 +134,7 @@ class _LevelChip extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppConstants.primaryCyan.withOpacity(0.35),
+                color: AppConstants.primaryCyan.withValues(alpha: 0.35),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -160,7 +160,7 @@ class _LevelChip extends StatelessWidget {
   }
 }
 
-// ── Single badge tile ─────────────────────────────────────────────────────────
+// â”€â”€ Single badge tile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _BadgeTile extends StatelessWidget {
   final GamificationBadge badge;
@@ -183,14 +183,14 @@ class _BadgeTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: badge.isUnlocked
-                  ? color.withOpacity(0.35)
+                  ? color.withValues(alpha: 0.35)
                   : AppConstants.borderDark,
               width: badge.isUnlocked ? 1.5 : 1,
             ),
             boxShadow: badge.isUnlocked
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.15),
+                      color: color.withValues(alpha: 0.15),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     )
@@ -209,8 +209,8 @@ class _BadgeTile extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: badge.isUnlocked
-                          ? color.withOpacity(0.12)
-                          : Colors.white.withOpacity(0.04),
+                          ? color.withValues(alpha: 0.12)
+                          : Colors.white.withValues(alpha: 0.04),
                     ),
                   ),
                   Icon(
@@ -261,8 +261,8 @@ class _BadgeTile extends StatelessWidget {
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withOpacity(0.15),
-                border: Border.all(color: color.withOpacity(0.4), width: 2),
+                color: color.withValues(alpha: 0.15),
+                border: Border.all(color: color.withValues(alpha: 0.4), width: 2),
               ),
               child: Icon(
                 IconData(badge.iconCodePoint,

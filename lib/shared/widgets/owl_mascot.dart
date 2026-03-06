@@ -67,12 +67,11 @@ class _OwlMascotWidgetState extends State<OwlMascotWidget>
 
   // ── State-change reaction (shake / pop) ───────────────────────────────────
   late final AnimationController _reactCtrl;
-  late final Animation<double> _reactAnim;
+
 
   // ── Verifying spin ────────────────────────────────────────────────────────
   late final AnimationController _spinCtrl;
 
-  OwlState _prevState = OwlState.idle;
 
   @override
   void initState() {
@@ -108,12 +107,6 @@ class _OwlMascotWidgetState extends State<OwlMascotWidget>
       vsync: this,
       duration: const Duration(milliseconds: 480),
     );
-    _reactAnim = TweenSequence<double>([
-      TweenSequenceItem(
-          tween: Tween(begin: 0.0, end: 1.0)
-              .chain(CurveTween(curve: Curves.elasticOut)),
-          weight: 100),
-    ]).animate(_reactCtrl);
 
     _spinCtrl = AnimationController(
       vsync: this,
@@ -137,7 +130,6 @@ class _OwlMascotWidgetState extends State<OwlMascotWidget>
   void didUpdateWidget(OwlMascotWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state != widget.state) {
-      _prevState = oldWidget.state;
       _onStateChange(widget.state);
     }
   }

@@ -29,29 +29,29 @@ class CipherOwlLogo extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // ── Outer ring (subtle) ──────────────────────
+          // â”€â”€ Outer ring (subtle) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.1), width: 1),
+              border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.1), width: 1),
             ),
           ),
 
-          // ── Owl body + wings ────────────────────────
+          // â”€â”€ Owl body + wings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           FadeTransition(
             opacity: bodyOpacity,
             child: _OwlBodyPainter(size: size),
           ),
 
-          // ── Glowing eyes ────────────────────────────
+          // â”€â”€ Glowing eyes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           FadeTransition(
             opacity: eyeOpacity,
             child: _OwlEyesPainter(size: size),
           ),
 
-          // ── Key (rotates in) ────────────────────────
+          // â”€â”€ Key (rotates in) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           FadeTransition(
             opacity: keyOpacity,
             child: AnimatedBuilder(
@@ -87,7 +87,7 @@ class _OwlOutlinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.9)
+      ..color = Colors.white.withValues(alpha: 0.9)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
@@ -96,13 +96,13 @@ class _OwlOutlinePainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.38;
 
-    // Body — oval
+    // Body â€” oval
     canvas.drawOval(
       Rect.fromCenter(center: Offset(cx, cy + r * 0.1), width: r * 1.2, height: r * 1.6),
       paint,
     );
 
-    // Head — circle
+    // Head â€” circle
     canvas.drawCircle(Offset(cx, cy - r * 0.35), r * 0.52, paint);
 
     // Left ear tuft
@@ -134,7 +134,7 @@ class _OwlOutlinePainter extends CustomPainter {
       ..moveTo(cx - r * 0.1, cy - r * 0.25)
       ..lineTo(cx, cy - r * 0.08)
       ..lineTo(cx + r * 0.1, cy - r * 0.25);
-    canvas.drawPath(beakPath, paint..color = AppConstants.accentGold.withOpacity(0.8));
+    canvas.drawPath(beakPath, paint..color = AppConstants.accentGold.withValues(alpha: 0.8));
   }
 
   @override
@@ -165,7 +165,7 @@ class _EyesPainter extends CustomPainter {
 
     // Glow halo
     final glowPaint = Paint()
-      ..color = AppConstants.primaryCyan.withOpacity(0.3)
+      ..color = AppConstants.primaryCyan.withValues(alpha: 0.3)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
 
     canvas.drawCircle(Offset(cx - r * 0.22, eyeY), eyeR + 4, glowPaint);
@@ -186,7 +186,7 @@ class _EyesPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx + r * 0.22, eyeY), eyeR * 0.5, pupilPaint);
 
     // Highlight dot
-    final hlPaint = Paint()..color = Colors.white.withOpacity(0.8);
+    final hlPaint = Paint()..color = Colors.white.withValues(alpha: 0.8);
     canvas.drawCircle(Offset(cx - r * 0.22 + eyeR * 0.2, eyeY - eyeR * 0.2), eyeR * 0.18, hlPaint);
     canvas.drawCircle(Offset(cx + r * 0.22 + eyeR * 0.2, eyeY - eyeR * 0.2), eyeR * 0.18, hlPaint);
   }

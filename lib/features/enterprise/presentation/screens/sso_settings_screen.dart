@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cipherowl/core/constants/app_constants.dart';
 import '../../domain/entities/sso_config.dart';
 
-/// SSO settings screen — configure OIDC, SAML 2.0, and LDAP/AD.
+/// SSO settings screen â€” configure OIDC, SAML 2.0, and LDAP/AD.
 class SsoSettingsScreen extends StatefulWidget {
   const SsoSettingsScreen({super.key});
 
@@ -34,7 +34,7 @@ class _SsoSettingsScreenState extends State<SsoSettingsScreen>
       appBar: AppBar(
         backgroundColor: AppConstants.backgroundDark,
         title: const Text(
-          'إعدادات SSO',
+          'ط¥ط¹ط¯ط§ط¯ط§طھ SSO',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         bottom: TabBar(
@@ -70,7 +70,7 @@ class _SsoSettingsScreenState extends State<SsoSettingsScreen>
   }
 }
 
-// ── OIDC Panel ────────────────────────────────────────────────────────────────
+// â”€â”€ OIDC Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _OidcConfigPanel extends StatefulWidget {
   @override
@@ -104,13 +104,13 @@ class _OidcConfigPanelState extends State<_OidcConfigPanel> {
   void _save(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('تم حفظ إعدادات OIDC'),
+          content: Text('طھظ… ط­ظپط¸ ط¥ط¹ط¯ط§ط¯ط§طھ OIDC'),
           backgroundColor: AppConstants.successGreen),
     );
   }
 }
 
-// ── SAML Panel ────────────────────────────────────────────────────────────────
+// â”€â”€ SAML Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SamlConfigPanel extends StatefulWidget {
   @override
@@ -148,13 +148,13 @@ class _SamlConfigPanelState extends State<_SamlConfigPanel> {
   void _save(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('تم حفظ إعدادات SAML'),
+          content: Text('طھظ… ط­ظپط¸ ط¥ط¹ط¯ط§ط¯ط§طھ SAML'),
           backgroundColor: AppConstants.successGreen),
     );
   }
 }
 
-// ── LDAP Panel ────────────────────────────────────────────────────────────────
+// â”€â”€ LDAP Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _LdapConfigPanel extends StatefulWidget {
   @override
@@ -185,10 +185,10 @@ class _LdapConfigPanelState extends State<_LdapConfigPanel> {
       ),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: const Text('استخدام SSL/TLS',
+        title: const Text('ط§ط³طھط®ط¯ط§ظ… SSL/TLS',
             style: TextStyle(color: Colors.white70, fontSize: 14)),
         value: _useSsl,
-        activeColor: AppConstants.primaryCyan,
+        activeThumbColor: AppConstants.primaryCyan,
         onChanged: (v) => setState(() {
           _useSsl = v;
           _portCtrl.text = v ? '636' : '389';
@@ -211,13 +211,13 @@ class _LdapConfigPanelState extends State<_LdapConfigPanel> {
   void _save(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('تم حفظ إعدادات LDAP'),
+          content: Text('طھظ… ط­ظپط¸ ط¥ط¹ط¯ط§ط¯ط§طھ LDAP'),
           backgroundColor: AppConstants.successGreen),
     );
   }
 }
 
-// ── Shared form wrapper ───────────────────────────────────────────────────────
+// â”€â”€ Shared form wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ConfigForm extends StatelessWidget {
   final SsoProvider provider;
@@ -247,7 +247,7 @@ class _ConfigForm extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppConstants.cardDark,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3)),
+              border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.3)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +265,7 @@ class _ConfigForm extends StatelessWidget {
                     ),
                     Switch(
                       value: isEnabled,
-                      activeColor: AppConstants.primaryCyan,
+                      activeThumbColor: AppConstants.primaryCyan,
                       onChanged: onToggle,
                     ),
                   ],
@@ -280,7 +280,7 @@ class _ConfigForm extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Center(
-                child: Text('فعّل المزوّد أولاً لتكوينه',
+                child: Text('ظپط¹ظ‘ظ„ ط§ظ„ظ…ط²ظˆظ‘ط¯ ط£ظˆظ„ط§ظ‹ ظ„طھظƒظˆظٹظ†ظ‡',
                     style: TextStyle(color: Colors.white38, fontSize: 14)),
               ),
             )
@@ -301,7 +301,7 @@ class _ConfigForm extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: onSave,
-                child: const Text('حفظ الإعدادات',
+                child: const Text('ط­ظپط¸ ط§ظ„ط¥ط¹ط¯ط§ط¯ط§طھ',
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.w700)),
               ),

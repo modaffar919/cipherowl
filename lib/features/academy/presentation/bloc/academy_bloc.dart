@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/academy_content.dart';
-import '../../domain/entities/academy_module.dart';
 import '../../../../features/gamification/presentation/bloc/gamification_bloc.dart';
 
 part 'academy_event.dart';

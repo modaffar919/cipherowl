@@ -6,7 +6,7 @@ import 'package:cipherowl/core/constants/app_constants.dart';
 import '../../data/academy_content.dart';
 import '../bloc/academy_bloc.dart';
 
-/// Threat Academy hub — module grid + quick-access to badges and daily challenge.
+/// Threat Academy hub â€” module grid + quick-access to badges and daily challenge.
 class AcademyScreen extends StatelessWidget {
   const AcademyScreen({super.key});
 
@@ -16,12 +16,12 @@ class AcademyScreen extends StatelessWidget {
       backgroundColor: AppConstants.backgroundDark,
       body: CustomScrollView(
         slivers: [
-          // ── App Bar ─────────────────────────────────────────────────────
+          // â”€â”€ App Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverAppBar(
             backgroundColor: AppConstants.backgroundDark,
             pinned: true,
             title: const Text(
-              'أكاديمية CipherOwl',
+              'ط£ظƒط§ط¯ظٹظ…ظٹط© CipherOwl',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -33,14 +33,14 @@ class AcademyScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.emoji_events_outlined,
                     color: AppConstants.accentGold),
-                tooltip: 'الإنجازات',
+                tooltip: 'ط§ظ„ط¥ظ†ط¬ط§ط²ط§طھ',
                 onPressed: () =>
                     context.push(AppConstants.routeAcademyBadges),
               ),
             ],
           ),
 
-          // ── Quick-action row (XP + streak + daily) ─────────────────────
+          // â”€â”€ Quick-action row (XP + streak + daily) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -48,7 +48,7 @@ class AcademyScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Module grid ─────────────────────────────────────────────────
+          // â”€â”€ Module grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           BlocBuilder<AcademyBloc, AcademyState>(
             builder: (context, state) {
               final loaded =
@@ -84,7 +84,7 @@ class AcademyScreen extends StatelessWidget {
   }
 }
 
-// ── Quick actions row ─────────────────────────────────────────────────────────
+// â”€â”€ Quick actions row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _QuickActions extends StatelessWidget {
   @override
@@ -111,7 +111,7 @@ class _QuickActions extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Text('📚',
+                    const Text('ًں“ڑ',
                         style: TextStyle(fontSize: 18)),
                     const SizedBox(width: 8),
                     Column(
@@ -125,7 +125,7 @@ class _QuickActions extends StatelessWidget {
                               fontSize: 14),
                         ),
                         const Text(
-                          'درس مكتمل',
+                          'ط¯ط±ط³ ظ…ظƒطھظ…ظ„',
                           style: TextStyle(
                               color: Colors.white38, fontSize: 10),
                         ),
@@ -146,24 +146,24 @@ class _QuickActions extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: dailyDone
                       ? AppConstants.cardDark
-                      : AppConstants.warningAmber.withOpacity(0.12),
+                      : AppConstants.warningAmber.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: dailyDone
                         ? AppConstants.borderDark
                         : AppConstants.warningAmber
-                            .withOpacity(0.4),
+                            .withValues(alpha: 0.4),
                   ),
                 ),
                 child: Row(
                   children: [
                     Text(
-                      dailyDone ? '✅' : '🔥',
+                      dailyDone ? 'âœ…' : 'ًں”¥',
                       style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      dailyDone ? 'أُنجز' : 'تحدي اليوم',
+                      dailyDone ? 'ط£ظڈظ†ط¬ط²' : 'طھط­ط¯ظٹ ط§ظ„ظٹظˆظ…',
                       style: TextStyle(
                         color: dailyDone
                             ? Colors.white38
@@ -183,7 +183,7 @@ class _QuickActions extends StatelessWidget {
   }
 }
 
-// ── Module tile ───────────────────────────────────────────────────────────────
+// â”€â”€ Module tile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ModuleTile extends StatelessWidget {
   final dynamic module; // AcademyModule
@@ -209,14 +209,14 @@ class _ModuleTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: completed
-                ? AppConstants.successGreen.withOpacity(0.4)
-                : color.withOpacity(0.2),
+                ? AppConstants.successGreen.withValues(alpha: 0.4)
+                : color.withValues(alpha: 0.2),
             width: completed ? 1.5 : 1,
           ),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.06), Colors.transparent],
+            colors: [color.withValues(alpha: 0.06), Colors.transparent],
           ),
         ),
         child: Column(
@@ -254,7 +254,7 @@ class _ModuleTile extends StatelessWidget {
                       horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
                     color:
-                        AppConstants.accentGold.withOpacity(0.12),
+                        AppConstants.accentGold.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -268,7 +268,7 @@ class _ModuleTile extends StatelessWidget {
                 const SizedBox(width: 4),
                 if ((module.quiz as List).isNotEmpty)
                   Text(
-                    '${(module.quiz as List).length} أسئلة',
+                    '${(module.quiz as List).length} ط£ط³ط¦ظ„ط©',
                     style: const TextStyle(
                         color: Colors.white24, fontSize: 9),
                   ),

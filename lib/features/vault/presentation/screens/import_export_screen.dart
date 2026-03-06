@@ -179,10 +179,10 @@ class _ImportExportScreenState extends State<ImportExportScreen> {
 
       if (mounted) {
         setState(() => _exporting = false);
-        await Share.shareXFiles(
-          [XFile(file.path, mimeType: 'text/csv')],
+        await SharePlus.instance.share(ShareParams(
+          files: [XFile(file.path, mimeType: 'text/csv')],
           subject: 'CipherOwl Export',
-        );
+        ));
       }
     } catch (e) {
       if (mounted) {

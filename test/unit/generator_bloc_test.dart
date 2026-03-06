@@ -7,7 +7,6 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.dart';
 import 'package:cipherowl/src/rust/api.dart' show ApiGeneratorConfig;
 

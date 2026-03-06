@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:meta/meta.dart';
-
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/generator/presentation/bloc/generator_bloc.dart';
 
@@ -53,15 +51,15 @@ class _GeneratorScreenState extends State<GeneratorScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('مولّد كلمات المرور', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
-                    const Text('اصنع كلمات مرور غير قابلة للكسر', style: TextStyle(color: Colors.white54, fontSize: 14)),
+                    const Text('ظ…ظˆظ„ظ‘ط¯ ظƒظ„ظ…ط§طھ ط§ظ„ظ…ط±ظˆط±', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+                    const Text('ط§طµظ†ط¹ ظƒظ„ظ…ط§طھ ظ…ط±ظˆط± ط؛ظٹط± ظ‚ط§ط¨ظ„ط© ظ„ظ„ظƒط³ط±', style: TextStyle(color: Colors.white54, fontSize: 14)),
                     const SizedBox(height: 16),
                     TabBar(
                       controller: _tabs,
                       indicatorColor: AppConstants.primaryCyan,
                       labelColor: AppConstants.primaryCyan,
                       unselectedLabelColor: Colors.white38,
-                      tabs: const [Tab(text: 'كلمة مرور'), Tab(text: 'عبارة مرور')],
+                      tabs: const [Tab(text: 'ظƒظ„ظ…ط© ظ…ط±ظˆط±'), Tab(text: 'ط¹ط¨ط§ط±ط© ظ…ط±ظˆط±')],
                     ),
                   ],
                 ),
@@ -95,13 +93,13 @@ class _PasswordTab extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // ── Result display ───────────────────────────────────────────
+            // â”€â”€ Result display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: AppConstants.cardDark,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppConstants.primaryCyan.withOpacity(0.3)),
+                border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.3)),
               ),
               child: Column(
                 children: [
@@ -155,7 +153,7 @@ class _PasswordTab extends StatelessWidget {
                             onTap: () {
                               Clipboard.setData(ClipboardData(text: state.password));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('تم نسخ كلمة المرور ✓')),
+                                const SnackBar(content: Text('طھظ… ظ†ط³ط® ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± âœ“')),
                               );
                             },
                           ),
@@ -167,7 +165,7 @@ class _PasswordTab extends StatelessWidget {
               ),
             ),
 
-            // ── Animated strength bar (cipherowl-xw9) ───────────────────
+            // â”€â”€ Animated strength bar (cipherowl-xw9) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             const SizedBox(height: 16),
             TweenAnimationBuilder<double>(
               tween: Tween<double>(end: state.strengthScore / 4.0),
@@ -186,7 +184,7 @@ class _PasswordTab extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ── Options ──────────────────────────────────────────────────
+            // â”€â”€ Options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             _OptionCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +192,7 @@ class _PasswordTab extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('الطول', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                      const Text('ط§ظ„ط·ظˆظ„', style: TextStyle(color: Colors.white70, fontSize: 14)),
                       Text('${state.length.toInt()}', style: const TextStyle(color: AppConstants.primaryCyan, fontWeight: FontWeight.w700, fontSize: 16)),
                     ],
                   ),
@@ -215,11 +213,11 @@ class _PasswordTab extends StatelessWidget {
             _OptionCard(
               child: Column(
                 children: [
-                  _ToggleTile(label: 'أحرف كبيرة A-Z', value: state.useUppercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useUppercase: v))),
-                  _ToggleTile(label: 'أحرف صغيرة a-z', value: state.useLowercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useLowercase: v))),
-                  _ToggleTile(label: 'أرقام 0-9', value: state.useDigits, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useDigits: v))),
-                  _ToggleTile(label: 'رموز !@#', value: state.useSymbols, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useSymbols: v))),
-                  _ToggleTile(label: 'استبعاد الأحرف المتشابهة', value: state.excludeAmbiguous, onChanged: (v) => bloc.add(GeneratorConfigUpdated(excludeAmbiguous: v))),
+                  _ToggleTile(label: 'ط£ط­ط±ظپ ظƒط¨ظٹط±ط© A-Z', value: state.useUppercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useUppercase: v))),
+                  _ToggleTile(label: 'ط£ط­ط±ظپ طµط؛ظٹط±ط© a-z', value: state.useLowercase, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useLowercase: v))),
+                  _ToggleTile(label: 'ط£ط±ظ‚ط§ظ… 0-9', value: state.useDigits, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useDigits: v))),
+                  _ToggleTile(label: 'ط±ظ…ظˆط² !@#', value: state.useSymbols, onChanged: (v) => bloc.add(GeneratorConfigUpdated(useSymbols: v))),
+                  _ToggleTile(label: 'ط§ط³طھط¨ط¹ط§ط¯ ط§ظ„ط£ط­ط±ظپ ط§ظ„ظ…طھط´ط§ط¨ظ‡ط©', value: state.excludeAmbiguous, onChanged: (v) => bloc.add(GeneratorConfigUpdated(excludeAmbiguous: v))),
                 ],
               ),
             ),
@@ -240,7 +238,7 @@ class _PassphraseTab extends StatefulWidget {
 
 class _PassphraseTabState extends State<_PassphraseTab> {
   int _words = 5;
-  String _sep = '-';
+  final String _sep = '-';
   bool _capitalize = true;
   String _result = '';
 
@@ -268,7 +266,7 @@ class _PassphraseTabState extends State<_PassphraseTab> {
           decoration: BoxDecoration(
             color: AppConstants.cardDark,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppConstants.accentGold.withOpacity(0.3)),
+            border: Border.all(color: AppConstants.accentGold.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -281,7 +279,7 @@ class _PassphraseTabState extends State<_PassphraseTab> {
                   const SizedBox(width: 12),
                   _IconBtn(icon: Icons.copy, color: Colors.white, onTap: () {
                     Clipboard.setData(ClipboardData(text: _result));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم النسخ ✓')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('طھظ… ط§ظ„ظ†ط³ط® âœ“')));
                   }),
                 ],
               ),
@@ -291,12 +289,12 @@ class _PassphraseTabState extends State<_PassphraseTab> {
         const SizedBox(height: 24),
         _OptionCard(child: Column(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text('عدد الكلمات', style: TextStyle(color: Colors.white70)),
+            const Text('ط¹ط¯ط¯ ط§ظ„ظƒظ„ظ…ط§طھ', style: TextStyle(color: Colors.white70)),
             Text('$_words', style: const TextStyle(color: AppConstants.accentGold, fontWeight: FontWeight.w700, fontSize: 16)),
           ]),
           Slider(value: _words.toDouble(), min: 3, max: 8, divisions: 5, activeColor: AppConstants.accentGold, inactiveColor: AppConstants.borderDark,
             onChanged: (v) { setState(() => _words = v.toInt()); _generate(); }),
-          _ToggleTile(label: 'تكبير أول حرف', value: _capitalize, onChanged: (v) { setState(() => _capitalize = v); _generate(); }),
+          _ToggleTile(label: 'طھظƒط¨ظٹط± ط£ظˆظ„ ط­ط±ظپ', value: _capitalize, onChanged: (v) { setState(() => _capitalize = v); _generate(); }),
         ])),
         const SizedBox(height: 80),
       ],
@@ -324,7 +322,7 @@ class _ToggleTile extends StatelessWidget {
   Widget build(BuildContext context) => SwitchListTile(
     dense: true, contentPadding: EdgeInsets.zero,
     title: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
-    value: value, activeColor: AppConstants.primaryCyan, onChanged: onChanged,
+    value: value, activeThumbColor: AppConstants.primaryCyan, onChanged: onChanged,
   );
 }
 
@@ -338,7 +336,7 @@ class _IconBtn extends StatelessWidget {
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
       child: Icon(icon, color: color, size: 18),
     ),
   );

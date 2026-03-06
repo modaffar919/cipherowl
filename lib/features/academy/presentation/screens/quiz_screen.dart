@@ -94,7 +94,7 @@ class _QuizScreenState extends State<QuizScreen>
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20)),
         title: Text(
-          pct >= 70 ? '🎉 أحسنت!' : '📚 حاول مجدداً',
+          pct >= 70 ? 'ًںژ‰ ط£ط­ط³ظ†طھ!' : 'ًں“ڑ ط­ط§ظˆظ„ ظ…ط¬ط¯ط¯ط§ظ‹',
           textAlign: TextAlign.center,
           style: const TextStyle(
               color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
@@ -104,7 +104,7 @@ class _QuizScreenState extends State<QuizScreen>
           children: [
             const SizedBox(height: 8),
             Text(
-              '$_correctCount / $total إجابات صحيحة ($pct%)',
+              '$_correctCount / $total ط¥ط¬ط§ط¨ط§طھ طµط­ظٹط­ط© ($pct%)',
               style: const TextStyle(color: Colors.white70, fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -113,7 +113,7 @@ class _QuizScreenState extends State<QuizScreen>
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppConstants.accentGold.withOpacity(0.12),
+                color: AppConstants.accentGold.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -132,7 +132,7 @@ class _QuizScreenState extends State<QuizScreen>
               Navigator.of(context).pop();
               context.pop(); // back to module detail
             },
-            child: const Text('العودة للأكاديمية',
+            child: const Text('ط§ظ„ط¹ظˆط¯ط© ظ„ظ„ط£ظƒط§ط¯ظٹظ…ظٹط©',
                 style: TextStyle(
                     color: AppConstants.primaryCyan,
                     fontWeight: FontWeight.w700)),
@@ -180,7 +180,7 @@ class _QuizScreenState extends State<QuizScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Progress Bar ─────────────────────────────────────────────
+              // â”€â”€ Progress Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
@@ -192,14 +192,14 @@ class _QuizScreenState extends State<QuizScreen>
               ),
               const SizedBox(height: 28),
 
-              // ── Question ─────────────────────────────────────────────────
+              // â”€â”€ Question â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppConstants.cardDark,
                   borderRadius: BorderRadius.circular(16),
                   border:
-                      Border.all(color: color.withOpacity(0.25)),
+                      Border.all(color: color.withValues(alpha: 0.25)),
                 ),
                 child: Text(
                   _question.questionAr,
@@ -214,7 +214,7 @@ class _QuizScreenState extends State<QuizScreen>
               ),
               const SizedBox(height: 20),
 
-              // ── Choices ──────────────────────────────────────────────────
+              // â”€â”€ Choices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               ...List.generate(_question.choicesAr.length, (i) {
                 final isSelected = _selectedChoice == i;
                 final isCorrect = i == _question.correctIndex;
@@ -225,16 +225,16 @@ class _QuizScreenState extends State<QuizScreen>
                 if (_revealed) {
                   if (isCorrect) {
                     borderColor = AppConstants.successGreen;
-                    bgColor = AppConstants.successGreen.withOpacity(0.08);
+                    bgColor = AppConstants.successGreen.withValues(alpha: 0.08);
                     textColor = AppConstants.successGreen;
                   } else if (isSelected && !isCorrect) {
                     borderColor = AppConstants.errorRed;
-                    bgColor = AppConstants.errorRed.withOpacity(0.08);
+                    bgColor = AppConstants.errorRed.withValues(alpha: 0.08);
                     textColor = AppConstants.errorRed;
                   }
                 } else if (isSelected) {
                   borderColor = color;
-                  bgColor = color.withOpacity(0.08);
+                  bgColor = color.withValues(alpha: 0.08);
                   textColor = color;
                 }
 
@@ -293,7 +293,7 @@ class _QuizScreenState extends State<QuizScreen>
                 );
               }),
 
-              // ── Explanation ──────────────────────────────────────────────
+              // â”€â”€ Explanation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_revealed) ...[
                 const SizedBox(height: 8),
                 AnimatedOpacity(
@@ -302,10 +302,10 @@ class _QuizScreenState extends State<QuizScreen>
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppConstants.primaryCyan.withOpacity(0.07),
+                      color: AppConstants.primaryCyan.withValues(alpha: 0.07),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppConstants.primaryCyan.withOpacity(0.2)),
+                          color: AppConstants.primaryCyan.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +331,7 @@ class _QuizScreenState extends State<QuizScreen>
 
               const Spacer(),
 
-              // ── Next / Finish ────────────────────────────────────────────
+              // â”€â”€ Next / Finish â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_revealed)
                 SizedBox(
                   height: 52,
@@ -344,7 +344,7 @@ class _QuizScreenState extends State<QuizScreen>
                           borderRadius: BorderRadius.circular(14)),
                     ),
                     child: Text(
-                      _isLast ? 'إنهاء الاختبار 🎯' : 'السؤال التالي ←',
+                      _isLast ? 'ط¥ظ†ظ‡ط§ط، ط§ظ„ط§ط®طھط¨ط§ط± ًںژ¯' : 'ط§ظ„ط³ط¤ط§ظ„ ط§ظ„طھط§ظ„ظٹ â†گ',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w700),
                     ),

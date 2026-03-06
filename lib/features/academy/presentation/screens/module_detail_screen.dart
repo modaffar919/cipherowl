@@ -18,7 +18,7 @@ class ModuleDetailScreen extends StatelessWidget {
       backgroundColor: AppConstants.backgroundDark,
       body: CustomScrollView(
         slivers: [
-          // ── Hero App Bar ─────────────────────────────────────────────────
+          // â”€â”€ Hero App Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
@@ -35,7 +35,7 @@ class ModuleDetailScreen extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      color.withOpacity(0.25),
+                      color.withValues(alpha: 0.25),
                       AppConstants.backgroundDark,
                     ],
                   ),
@@ -65,7 +65,7 @@ class ModuleDetailScreen extends StatelessWidget {
             ),
           ),
 
-          // ── XP Badge ────────────────────────────────────────────────────
+          // â”€â”€ XP Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverToBoxAdapter(
             child: Padding(
               padding:
@@ -77,19 +77,19 @@ class ModuleDetailScreen extends StatelessWidget {
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color:
-                          AppConstants.accentGold.withOpacity(0.12),
+                          AppConstants.accentGold.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: AppConstants.accentGold.withOpacity(0.3)),
+                          color: AppConstants.accentGold.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('⭐',
+                        const Text('â­گ',
                             style: TextStyle(fontSize: 14)),
                         const SizedBox(width: 4),
                         Text(
-                          '+${module.xpReward} XP عند الإكمال',
+                          '+${module.xpReward} XP ط¹ظ†ط¯ ط§ظ„ط¥ظƒظ…ط§ظ„',
                           style: const TextStyle(
                               color: AppConstants.accentGold,
                               fontWeight: FontWeight.w700,
@@ -107,11 +107,11 @@ class ModuleDetailScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppConstants.successGreen.withOpacity(0.12),
+                          color: AppConstants.successGreen.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                               color:
-                                  AppConstants.successGreen.withOpacity(0.3)),
+                                  AppConstants.successGreen.withValues(alpha: 0.3)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -121,7 +121,7 @@ class ModuleDetailScreen extends StatelessWidget {
                                 size: 14),
                             SizedBox(width: 4),
                             Text(
-                              'مكتمل',
+                              'ظ…ظƒطھظ…ظ„',
                               style: TextStyle(
                                   color: AppConstants.successGreen,
                                   fontSize: 12,
@@ -137,7 +137,7 @@ class ModuleDetailScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Lesson Body ──────────────────────────────────────────────────
+          // â”€â”€ Lesson Body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
@@ -147,7 +147,7 @@ class ModuleDetailScreen extends StatelessWidget {
                   color: AppConstants.cardDark,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                      color: color.withOpacity(0.15)),
+                      color: color.withValues(alpha: 0.15)),
                 ),
                 child: Text(
                   module.bodyAr.trim(),
@@ -161,7 +161,7 @@ class ModuleDetailScreen extends StatelessWidget {
             ),
           ),
 
-          // ── Quiz CTA ─────────────────────────────────────────────────────
+          // â”€â”€ Quiz CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
@@ -199,7 +199,7 @@ class ModuleDetailScreen extends StatelessWidget {
                               : Icons.quiz_outlined,
                           size: 20),
                       label: Text(
-                        completed ? 'أُكملت الاختبار ✓' : 'ابدأ الاختبار',
+                        completed ? 'ط£ظڈظƒظ…ظ„طھ ط§ظ„ط§ط®طھط¨ط§ط± âœ“' : 'ط§ط¨ط¯ط£ ط§ظ„ط§ط®طھط¨ط§ط±',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w700),
                       ),

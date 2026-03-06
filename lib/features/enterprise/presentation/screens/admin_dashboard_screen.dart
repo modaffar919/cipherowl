@@ -9,7 +9,7 @@ import '../bloc/org_bloc.dart';
 import '../bloc/org_event.dart';
 import '../bloc/org_state.dart';
 
-/// Admin dashboard — member management, activity log, security policies.
+/// Admin dashboard â€” member management, activity log, security policies.
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -40,7 +40,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       appBar: AppBar(
         backgroundColor: AppConstants.backgroundDark,
         title: const Text(
-          'لوحة الإدارة',
+          'ظ„ظˆط­ط© ط§ظ„ط¥ط¯ط§ط±ط©',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         bottom: TabBar(
@@ -49,9 +49,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           labelColor: AppConstants.primaryCyan,
           unselectedLabelColor: Colors.white54,
           tabs: const [
-            Tab(icon: Icon(Icons.people_outline), text: 'الأعضاء'),
-            Tab(icon: Icon(Icons.history), text: 'سجل النشاط'),
-            Tab(icon: Icon(Icons.policy_outlined), text: 'السياسات'),
+            Tab(icon: Icon(Icons.people_outline), text: 'ط§ظ„ط£ط¹ط¶ط§ط،'),
+            Tab(icon: Icon(Icons.history), text: 'ط³ط¬ظ„ ط§ظ„ظ†ط´ط§ط·'),
+            Tab(icon: Icon(Icons.policy_outlined), text: 'ط§ظ„ط³ظٹط§ط³ط§طھ'),
           ],
         ),
       ),
@@ -60,7 +60,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           final org = state.selectedOrg;
           if (org == null) {
             return const Center(
-              child: Text('اختر مؤسسة أولاً',
+              child: Text('ط§ط®طھط± ظ…ط¤ط³ط³ط© ط£ظˆظ„ط§ظ‹',
                   style: TextStyle(color: Colors.white54)),
             );
           }
@@ -78,7 +78,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   }
 }
 
-// ── Members Tab ──────────────────────────────────────────────────────────────
+// â”€â”€ Members Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _MembersTab extends StatelessWidget {
   final Organisation org;
@@ -96,19 +96,19 @@ class _MembersTab extends StatelessWidget {
             children: [
               _StatCard(
                   value: '${members.length}',
-                  label: 'إجمالي الأعضاء',
+                  label: 'ط¥ط¬ظ…ط§ظ„ظٹ ط§ظ„ط£ط¹ط¶ط§ط،',
                   icon: Icons.group,
                   color: AppConstants.primaryCyan),
               const SizedBox(width: 12),
               _StatCard(
                   value: '${members.where((m) => m.role == OrgRole.admin).length}',
-                  label: 'المدراء',
+                  label: 'ط§ظ„ظ…ط¯ط±ط§ط،',
                   icon: Icons.admin_panel_settings,
                   color: AppConstants.errorRed),
               const SizedBox(width: 12),
               _StatCard(
                   value: '${members.where((m) => m.role == OrgRole.manager).length}',
-                  label: 'المشرفون',
+                  label: 'ط§ظ„ظ…ط´ط±ظپظˆظ†',
                   icon: Icons.manage_accounts,
                   color: AppConstants.accentGold),
             ],
@@ -120,7 +120,7 @@ class _MembersTab extends StatelessWidget {
           child: TextField(
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'بحث عن عضو...',
+              hintText: 'ط¨ط­ط« ط¹ظ† ط¹ط¶ظˆ...',
               hintStyle: const TextStyle(color: Colors.white38),
               prefixIcon: const Icon(Icons.search, color: Colors.white38),
               filled: true,
@@ -144,7 +144,7 @@ class _MembersTab extends StatelessWidget {
         Expanded(
           child: members.isEmpty
               ? const Center(
-                  child: Text('لا يوجد أعضاء',
+                  child: Text('ظ„ط§ ظٹظˆط¬ط¯ ط£ط¹ط¶ط§ط،',
                       style: TextStyle(color: Colors.white54)))
               : ListView.builder(
                   itemCount: members.length,
@@ -182,7 +182,7 @@ class _StatCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppConstants.cardDark,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -226,7 +226,7 @@ class _AdminMemberRow extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: _roleColor(member.role).withOpacity(0.15),
+            backgroundColor: _roleColor(member.role).withValues(alpha: 0.15),
             child: Text(
               member.displayName.isNotEmpty
                   ? member.displayName[0].toUpperCase()
@@ -261,7 +261,7 @@ class _AdminMemberRow extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: _roleColor(member.role).withOpacity(0.12),
+              color: _roleColor(member.role).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: DropdownButton<OrgRole>(
@@ -285,7 +285,7 @@ class _AdminMemberRow extends StatelessWidget {
             icon: const Icon(Icons.remove_circle_outline,
                 color: AppConstants.errorRed, size: 20),
             onPressed: onRemove,
-            tooltip: 'إزالة',
+            tooltip: 'ط¥ط²ط§ظ„ط©',
           ),
         ],
       ),
@@ -304,7 +304,7 @@ class _AdminMemberRow extends StatelessWidget {
   }
 }
 
-// ── Activity Log Tab ─────────────────────────────────────────────────────────
+// â”€â”€ Activity Log Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ActivityLogTab extends StatelessWidget {
   final String orgId;
@@ -315,33 +315,33 @@ class _ActivityLogTab extends StatelessWidget {
     _ActivityEntry(
         icon: Icons.login,
         color: Color(0xFF06D6A0),
-        title: 'تسجيل دخول',
-        detail: 'user@example.com — منذ دقيقتين'),
+        title: 'طھط³ط¬ظٹظ„ ط¯ط®ظˆظ„',
+        detail: 'user@example.com â€” ظ…ظ†ط° ط¯ظ‚ظٹظ‚طھظٹظ†'),
     _ActivityEntry(
         icon: Icons.person_add,
         color: Color(0xFF3B82F6),
-        title: 'إضافة عضو',
-        detail: 'ahmed@company.com — منذ ساعة'),
+        title: 'ط¥ط¶ط§ظپط© ط¹ط¶ظˆ',
+        detail: 'ahmed@company.com â€” ظ…ظ†ط° ط³ط§ط¹ط©'),
     _ActivityEntry(
         icon: Icons.lock_reset,
         color: Color(0xFFFFAB00),
-        title: 'تغيير دور',
-        detail: 'عُيّن sara@company.com مديراً — منذ 3 ساعات'),
+        title: 'طھط؛ظٹظٹط± ط¯ظˆط±',
+        detail: 'ط¹ظڈظٹظ‘ظ† sara@company.com ظ…ط¯ظٹط±ط§ظ‹ â€” ظ…ظ†ط° 3 ط³ط§ط¹ط§طھ'),
     _ActivityEntry(
         icon: Icons.share,
         color: Color(0xFF8B5CF6),
-        title: 'مشاركة خزينة',
-        detail: '"خزينة الإنتاج" شاركها admin@company.com — أمس'),
+        title: 'ظ…ط´ط§ط±ظƒط© ط®ط²ظٹظ†ط©',
+        detail: '"ط®ط²ظٹظ†ط© ط§ظ„ط¥ظ†طھط§ط¬" ط´ط§ط±ظƒظ‡ط§ admin@company.com â€” ط£ظ…ط³'),
     _ActivityEntry(
         icon: Icons.delete_sweep,
         color: Color(0xFFFF3D57),
-        title: 'حذف بند',
-        detail: 'حُذف "Production DB" — أمس 14:30'),
+        title: 'ط­ط°ظپ ط¨ظ†ط¯',
+        detail: 'ط­ظڈط°ظپ "Production DB" â€” ط£ظ…ط³ 14:30'),
     _ActivityEntry(
         icon: Icons.vpn_key,
         color: Color(0xFF00CEC9),
-        title: 'جلسة SSO',
-        detail: 'تسجيل دخول عبر OIDC — قبل يومين'),
+        title: 'ط¬ظ„ط³ط© SSO',
+        detail: 'طھط³ط¬ظٹظ„ ط¯ط®ظˆظ„ ط¹ط¨ط± OIDC â€” ظ‚ط¨ظ„ ظٹظˆظ…ظٹظ†'),
   ];
 
   @override
@@ -359,7 +359,7 @@ class _ActivityLogTab extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: entry.color.withOpacity(0.15),
+                color: entry.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(entry.icon, color: entry.color, size: 20),
@@ -388,7 +388,7 @@ class _ActivityEntry {
       required this.detail});
 }
 
-// ── Security Policies Tab ─────────────────────────────────────────────────────
+// â”€â”€ Security Policies Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SecurityPoliciesTab extends StatefulWidget {
   final String orgId;
@@ -411,33 +411,33 @@ class _SecurityPoliciesTabState extends State<_SecurityPoliciesTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _SectionHeader(title: 'المصادقة'),
+        _SectionHeader(title: 'ط§ظ„ظ…طµط§ط¯ظ‚ط©'),
         _PolicyToggle(
-          title: 'طلب المصادقة البيومترية',
-          subtitle: 'FaceID / بصمة الإصبع عند كل وصول',
+          title: 'ط·ظ„ط¨ ط§ظ„ظ…طµط§ط¯ظ‚ط© ط§ظ„ط¨ظٹظˆظ…طھط±ظٹط©',
+          subtitle: 'FaceID / ط¨طµظ…ط© ط§ظ„ط¥طµط¨ط¹ ط¹ظ†ط¯ ظƒظ„ ظˆطµظˆظ„',
           value: _requireMfa,
           onChanged: (v) => setState(() => _requireMfa = v),
           activeColor: AppConstants.primaryCyan,
         ),
         _PolicyToggle(
-          title: 'إلزامية 2FA',
-          subtitle: 'TOTP أو مفتاح أمان لجميع الأعضاء',
+          title: 'ط¥ظ„ط²ط§ظ…ظٹط© 2FA',
+          subtitle: 'TOTP ط£ظˆ ظ…ظپطھط§ط­ ط£ظ…ط§ظ† ظ„ط¬ظ…ظٹط¹ ط§ظ„ط£ط¹ط¶ط§ط،',
           value: _require2Fa,
           onChanged: (v) => setState(() => _require2Fa = v),
           activeColor: AppConstants.primaryCyan,
         ),
         const SizedBox(height: 20),
-        _SectionHeader(title: 'كلمات المرور'),
+        _SectionHeader(title: 'ظƒظ„ظ…ط§طھ ط§ظ„ظ…ط±ظˆط±'),
         _PolicyToggle(
-          title: 'السماح بكلمات مرور ضعيفة',
-          subtitle: 'موصى بإيقافه للأمان الأمثل',
+          title: 'ط§ظ„ط³ظ…ط§ط­ ط¨ظƒظ„ظ…ط§طھ ظ…ط±ظˆط± ط¶ط¹ظٹظپط©',
+          subtitle: 'ظ…ظˆطµظ‰ ط¨ط¥ظٹظ‚ط§ظپظ‡ ظ„ظ„ط£ظ…ط§ظ† ط§ظ„ط£ظ…ط«ظ„',
           value: _allowWeakPasswords,
           onChanged: (v) => setState(() => _allowWeakPasswords = v),
           activeColor: AppConstants.errorRed,
         ),
         _PolicyToggle(
-          title: 'تدوير كلمات المرور الإلزامي',
-          subtitle: 'تذكير دوري بتغيير كلمات المرور',
+          title: 'طھط¯ظˆظٹط± ظƒظ„ظ…ط§طھ ط§ظ„ظ…ط±ظˆط± ط§ظ„ط¥ظ„ط²ط§ظ…ظٹ',
+          subtitle: 'طھط°ظƒظٹط± ط¯ظˆط±ظٹ ط¨طھط؛ظٹظٹط± ظƒظ„ظ…ط§طھ ط§ظ„ظ…ط±ظˆط±',
           value: _enforcePasswordRotation,
           onChanged: (v) => setState(() => _enforcePasswordRotation = v),
           activeColor: AppConstants.accentGold,
@@ -445,7 +445,7 @@ class _SecurityPoliciesTabState extends State<_SecurityPoliciesTab> {
         if (_enforcePasswordRotation) ...[
           const SizedBox(height: 12),
           _SliderPolicy(
-            label: 'تدوير كل $_passwordRotationDays يوم',
+            label: 'طھط¯ظˆظٹط± ظƒظ„ $_passwordRotationDays ظٹظˆظ…',
             value: _passwordRotationDays.toDouble(),
             min: 30,
             max: 365,
@@ -455,7 +455,7 @@ class _SecurityPoliciesTabState extends State<_SecurityPoliciesTab> {
         ],
         const SizedBox(height: 8),
         _SliderPolicy(
-          label: 'الحد الأدنى لطول كلمة المرور: $_minPasswordLength حرف',
+          label: 'ط§ظ„ط­ط¯ ط§ظ„ط£ط¯ظ†ظ‰ ظ„ط·ظˆظ„ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±: $_minPasswordLength ط­ط±ظپ',
           value: _minPasswordLength.toDouble(),
           min: 8,
           max: 32,
@@ -463,9 +463,9 @@ class _SecurityPoliciesTabState extends State<_SecurityPoliciesTab> {
           onChanged: (v) => setState(() => _minPasswordLength = v.round()),
         ),
         const SizedBox(height: 20),
-        _SectionHeader(title: 'الجلسة'),
+        _SectionHeader(title: 'ط§ظ„ط¬ظ„ط³ط©'),
         _SliderPolicy(
-          label: 'انتهاء الجلسة بعد: $_sessionTimeoutHours ساعة',
+          label: 'ط§ظ†طھظ‡ط§ط، ط§ظ„ط¬ظ„ط³ط© ط¨ط¹ط¯: $_sessionTimeoutHours ط³ط§ط¹ط©',
           value: _sessionTimeoutHours.toDouble(),
           min: 1,
           max: 72,
@@ -483,12 +483,12 @@ class _SecurityPoliciesTabState extends State<_SecurityPoliciesTab> {
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم حفظ السياسات بنجاح'),
+                content: Text('طھظ… ط­ظپط¸ ط§ظ„ط³ظٹط§ط³ط§طھ ط¨ظ†ط¬ط§ط­'),
                 backgroundColor: AppConstants.successGreen,
               ),
             );
           },
-          child: const Text('حفظ السياسات',
+          child: const Text('ط­ظپط¸ ط§ظ„ط³ظٹط§ط³ط§طھ',
               style: TextStyle(
                   color: Colors.black, fontWeight: FontWeight.w700)),
         ),
@@ -545,7 +545,7 @@ class _PolicyToggle extends StatelessWidget {
           subtitle: Text(subtitle,
               style: const TextStyle(color: Colors.white54, fontSize: 12)),
           value: value,
-          activeColor: activeColor,
+          activeThumbColor: activeColor,
           onChanged: onChanged,
         ),
       );

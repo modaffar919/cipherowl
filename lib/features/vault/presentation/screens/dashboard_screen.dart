@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:meta/meta.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'vault_list_screen.dart';
@@ -9,7 +7,7 @@ import '../../../generator/presentation/generator_screen.dart';
 import '../../../academy/presentation/screens/academy_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 
-/// Main Dashboard — entry point that shows VaultListScreen by default,
+/// Main Dashboard â€” entry point that shows VaultListScreen by default,
 /// with a persistent bottom navigation bar
 class DashboardScreen extends StatefulWidget {
   /// Override the tab screens in tests to avoid platform-channel / Rust calls.
@@ -25,11 +23,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   static const _destinations = [
-    _NavItem(icon: Icons.lock_outline, activeIcon: Icons.lock, labelAr: 'الخزنة', route: AppConstants.routeVaultList),
-    _NavItem(icon: Icons.security_outlined, activeIcon: Icons.security, labelAr: 'الأمان', route: AppConstants.routeSecurityCenter),
-    _NavItem(icon: Icons.casino_outlined, activeIcon: Icons.casino, labelAr: 'المولّد', route: AppConstants.routeGenerator),
-    _NavItem(icon: Icons.school_outlined, activeIcon: Icons.school, labelAr: 'الأكاديمية', route: AppConstants.routeAcademy),
-    _NavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, labelAr: 'الإعدادات', route: AppConstants.routeSettings),
+    _NavItem(icon: Icons.lock_outline, activeIcon: Icons.lock, labelAr: 'ط§ظ„ط®ط²ظ†ط©', route: AppConstants.routeVaultList),
+    _NavItem(icon: Icons.security_outlined, activeIcon: Icons.security, labelAr: 'ط§ظ„ط£ظ…ط§ظ†', route: AppConstants.routeSecurityCenter),
+    _NavItem(icon: Icons.casino_outlined, activeIcon: Icons.casino, labelAr: 'ط§ظ„ظ…ظˆظ„ظ‘ط¯', route: AppConstants.routeGenerator),
+    _NavItem(icon: Icons.school_outlined, activeIcon: Icons.school, labelAr: 'ط§ظ„ط£ظƒط§ط¯ظٹظ…ظٹط©', route: AppConstants.routeAcademy),
+    _NavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, labelAr: 'ط§ظ„ط¥ط¹ط¯ط§ط¯ط§طھ', route: AppConstants.routeSettings),
   ];
 
   // One persistent screen instance per tab
@@ -88,7 +86,7 @@ class _CipherBottomNav extends StatelessWidget {
         color: AppConstants.surfaceDark,
         border: Border(top: BorderSide(color: AppConstants.borderDark, width: 1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, -4)),
         ],
       ),
       child: SafeArea(
@@ -111,7 +109,7 @@ class _CipherBottomNav extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: active ? AppConstants.primaryCyan.withOpacity(0.15) : Colors.transparent,
+                          color: active ? AppConstants.primaryCyan.withValues(alpha: 0.15) : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(

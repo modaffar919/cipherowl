@@ -68,15 +68,15 @@ class OrgRepository {
         .from('organisations')
         .select()
         .inFilter('id', orgIds);
-    return (rows as List).map((r) => Organisation.fromJson(r)).toList();
+    return rows.map((r) => Organisation.fromJson(r)).toList();
   }
 
   /// Fetch a single organisation by [orgId], including its members.
   Future<Organisation?> getOrg(String orgId) async {
     final rows =
         await _client.from('organisations').select().eq('id', orgId).limit(1);
-    if ((rows as List).isEmpty) return null;
-    final org = Organisation.fromJson(rows.first as Map<String, dynamic>);
+    if (rows.isEmpty) return null;
+    final org = Organisation.fromJson(rows.first);
     final members = await getMembersForOrg(orgId);
     return org.copyWith(members: members);
   }

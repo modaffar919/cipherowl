@@ -66,7 +66,7 @@ Uint8List apiDeriveX25519SharedSecret(
 /// Compute cosine similarity between two 128-dimensional face embeddings.
 /// Returns a score in [-1.0, 1.0]. Handles L2-normalisation internally.
 ///
-/// Both `a` and `b` must be Vec<f32> of length 128 (MobileFaceNet output).
+/// Both `a` and `b` must be `Vec<f32>` of length 128 (MobileFaceNet output).
 double apiFaceCosineSimilarity(
         {required List<double> a, required List<double> b}) =>
     RustLib.instance.api.crateApiApiFaceCosineSimilarity(a: a, b: b);
@@ -91,7 +91,7 @@ bool apiFaceIsSamePerson(
         .crateApiApiFaceFindBestMatch(probe: probe, stored: stored);
 
 /// L2-normalise a 128-dimensional face embedding.
-/// Returns the normalised embedding as Vec<f32>.
+/// Returns the normalised embedding as `Vec<f32>`.
 Float32List apiFaceNormalizeEmbedding({required List<double> embeddingVec}) =>
     RustLib.instance.api
         .crateApiApiFaceNormalizeEmbedding(embeddingVec: embeddingVec);

@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../domain/entities/org_member.dart';
 import '../../domain/entities/org_role.dart';
-import '../../domain/entities/organisation.dart';
 
 abstract class OrgEvent extends Equatable {
   const OrgEvent();

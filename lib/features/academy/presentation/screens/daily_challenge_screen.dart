@@ -24,7 +24,7 @@ class DailyChallengeScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'تحدي اليوم 🔥',
+          'طھط­ط¯ظٹ ط§ظ„ظٹظˆظ… ًں”¥',
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
         ),
@@ -41,11 +41,11 @@ class DailyChallengeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ── Streak + XP header ─────────────────────────────────
+                // â”€â”€ Streak + XP header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 _StreakHeader(xpReward: challenge.xpReward),
                 const SizedBox(height: 24),
 
-                // ── Challenge title ────────────────────────────────────
+                // â”€â”€ Challenge title â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 Text(
                   challenge.titleAr,
                   textAlign: TextAlign.right,
@@ -57,14 +57,14 @@ class DailyChallengeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // ── Question card ──────────────────────────────────────
+                // â”€â”€ Question card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: AppConstants.cardDark,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: AppConstants.primaryCyan.withOpacity(0.2)),
+                        color: AppConstants.primaryCyan.withValues(alpha: 0.2)),
                   ),
                   child: Text(
                     challenge.questionAr,
@@ -79,7 +79,7 @@ class DailyChallengeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Choices ────────────────────────────────────────────
+                // â”€â”€ Choices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 ...List.generate(challenge.choicesAr.length, (i) {
                   final isSelected = selectedChoice == i;
                   final isCorrect = i == challenge.correctIndex;
@@ -90,11 +90,11 @@ class DailyChallengeScreen extends StatelessWidget {
                   if (answered) {
                     if (isCorrect) {
                       borderColor = AppConstants.successGreen;
-                      bgColor = AppConstants.successGreen.withOpacity(0.08);
+                      bgColor = AppConstants.successGreen.withValues(alpha: 0.08);
                       textColor = AppConstants.successGreen;
                     } else if (isSelected && !isCorrect) {
                       borderColor = AppConstants.errorRed;
-                      bgColor = AppConstants.errorRed.withOpacity(0.08);
+                      bgColor = AppConstants.errorRed.withValues(alpha: 0.08);
                       textColor = AppConstants.errorRed;
                     }
                   }
@@ -149,17 +149,17 @@ class DailyChallengeScreen extends StatelessWidget {
                   );
                 }),
 
-                // ── Explanation ────────────────────────────────────────
+                // â”€â”€ Explanation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 if (answered) ...[
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppConstants.primaryCyan.withOpacity(0.07),
+                      color: AppConstants.primaryCyan.withValues(alpha: 0.07),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                           color:
-                              AppConstants.primaryCyan.withOpacity(0.2)),
+                              AppConstants.primaryCyan.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,19 +184,19 @@ class DailyChallengeScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppConstants.accentGold.withOpacity(0.08),
+                      color: AppConstants.accentGold.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppConstants.accentGold.withOpacity(0.25)),
+                          color: AppConstants.accentGold.withValues(alpha: 0.25)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('⭐',
+                        const Text('â­گ',
                             style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 8),
                         Text(
-                          '+${challenge.xpReward} XP أُضيفت!',
+                          '+${challenge.xpReward} XP ط£ظڈط¶ظٹظپطھ!',
                           style: const TextStyle(
                             color: AppConstants.accentGold,
                             fontSize: 15,
@@ -211,10 +211,10 @@ class DailyChallengeScreen extends StatelessWidget {
                 if (!answered) ...[
                   const SizedBox(height: 12),
                   Text(
-                    'اختر إجابة واحدة',
+                    'ط§ط®طھط± ط¥ط¬ط§ط¨ط© ظˆط§ط­ط¯ط©',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                         fontSize: 12),
                   ),
                 ],
@@ -227,7 +227,7 @@ class DailyChallengeScreen extends StatelessWidget {
   }
 }
 
-// ── Streak header ─────────────────────────────────────────────────────────────
+// â”€â”€ Streak header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _StreakHeader extends StatelessWidget {
   final int xpReward;
@@ -241,13 +241,13 @@ class _StreakHeader extends StatelessWidget {
         return Row(
           children: [
             _StatPill(
-              icon: '🔥',
-              label: '$streak يوم متوالي',
+              icon: 'ًں”¥',
+              label: '$streak ظٹظˆظ… ظ…طھظˆط§ظ„ظٹ',
               color: AppConstants.warningAmber,
             ),
             const SizedBox(width: 10),
             _StatPill(
-              icon: '⭐',
+              icon: 'â­گ',
               label: '+$xpReward XP',
               color: AppConstants.accentGold,
             ),
@@ -270,9 +270,9 @@ class _StatPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

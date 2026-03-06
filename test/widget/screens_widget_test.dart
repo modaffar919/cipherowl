@@ -14,9 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-
-// ── App-level
-import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
 
 // ── Screens
@@ -626,7 +623,7 @@ void main() {
 
     /// Build a DashboardScreen with all real screens replaced by safe stubs
     /// so that GeneratorScreen never calls the Rust API.
-    Widget _dashboardWithMocks() => _appWithBlocs(
+    Widget dashboardWithMocks() => _appWithBlocs(
           DashboardScreen(
             tabScreens: [
               const VaultListScreen(),
@@ -645,7 +642,7 @@ void main() {
         );
 
     testWidgets('renders bottom navigation with 5 tabs', (tester) async {
-      await tester.pumpWidget(_dashboardWithMocks());
+      await tester.pumpWidget(dashboardWithMocks());
       await tester.pump();
       // DashboardScreen renders with its Scaffold and custom bottom nav.
       // IndexedStack keeps all tab Scaffolds alive, so we find more than one.
@@ -655,7 +652,7 @@ void main() {
     });
 
     testWidgets('tapping second tab does not crash', (tester) async {
-      await tester.pumpWidget(_dashboardWithMocks());
+      await tester.pumpWidget(dashboardWithMocks());
       await tester.pump();
       // Tap second nav item (security)
       final navItems = find.byType(NavigationDestination);
