@@ -13,9 +13,24 @@
         </trust-anchors>
     </base-config>
 
-    <!-- Allow cleartext only for localhost during debug/emulator testing -->
+    <!-- Supabase domains: TLS-only + certificate pinning (MASVS-NETWORK-2) -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">supabase.co</domain>
-        <domain includeSubdomains="true">supabase.io</domain>
+        <domain includeSubdomains="true">supabase.in</domain>
+        <pin-set expiration="2027-06-01">
+            <!-- Amazon Root CA 1 (Supabase/AWS infrastructure) -->
+            <pin digest="SHA-256">++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=</pin>
+            <!-- Starfield Services Root CA (AWS backup chain) -->
+            <pin digest="SHA-256">KwccWaCgrnaw6tsrrSO61FgLacNgG2MMLq8GE6+oP5I=</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Allow cleartext for localhost during debug/emulator testing -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
     </domain-config>
 </network-security-config>
