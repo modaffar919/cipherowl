@@ -13,9 +13,10 @@
 
 use flutter_rust_bridge::frb;
 
-use crate::crypto::{aes_gcm, argon2, ed25519, pbkdf2, sharing};
+use crate::crypto::{aes_gcm, argon2, bip39, ed25519, pbkdf2, sharing};
 use crate::face::embedding;
 use crate::password::generator::{GeneratorConfig, GeneratorError};
+use crate::password::strength;
 
 use crate::crypto::x25519;
 use crate::totp::generator as totp;
@@ -113,7 +114,7 @@ pub fn api_derive_x25519_shared_secret(private_key: Vec<u8>, peer_public_key: Ve
 /// Compute cosine similarity between two 128-dimensional face embeddings.
 /// Returns a score in [-1.0, 1.0]. Handles L2-normalisation internally.
 ///
-/// Both `a` and `b` must be Vec<f32> of length 128 (MobileFaceNet output).
+/// Both `a` and `b` must be `Vec<f32>` of length 128 (MobileFaceNet output).
 #[frb(sync)]
 pub fn api_face_cosine_similarity(a: Vec<f32>, b: Vec<f32>) -> anyhow::Result<f32> {
     embedding::cosine_similarity(&a, &b).map_err(|e| anyhow::anyhow!("{}", e))
@@ -137,7 +138,7 @@ pub fn api_face_find_best_match(probe: Vec<f32>, stored: Vec<Vec<f32>>) -> anyho
 }
 
 /// L2-normalise a 128-dimensional face embedding.
-/// Returns the normalised embedding as Vec<f32>.
+/// Returns the normalised embedding as `Vec<f32>`.
 #[frb(sync)]
 pub fn api_face_normalize_embedding(embedding_vec: Vec<f32>) -> anyhow::Result<Vec<f32>> {
     let arr = embedding::to_normalized_array(&embedding_vec)
@@ -305,6 +306,66 @@ pub fn api_sharing_decrypt(
     let share = sharing::EncryptedShare::from_bytes(&share_bytes)
         .ok_or_else(|| anyhow::anyhow!("Invalid share format"))?;
     sharing::decrypt_from_sender(&share, &recipient_private_key)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+// ─── Password Strength (zxcvbn) ──────────────────────────────────────────────
+
+/// Result of password strength estimation exposed to Dart.
+#[frb]
+pub struct ApiStrengthResult {
+    /// Score 0 (very weak) to 4 (very strong).
+    pub score: u8,
+    /// Human-readable crack time (e.g. "3 hours").
+    pub crack_time_display: String,
+    /// log10 of estimated guesses needed.
+    pub guesses_log10: f64,
+    /// Warning message from zxcvbn, if any.
+    pub warning: String,
+    /// Suggestions to improve the password.
+    pub suggestions: Vec<String>,
+}
+
+/// Estimate password strength using the zxcvbn algorithm.
+///
+/// Returns score (0-4), crack time, and actionable feedback.
+#[frb(sync)]
+pub fn api_estimate_strength(password: String) -> ApiStrengthResult {
+    let r = strength::estimate_strength(&password);
+    ApiStrengthResult {
+        score: r.score,
+        crack_time_display: r.crack_time_display,
+        guesses_log10: r.guesses_log10,
+        warning: r.warning,
+        suggestions: r.suggestions,
+    }
+}
+
+// ─── BIP39 Mnemonic (Recovery Key) ───────────────────────────────────────────
+
+/// Generate a BIP39 mnemonic phrase (12 or 24 English words).
+///
+/// * `word_count` — 12 (128-bit entropy) or 24 (256-bit entropy).
+#[frb(sync)]
+pub fn api_generate_mnemonic(word_count: usize) -> anyhow::Result<Vec<String>> {
+    bip39::generate_mnemonic(word_count)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Validate a BIP39 mnemonic phrase (word count, wordlist, checksum).
+#[frb(sync)]
+pub fn api_validate_mnemonic(words: Vec<String>) -> anyhow::Result<bool> {
+    bip39::validate_mnemonic(&words)
+        .map_err(|e| anyhow::anyhow!("{}", e))
+}
+
+/// Derive a 64-byte seed from a BIP39 mnemonic and optional passphrase.
+///
+/// The seed can be used to deterministically re-derive the master encryption key.
+/// Pass an empty string for `passphrase` if no passphrase is desired.
+#[frb(sync)]
+pub fn api_mnemonic_to_seed(words: Vec<String>, passphrase: String) -> anyhow::Result<Vec<u8>> {
+    bip39::mnemonic_to_seed(&words, &passphrase)
         .map_err(|e| anyhow::anyhow!("{}", e))
 }
 

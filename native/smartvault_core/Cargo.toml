@@ -22,6 +22,8 @@ hmac = "0.12.1"
 data-encoding = "2.6.0"
 hex = "0.4.3"
 base64 = "0.22.1"
+zxcvbn = "3"
+tiny-bip39 = "1.0.0"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"

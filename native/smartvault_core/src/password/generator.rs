@@ -45,8 +45,6 @@ pub enum GeneratorError {
 }
 
 /// Generate a cryptographically random password according to the given config.
-///
-/// **TODO**: integrate zxcvbn strength estimation and add Arabic password policy.
 pub fn generate(config: &GeneratorConfig) -> Result<String, GeneratorError> {
     // Build an alphabet from enabled character classes
     let mut alphabet: Vec<u8> = Vec::new();

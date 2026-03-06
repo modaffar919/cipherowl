@@ -22,4 +22,6 @@ pub use crypto::sharing::{encrypt_for_recipient, decrypt_from_sender, EncryptedS
 pub use memory::secure_memory::SecureBytes;
 pub use face::embedding::{cosine_similarity, is_same_person, find_best_match, EMBEDDING_DIM, DEFAULT_THRESHOLD};
 pub use totp::generator::{generate as totp_generate, generate_custom as totp_generate_custom, time_remaining as totp_time_remaining, TotpError};
+pub use crypto::bip39::{generate_mnemonic, validate_mnemonic, mnemonic_to_seed, Bip39Error};
+pub use password::strength::{estimate_strength, StrengthResult};
 // api module re-exported for frb codegen

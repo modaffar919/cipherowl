@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zxcvbn/zxcvbn.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/src/rust/api.dart';
 import '../bloc/auth_bloc.dart';
 
 /// First-time setup — creates master password + recovery key
@@ -110,6 +112,7 @@ class _SetupPage1 extends StatefulWidget {
 class _SetupPage1State extends State<_SetupPage1> {
   final _ctrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+  final _zxcvbn = Zxcvbn();
   double _strength = 0;
 
   @override
@@ -139,8 +142,8 @@ class _SetupPage1State extends State<_SetupPage1> {
             style: const TextStyle(color: Colors.white, fontFamily: 'SpaceMono'),
             decoration: const InputDecoration(labelText: 'كلمة المرور الرئيسية'),
             onChanged: (v) {
-              // TODO: Use zxcvbn for real strength
-              setState(() => _strength = (v.length / 20).clamp(0.0, 1.0));
+              final score = v.isEmpty ? 0 : (_zxcvbn.evaluate(v).score ?? 0);
+              setState(() => _strength = (score / 4).clamp(0.0, 1.0));
             },
           ),
 
@@ -180,16 +183,29 @@ class _SetupPage1State extends State<_SetupPage1> {
   }
 }
 
-class _SetupPage2 extends StatelessWidget {
+class _SetupPage2 extends StatefulWidget {
   final VoidCallback onNext;
   const _SetupPage2({required this.onNext});
+  @override
+  State<_SetupPage2> createState() => _SetupPage2State();
+}
+
+class _SetupPage2State extends State<_SetupPage2> {
+  late final String _mnemonic;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      final words = apiGenerateMnemonic(wordCount: BigInt.from(24));
+      _mnemonic = words.join(' ');
+    } catch (_) {
+      _mnemonic = 'خطأ في توليد مفتاح الاسترداد';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Generate real BIP39 mnemonic via Rust
-    const mnemonic = 'abandon ability able about above absent absorb abstract '
-        'absurd abuse access accident account accuse achieve acid '
-        'acoustic acquire across act action actor';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -218,7 +234,7 @@ class _SetupPage2 extends StatelessWidget {
               border: Border.all(color: AppConstants.primaryCyan.withValues(alpha: 0.3)),
             ),
             child: Text(
-              mnemonic,
+              _mnemonic,
               style: const TextStyle(
                 color: AppConstants.primaryCyan,
                 fontFamily: 'SpaceMono',
@@ -243,7 +259,7 @@ class _SetupPage2 extends StatelessWidget {
           ),
 
           const Spacer(),
-          ElevatedButton(onPressed: onNext, child: const Text('لقد حفظتها بأمان ✓')),
+          ElevatedButton(onPressed: widget.onNext, child: const Text('لقد حفظتها بأمان ✓')),
           const SizedBox(height: 20),
         ],
       ),

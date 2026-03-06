@@ -194,6 +194,31 @@ Uint8List apiSharingDecrypt(
     RustLib.instance.api.crateApiApiSharingDecrypt(
         shareBytes: shareBytes, recipientPrivateKey: recipientPrivateKey);
 
+/// Estimate password strength using the zxcvbn algorithm.
+///
+/// Returns score (0-4), crack time, and actionable feedback.
+ApiStrengthResult apiEstimateStrength({required String password}) =>
+    RustLib.instance.api.crateApiApiEstimateStrength(password: password);
+
+/// Generate a BIP39 mnemonic phrase (12 or 24 English words).
+///
+/// * `word_count` — 12 (128-bit entropy) or 24 (256-bit entropy).
+List<String> apiGenerateMnemonic({required BigInt wordCount}) =>
+    RustLib.instance.api.crateApiApiGenerateMnemonic(wordCount: wordCount);
+
+/// Validate a BIP39 mnemonic phrase (word count, wordlist, checksum).
+bool apiValidateMnemonic({required List<String> words}) =>
+    RustLib.instance.api.crateApiApiValidateMnemonic(words: words);
+
+/// Derive a 64-byte seed from a BIP39 mnemonic and optional passphrase.
+///
+/// The seed can be used to deterministically re-derive the master encryption key.
+/// Pass an empty string for `passphrase` if no passphrase is desired.
+Uint8List apiMnemonicToSeed(
+        {required List<String> words, required String passphrase}) =>
+    RustLib.instance.api
+        .crateApiApiMnemonicToSeed(words: words, passphrase: passphrase);
+
 /// Config for `api_generate_password`.
 class ApiGeneratorConfig {
   final BigInt length;
@@ -228,4 +253,49 @@ class ApiGeneratorConfig {
           useUppercase == other.useUppercase &&
           useDigits == other.useDigits &&
           useSymbols == other.useSymbols;
+}
+
+/// Result of password strength estimation exposed to Dart.
+class ApiStrengthResult {
+  /// Score 0 (very weak) to 4 (very strong).
+  final int score;
+
+  /// Human-readable crack time (e.g. "3 hours").
+  final String crackTimeDisplay;
+
+  /// log10 of estimated guesses needed.
+  final double guessesLog10;
+
+  /// Warning message from zxcvbn, if any.
+  final String warning;
+
+  /// Suggestions to improve the password.
+  final List<String> suggestions;
+
+  const ApiStrengthResult({
+    required this.score,
+    required this.crackTimeDisplay,
+    required this.guessesLog10,
+    required this.warning,
+    required this.suggestions,
+  });
+
+  @override
+  int get hashCode =>
+      score.hashCode ^
+      crackTimeDisplay.hashCode ^
+      guessesLog10.hashCode ^
+      warning.hashCode ^
+      suggestions.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApiStrengthResult &&
+          runtimeType == other.runtimeType &&
+          score == other.score &&
+          crackTimeDisplay == other.crackTimeDisplay &&
+          guessesLog10 == other.guessesLog10 &&
+          warning == other.warning &&
+          suggestions == other.suggestions;
 }

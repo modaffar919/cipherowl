@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../face_track/data/services/background_face_monitor.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/services/intruder_snapshot_service.dart';
 
@@ -10,6 +11,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final IntruderSnapshotService _snapshotService;
+  BackgroundFaceMonitor? _faceMonitor;
 
   AuthBloc({
     AuthRepository? authRepository,
@@ -61,6 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       switch (result.status) {
         case VerifyStatus.success:
           emit(const AuthAuthenticated());
+          _startFaceMonitor();
 
         case VerifyStatus.duress:
           // Duress password — open decoy (empty) vault, don't reveal real data
@@ -112,6 +115,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       switch (result.status) {
         case BiometricStatus.success:
           emit(const AuthAuthenticated());
+          _startFaceMonitor();
 
         case BiometricStatus.failed:
           emit(const AuthLocked());
@@ -138,6 +142,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       switch (result.status) {
         case Fido2AuthStatus.success:
           emit(const AuthAuthenticated());
+          _startFaceMonitor();
 
         case Fido2AuthStatus.noCredentials:
           emit(AuthFido2Error(result.message ?? 'لا توجد مفاتيح مسجّلة'));
@@ -172,6 +177,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _authRepository.saveMasterPassword(event.masterPassword);
       emit(const AuthAuthenticated());
+      _startFaceMonitor();
     } catch (e) {
       emit(AuthFailed(
         message: 'فشل حفظ كلمة المرور: ${e.toString()}',
@@ -184,6 +190,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthVaultLocked event,
     Emitter<AuthState> emit,
   ) async {
+    await _stopFaceMonitor();
     emit(const AuthLocked());
   }
 
@@ -192,5 +199,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) {
     emit(const AuthLocked());
+  }
+
+  // ── Face-Track monitor ─────────────────────────────────
+
+  void _startFaceMonitor() {
+    _faceMonitor ??= BackgroundFaceMonitor(
+      onVerificationFailed: () => add(const AuthVaultLocked()),
+    );
+    _faceMonitor!.start();
+  }
+
+  Future<void> _stopFaceMonitor() async {
+    await _faceMonitor?.stop();
+  }
+
+  @override
+  Future<void> close() async {
+    await _stopFaceMonitor();
+    return super.close();
   }
 }
