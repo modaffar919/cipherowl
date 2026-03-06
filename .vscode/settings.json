@@ -1,0 +1,24 @@
+{
+  // ── SQL files: use postgres-aware language instead of T-SQL ──────────────
+  "files.associations": {
+    "*.sql": "sql"
+  },
+  // Disable mssql extension's IntelliSense / error detection for plain SQL
+  // (Supabase migrations are PostgreSQL, not T-SQL / SQL Server)
+  "sql.linter.enabled": false,
+  "mssql.intelliSense.enableIntelliSense": false,
+
+  // ── Flutter / Dart ────────────────────────────────────────────────────────
+  "dart.lineLength": 100,
+  "editor.formatOnSave": true,
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true,
+    "editor.rulers": [100]
+  },
+
+  // ── General ───────────────────────────────────────────────────────────────
+  "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
