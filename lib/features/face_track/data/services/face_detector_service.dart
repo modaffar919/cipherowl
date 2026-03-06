@@ -14,8 +14,8 @@ class FaceDetectorService {
   Future<void> initialize() async {
     _detector ??= FaceDetector(
       options: FaceDetectorOptions(
-        enableLandmarks: false,
-        enableClassification: false,
+        enableLandmarks: true,
+        enableClassification: true,
         enableTracking: true,
         minFaceSize: 0.15,
         performanceMode: FaceDetectorMode.fast,

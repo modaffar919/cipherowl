@@ -20,6 +20,8 @@ import '../../features/enterprise/presentation/screens/enterprise_screen.dart';
 import '../../features/enterprise/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/enterprise/presentation/screens/sso_settings_screen.dart';
 import '../../features/auth/presentation/screens/fido2_management_screen.dart';
+import '../../features/auth/presentation/screens/recovery_key_screen.dart';
+import '../../features/auth/presentation/screens/recovery_restore_screen.dart';
 import '../../features/notifications/presentation/screens/notification_center_screen.dart';
 import '../../features/academy/data/academy_content.dart';
 import '../../features/academy/domain/entities/academy_module.dart';
@@ -274,6 +276,20 @@ abstract class AppRouter {
         path: AppConstants.routeAcademyDaily,
         pageBuilder: (context, state) =>
             _slideUp(state, const DailyChallengeScreen()),
+      ),
+
+      // ── Recovery Setup ──────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeRecoverySetup,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const RecoveryKeyScreen()),
+      ),
+
+      // ── Recovery Restore ─────────────────────────────────
+      GoRoute(
+        path: AppConstants.routeRecoveryRestore,
+        pageBuilder: (context, state) =>
+            _slideRight(state, const RecoveryRestoreScreen()),
       ),
 
       // ── Geo-Fencing ───────────────────────────────────────

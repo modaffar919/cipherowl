@@ -19,6 +19,12 @@ class FaceEnrollmentCaptureRequested extends FaceEnrollmentEvent {
   });
 }
 
+/// Feeds a detected [Face] to the liveness service for anti-spoofing analysis.
+class FaceEnrollmentFrameReceived extends FaceEnrollmentEvent {
+  final Face face;
+  const FaceEnrollmentFrameReceived({required this.face});
+}
+
 /// User wants to start over.
 class FaceEnrollmentResetRequested extends FaceEnrollmentEvent {
   const FaceEnrollmentResetRequested();

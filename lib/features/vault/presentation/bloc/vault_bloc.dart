@@ -290,17 +290,103 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
 
   // ── Lifecycle ────────────────────────────────────────────────────────────
 
-  /// Duress mode: cancel the real DB subscription and serve an empty vault.
+  /// Duress mode: cancel the real DB subscription and serve a convincing
+  /// decoy vault with realistic-looking fake accounts.
   Future<void> _onDuressActivated(
       VaultDuressActivated event, Emitter<VaultState> emit) async {
     await _itemsSub?.cancel();
     _itemsSub = null;
-    // Emit an empty loaded state — the UI sees zero items
-    emit(const VaultLoaded(
-      allItems: [],
+    emit(VaultLoaded(
+      allItems: _buildDecoyItems(),
       searchQuery: '',
       categoryFilter: null,
     ));
+  }
+
+  /// Generate realistic decoy vault items so the vault looks authentic.
+  static List<VaultEntry> _buildDecoyItems() {
+    final now = DateTime.now();
+    return [
+      VaultEntry(
+        id: 'decoy-1',
+        userId: 'duress',
+        title: 'Gmail',
+        username: 'mohammed.k@gmail.com',
+        url: 'https://mail.google.com',
+        category: VaultCategory.login,
+        strengthScore: 3,
+        isFavorite: true,
+        createdAt: now.subtract(const Duration(days: 120)),
+        updatedAt: now.subtract(const Duration(days: 5)),
+      ),
+      VaultEntry(
+        id: 'decoy-2',
+        userId: 'duress',
+        title: 'Twitter / X',
+        username: 'mk_dev',
+        url: 'https://x.com',
+        category: VaultCategory.login,
+        strengthScore: 2,
+        createdAt: now.subtract(const Duration(days: 90)),
+        updatedAt: now.subtract(const Duration(days: 14)),
+      ),
+      VaultEntry(
+        id: 'decoy-3',
+        userId: 'duress',
+        title: 'Amazon',
+        username: 'mohammed.k@gmail.com',
+        url: 'https://amazon.com',
+        category: VaultCategory.login,
+        strengthScore: 4,
+        createdAt: now.subtract(const Duration(days: 60)),
+        updatedAt: now.subtract(const Duration(days: 2)),
+      ),
+      VaultEntry(
+        id: 'decoy-4',
+        userId: 'duress',
+        title: 'Netflix',
+        username: 'mohammed.k@gmail.com',
+        url: 'https://netflix.com',
+        category: VaultCategory.login,
+        strengthScore: 3,
+        createdAt: now.subtract(const Duration(days: 45)),
+        updatedAt: now.subtract(const Duration(days: 10)),
+      ),
+      VaultEntry(
+        id: 'decoy-5',
+        userId: 'duress',
+        title: 'LinkedIn',
+        username: 'mohammed-k-dev',
+        url: 'https://linkedin.com',
+        category: VaultCategory.login,
+        strengthScore: 3,
+        isFavorite: true,
+        createdAt: now.subtract(const Duration(days: 180)),
+        updatedAt: now.subtract(const Duration(days: 30)),
+      ),
+      VaultEntry(
+        id: 'decoy-6',
+        userId: 'duress',
+        title: 'بنك الراجحي',
+        username: '****4521',
+        url: 'https://alrajhibank.com.sa',
+        category: VaultCategory.card,
+        strengthScore: 4,
+        createdAt: now.subtract(const Duration(days: 200)),
+        updatedAt: now.subtract(const Duration(days: 60)),
+      ),
+      VaultEntry(
+        id: 'decoy-7',
+        userId: 'duress',
+        title: 'GitHub',
+        username: 'mk-developer',
+        url: 'https://github.com',
+        category: VaultCategory.login,
+        strengthScore: 4,
+        createdAt: now.subtract(const Duration(days: 150)),
+        updatedAt: now.subtract(const Duration(days: 7)),
+      ),
+    ];
   }
 
   @override

@@ -146,6 +146,7 @@ abstract class AppConstants {
   static const String routeSettings      = '/settings';
   static const String routeFaceSetup     = '/face-setup';
   static const String routeRecoverySetup = '/recovery-setup';
+  static const String routeRecoveryRestore = '/recovery-restore';
   static const String routeSharing          = '/sharing';
   static const String routeEnterprise       = '/enterprise';
   static const String routeAdminDashboard   = '/enterprise/admin';

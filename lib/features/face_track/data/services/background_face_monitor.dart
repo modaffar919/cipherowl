@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cipherowl/features/face_track/data/services/face_detector_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_embedding_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_verification_service.dart';
+import 'package:cipherowl/features/face_track/data/services/liveness_detection_service.dart';
 
 /// Background Face-Track monitoring service.
 ///
@@ -42,6 +43,7 @@ class BackgroundFaceMonitor {
   final FaceDetectorService _detector = FaceDetectorService();
   final FaceEmbeddingService _embedding = FaceEmbeddingService();
   final FaceVerificationService _verification = FaceVerificationService();
+  final LivenessDetectionService _liveness = LivenessDetectionService();
 
   Timer? _checkTimer;
   bool _running = false;
@@ -125,6 +127,9 @@ class BackgroundFaceMonitor {
         _handleFailure();
         return;
       }
+
+      // Feed liveness detector for anti-spoofing.
+      _liveness.addFrame(face);
 
       final embedding = await _embedding.getEmbeddingFromCamera(
         cameraImage: frame,

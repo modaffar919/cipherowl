@@ -3,10 +3,12 @@ import 'dart:ui' show Rect;
 
 import 'package:camera/camera.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
 import 'package:cipherowl/features/face_track/data/services/face_detector_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_embedding_service.dart';
 import 'package:cipherowl/features/face_track/data/services/face_verification_service.dart';
+import 'package:cipherowl/features/face_track/data/services/liveness_detection_service.dart';
 
 part 'face_enrollment_event.dart';
 part 'face_enrollment_state.dart';
@@ -22,6 +24,7 @@ class FaceEnrollmentBloc
   final FaceDetectorService _detector;
   final FaceEmbeddingService _embedding;
   final FaceVerificationService _verification;
+  final LivenessDetectionService _liveness = LivenessDetectionService();
 
   static const List<FacePose> _poses = FacePose.values; // front,left,right,up,down
   final List<List<double>> _captures = [];
@@ -36,6 +39,7 @@ class FaceEnrollmentBloc
        super(const FaceEnrollmentInitial()) {
     on<FaceEnrollmentInitialized>(_onInitialized);
     on<FaceEnrollmentCaptureRequested>(_onCaptureRequested);
+    on<FaceEnrollmentFrameReceived>(_onFrameReceived);
     on<FaceEnrollmentResetRequested>(_onResetRequested);
   }
 
@@ -94,7 +98,15 @@ class FaceEnrollmentBloc
       _captures.add(embedding);
 
       if (_captures.length >= _poses.length) {
-        // All 5 captures done → enroll.
+        // All 5 captures done — verify liveness before enrolling.
+        if (!_liveness.isLive) {
+          _captures.removeLast();
+          emit(FaceEnrollmentError(
+            message: 'فشل التحقق من الحياة — ارمش أو حرّك رأسك قليلاً.',
+            capturesDone: _captures.length,
+          ));
+          return;
+        }
         emit(const FaceEnrollmentProcessing());
         await _verification.enroll(_captures);
         emit(const FaceEnrollmentSuccess());
@@ -114,11 +126,19 @@ class FaceEnrollmentBloc
     }
   }
 
+  void _onFrameReceived(
+    FaceEnrollmentFrameReceived event,
+    Emitter<FaceEnrollmentState> emit,
+  ) {
+    _liveness.addFrame(event.face);
+  }
+
   Future<void> _onResetRequested(
     FaceEnrollmentResetRequested event,
     Emitter<FaceEnrollmentState> emit,
   ) async {
     _captures.clear();
+    _liveness.reset();
     emit(const FaceEnrollmentReady());
   }
 

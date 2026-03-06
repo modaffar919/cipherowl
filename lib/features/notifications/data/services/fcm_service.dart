@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../../../../core/supabase/supabase_client_provider.dart';
 import '../../domain/entities/app_notification.dart';
 import '../repositories/notification_repository.dart';
 
@@ -41,11 +43,15 @@ class FcmService {
       sound: true,
     );
 
-    // Print token for debug convenience.
-    if (kDebugMode) {
-      final token = await _fcm.getToken();
+    // Get and persist FCM token to Supabase for push delivery.
+    final token = await _fcm.getToken();
+    if (token != null) {
       debugPrint('[FCM] Device token: $token');
+      await _persistToken(token);
     }
+
+    // Listen for token refresh (e.g. app reinstall, new device).
+    _fcm.onTokenRefresh.listen(_persistToken);
 
     // Foreground messages.
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -56,6 +62,21 @@ class FcmService {
     // App launched from terminated state via notification.
     final initial = await _fcm.getInitialMessage();
     if (initial != null) _handleMessageOpenedApp(initial);
+  }
+
+  /// Persist FCM token to Supabase profiles table for server push delivery.
+  Future<void> _persistToken(String token) async {
+    try {
+      final user = SupabaseClientProvider.currentUser;
+      if (user == null) return;
+      await SupabaseClientProvider.client
+          .from('profiles')
+          .update({'fcm_token': token})
+          .eq('id', user.id);
+      debugPrint('[FCM] Token persisted to Supabase');
+    } catch (e) {
+      debugPrint('[FCM] Failed to persist token: $e');
+    }
   }
 
   // ── Private ────────────────────────────────────────────────────────────────

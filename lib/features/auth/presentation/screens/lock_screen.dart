@@ -165,7 +165,7 @@ class _LockScreenState extends State<LockScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppConstants.primaryCyan.withValues(alpha: 
+                    color: AppConstants.primaryCyan.withValues(alpha:
                       0.05 + _glowController.value * 0.1,
                     ),
                     blurRadius: 40 + _glowController.value * 20,
@@ -351,7 +351,7 @@ class _LockScreenState extends State<LockScreen>
   Widget _buildFooter() {
     return TextButton(
       onPressed: () {
-        // TODO: Navigate to recovery flow
+        context.push(AppConstants.routeRecoveryRestore);
       },
       child: const Text(
         'نسيت كلمة المرور؟',

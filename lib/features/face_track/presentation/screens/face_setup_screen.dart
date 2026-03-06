@@ -124,6 +124,11 @@ class _FaceSetupViewState extends State<_FaceSetupView>
       await detectorSvc.dispose();
       if (!mounted) return;
       setState(() => _currentFace = face);
+      if (face != null) {
+        context.read<FaceEnrollmentBloc>().add(
+          FaceEnrollmentFrameReceived(face: face),
+        );
+      }
     } catch (_) {
       // Ignore overlay errors.
     }
