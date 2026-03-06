@@ -42,6 +42,10 @@ class VaultLoaded extends VaultState {
   /// Timestamp of the last successful cloud sync, or null if never synced.
   final DateTime? lastSyncAt;
 
+  /// True when the vault is showing decoy items (duress mode).
+  /// All CRUD operations are silently accepted but never persisted.
+  final bool isDuress;
+
   const VaultLoaded({
     required this.allItems,
     this.searchQuery = '',
@@ -51,6 +55,7 @@ class VaultLoaded extends VaultState {
     this.isError = false,
     this.isSyncing = false,
     this.lastSyncAt,
+    this.isDuress = false,
   });
 
   // ── Derived ──────────────────────────────────────────────────────────────
@@ -92,6 +97,7 @@ class VaultLoaded extends VaultState {
     bool? isError,
     bool? isSyncing,
     DateTime? lastSyncAt,
+    bool? isDuress,
     bool clearMessage = false,
     bool clearCategory = false,
   }) =>
@@ -105,6 +111,7 @@ class VaultLoaded extends VaultState {
         isError: isError ?? this.isError,
         isSyncing: isSyncing ?? this.isSyncing,
         lastSyncAt: lastSyncAt ?? this.lastSyncAt,
+        isDuress: isDuress ?? this.isDuress,
       );
 }
 

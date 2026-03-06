@@ -322,6 +322,102 @@ void main() {
     );
   });
 
+  // ── VaultDuressActivated ───────────────────────────────────────────────────
+  group('VaultDuressActivated', () {
+    blocTest<VaultBloc, VaultState>(
+      'emits VaultLoaded with isDuress=true and decoy items',
+      build: () {
+        when(() => mockRepo.watchItems(any()))
+            .thenAnswer((_) => Stream.value([_entry()]));
+        return VaultBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const VaultStarted('local_user'));
+        await Future.delayed(Duration.zero);
+        bloc.add(const VaultDuressActivated());
+      },
+      skip: 2,
+      expect: () => [
+        isA<VaultLoaded>()
+            .having((s) => s.isDuress, 'isDuress', true)
+            .having((s) => s.allItems.isNotEmpty, 'has decoy items', true),
+      ],
+    );
+  });
+
+  // ── Duress mode CRUD guards ────────────────────────────────────────────────
+  group('Duress mode silent CRUD guards', () {
+    blocTest<VaultBloc, VaultState>(
+      'VaultItemAdded in duress mode emits success but never calls repo',
+      build: () {
+        when(() => mockRepo.watchItems(any()))
+            .thenAnswer((_) => Stream.value([_entry()]));
+        return VaultBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const VaultStarted('local_user'));
+        await Future.delayed(Duration.zero);
+        bloc.add(const VaultDuressActivated());
+        await Future.delayed(Duration.zero);
+        bloc.add(VaultItemAdded(_entry(id: 'new-1', title: 'Fake')));
+      },
+      skip: 3, // VaultLoading + VaultLoaded + duress VaultLoaded
+      expect: () => [
+        isA<VaultLoaded>()
+            .having((s) => s.isDuress, 'still duress', true)
+            .having((s) => s.message, 'success msg', contains('✓')),
+      ],
+      verify: (_) => verifyNever(() => mockRepo.addItem(any())),
+    );
+
+    blocTest<VaultBloc, VaultState>(
+      'VaultItemUpdated in duress mode emits success but never calls repo',
+      build: () {
+        when(() => mockRepo.watchItems(any()))
+            .thenAnswer((_) => Stream.value([_entry()]));
+        return VaultBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const VaultStarted('local_user'));
+        await Future.delayed(Duration.zero);
+        bloc.add(const VaultDuressActivated());
+        await Future.delayed(Duration.zero);
+        bloc.add(VaultItemUpdated(_entry(title: 'Changed')));
+      },
+      skip: 3,
+      expect: () => [
+        isA<VaultLoaded>()
+            .having((s) => s.isDuress, 'still duress', true)
+            .having((s) => s.message, 'success msg', contains('✓')),
+      ],
+      verify: (_) => verifyNever(() => mockRepo.updateItem(any())),
+    );
+
+    blocTest<VaultBloc, VaultState>(
+      'VaultItemDeleted in duress mode emits success but never calls repo',
+      build: () {
+        when(() => mockRepo.watchItems(any()))
+            .thenAnswer((_) => Stream.value([_entry()]));
+        when(() => mockRepo.deleteItem(any())).thenAnswer((_) async {});
+        return VaultBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const VaultStarted('local_user'));
+        await Future.delayed(Duration.zero);
+        bloc.add(const VaultDuressActivated());
+        await Future.delayed(Duration.zero);
+        bloc.add(const VaultItemDeleted('decoy-1'));
+      },
+      skip: 3,
+      expect: () => [
+        isA<VaultLoaded>()
+            .having((s) => s.isDuress, 'still duress', true)
+            .having((s) => s.message, 'msg set', isNotNull),
+      ],
+      verify: (_) => verifyNever(() => mockRepo.deleteItem(any())),
+    );
+  });
+
   // ── securityScore computed property ───────────────────────────────────────
   group('VaultLoaded.securityScore', () {
     test('returns 100 for empty vault', () {
@@ -345,6 +441,26 @@ void main() {
         _entry(id: '3', strengthScore: 4),
       ]);
       expect(state.weakItemCount, 2);
+    });
+  });
+
+  // ── VaultLoaded.isDuress state property ─────────────────────────────────────
+  group('VaultLoaded.isDuress', () {
+    test('defaults to false', () {
+      final state = VaultLoaded(allItems: const []);
+      expect(state.isDuress, isFalse);
+    });
+
+    test('copyWith preserves isDuress when not overridden', () {
+      const state = VaultLoaded(allItems: [], isDuress: true);
+      final copied = state.copyWith(searchQuery: 'test');
+      expect(copied.isDuress, isTrue);
+    });
+
+    test('copyWith can set isDuress', () {
+      const state = VaultLoaded(allItems: []);
+      final copied = state.copyWith(isDuress: true);
+      expect(copied.isDuress, isTrue);
     });
   });
 }

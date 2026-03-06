@@ -140,7 +140,13 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp.router(
+        return BlocListener<GeofenceBloc, GeofenceState>(
+          listenWhen: (prev, curr) =>
+              curr is GeofenceLoaded && curr.shouldLockVault,
+          listener: (context, state) {
+            context.read<AuthBloc>().add(const AuthVaultLocked());
+          },
+          child: MaterialApp.router(
           title: 'CipherOwl',
           debugShowCheckedModeBanner: false,
 
@@ -173,7 +179,8 @@ class _CipherOwlAppState extends State<CipherOwlApp> {
             }
             return const Locale('ar');
           },
-        );
+        ),  // MaterialApp.router
+        );  // BlocListener
       },
       ),  // ScreenUtilInit
     ),    // MultiBlocProvider

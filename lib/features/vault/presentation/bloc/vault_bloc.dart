@@ -135,7 +135,13 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   Future<void> _onItemAdded(
       VaultItemAdded event, Emitter<VaultState> emit) async {
     if (state is! VaultLoaded) return;
-    emit((state as VaultLoaded).copyWith(isOperating: true));
+    final loaded = state as VaultLoaded;
+    // In duress mode, silently accept but never persist.
+    if (loaded.isDuress) {
+      emit(loaded.copyWith(message: 'تم الحفظ بنجاح ✓'));
+      return;
+    }
+    emit(loaded.copyWith(isOperating: true));
     try {
       await _repo.addItem(event.entry);
       // Stream will auto-update allItems — just clear operating flag + message
@@ -159,7 +165,12 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   Future<void> _onItemUpdated(
       VaultItemUpdated event, Emitter<VaultState> emit) async {
     if (state is! VaultLoaded) return;
-    emit((state as VaultLoaded).copyWith(isOperating: true));
+    final loaded = state as VaultLoaded;
+    if (loaded.isDuress) {
+      emit(loaded.copyWith(message: 'تم التحديث بنجاح ✓'));
+      return;
+    }
+    emit(loaded.copyWith(isOperating: true));
     try {
       await _repo.updateItem(event.entry);
       if (state is VaultLoaded) {
@@ -182,7 +193,12 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
   Future<void> _onItemDeleted(
       VaultItemDeleted event, Emitter<VaultState> emit) async {
     if (state is! VaultLoaded) return;
-    emit((state as VaultLoaded).copyWith(isOperating: true));
+    final loaded = state as VaultLoaded;
+    if (loaded.isDuress) {
+      emit(loaded.copyWith(message: 'تم الحذف'));
+      return;
+    }
+    emit(loaded.copyWith(isOperating: true));
     try {
       await _repo.deleteItem(event.itemId);
       if (state is VaultLoaded) {
@@ -300,6 +316,7 @@ class VaultBloc extends Bloc<VaultEvent, VaultState> {
       allItems: _buildDecoyItems(),
       searchQuery: '',
       categoryFilter: null,
+      isDuress: true,
     ));
   }
 
