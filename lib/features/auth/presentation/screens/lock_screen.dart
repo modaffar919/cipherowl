@@ -64,6 +64,10 @@ class _LockScreenState extends State<LockScreen>
     context.read<AuthBloc>().add(const AuthBiometricRequested());
   }
 
+  void _faceUnlock() {
+    context.read<AuthBloc>().add(const AuthFaceUnlockRequested());
+  }
+
   void _fido2Unlock() {
     context.read<AuthBloc>().add(const AuthFido2Requested());
   }
@@ -89,19 +93,24 @@ class _LockScreenState extends State<LockScreen>
           context.go(AppConstants.routeSetup);
         } else if (state is AuthFido2Error) {
           HapticFeedback.mediumImpact();
+        } else if (state is AuthFaceUnlockFailed) {
+          HapticFeedback.mediumImpact();
         }
       },
       builder: (context, state) {
         final isLoading = state is AuthUnlocking
             || state is AuthBiometricInProgress
-            || state is AuthFido2InProgress;
-        final hasError = state is AuthFailed || state is AuthFido2Error;
+            || state is AuthFido2InProgress
+            || state is AuthFaceUnlockInProgress;
+        final hasError = state is AuthFailed || state is AuthFido2Error || state is AuthFaceUnlockFailed;
         final isBlocked = state is AuthBlocked;
         final errorMessage = state is AuthFailed
             ? state.message
             : state is AuthFido2Error
                 ? state.message
-                : null;
+                : state is AuthFaceUnlockFailed
+                    ? state.message
+                    : null;
 
         return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
@@ -324,18 +333,27 @@ class _LockScreenState extends State<LockScreen>
 
         const SizedBox(height: 16),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 24,
+          runSpacing: 12,
           children: [
-            // Biometric Unlock
+            // Face Unlock (MobileFaceNet embedding)
             _AuthOptionButton(
               icon: Icons.face_retouching_natural,
               labelAr: 'الوجه',
               labelEn: 'Face',
               color: AppConstants.primaryCyan,
+              onTap: _faceUnlock,
+            ),
+            // Biometric (Fingerprint / system Face ID)
+            _AuthOptionButton(
+              icon: Icons.fingerprint,
+              labelAr: 'البصمة',
+              labelEn: 'Touch',
+              color: AppConstants.successGreen,
               onTap: _biometricUnlock,
             ),
-            const SizedBox(width: 24),
             // FIDO2 Key
             _AuthOptionButton(
               icon: Icons.key,
@@ -344,7 +362,6 @@ class _LockScreenState extends State<LockScreen>
               color: AppConstants.accentGold,
               onTap: _fido2Unlock,
             ),
-            const SizedBox(width: 24),
             // Magic Link
             _AuthOptionButton(
               icon: Icons.mail_outline_rounded,

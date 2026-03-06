@@ -21,10 +21,12 @@ String _stubGenerator({required ApiGeneratorConfig config}) {
   return (strong * ((length ~/ strong.length) + 1)).substring(0, length);
 }
 
+int _stubScorer(String password) => password.isEmpty ? 0 : 3;
+
 // ── Helper ────────────────────────────────────────────────────────────────────
 
 GeneratorBloc _bloc() =>
-    GeneratorBloc(passwordGenerator: _stubGenerator);
+    GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer);
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

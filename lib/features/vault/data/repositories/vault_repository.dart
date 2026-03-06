@@ -11,8 +11,7 @@ import '../../domain/entities/vault_entry.dart';
 /// Translates between the Drift [VaultItem] row type and the
 /// clean-architecture [VaultEntry] domain model.
 ///
-/// Encryption/decryption of password blobs is a TODO until the
-/// Rust FFI bridge is ready (EPIC-2). For now blobs are stored as-is.
+/// Encryption/decryption uses AES-256-GCM via Rust FFI (EPIC-2 complete).
 class VaultRepository {
   final SmartVaultDatabase _db;
   static const _uuid = Uuid();

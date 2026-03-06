@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-import 'package:zxcvbn/zxcvbn.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
+import 'package:cipherowl/src/rust/api.dart';
 import 'package:cipherowl/core/crypto/vault_crypto_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cipherowl/features/vault/domain/entities/vault_entry.dart';
@@ -266,7 +266,7 @@ class _AddEditItemScreenState extends State<AddEditItemScreen> {
             ),
           ),
           onChanged: (v) {
-            final score = v.isEmpty ? 0 : (Zxcvbn().evaluate(v).score ?? 0);
+            final score = v.isEmpty ? 0 : apiEstimateStrength(password: v).score;
             setState(() => _strength = score / 4.0);
           },
         ),

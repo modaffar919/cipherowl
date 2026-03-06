@@ -98,3 +98,17 @@ class AuthFido2Error extends AuthState {
 class AuthDuressAuthenticated extends AuthState {
   const AuthDuressAuthenticated();
 }
+
+/// Face unlock verification in progress (camera + embedding)
+class AuthFaceUnlockInProgress extends AuthState {
+  const AuthFaceUnlockInProgress();
+}
+
+/// Face unlock failed (no enrolled face or mismatch)
+class AuthFaceUnlockFailed extends AuthState {
+  final String message;
+  const AuthFaceUnlockFailed(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

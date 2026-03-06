@@ -6,21 +6,25 @@ import 'package:cipherowl/features/auth/data/repositories/auth_repository.dart';
 import 'package:cipherowl/features/auth/data/services/intruder_snapshot_service.dart';
 import 'package:cipherowl/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:cipherowl/features/face_track/data/services/background_face_monitor.dart';
+import 'package:cipherowl/features/face_track/data/services/face_verification_service.dart';
 
-// â”€â”€ Mocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â"€â"€ Mocks â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 class MockAuthRepository extends Mock implements AuthRepository {}
 class MockIntruderSnapshotService extends Mock implements IntruderSnapshotService {}
 class MockBackgroundFaceMonitor extends Mock implements BackgroundFaceMonitor {}
+class MockFaceVerificationService extends Mock implements FaceVerificationService {}
 
 void main() {
   late MockAuthRepository mockRepo;
   late MockIntruderSnapshotService mockSnapshotService;
   late MockBackgroundFaceMonitor mockFaceMonitor;
+  late MockFaceVerificationService mockFaceVerification;
 
   setUp(() {
     mockRepo = MockAuthRepository();
     mockSnapshotService = MockIntruderSnapshotService();
     mockFaceMonitor = MockBackgroundFaceMonitor();
+    mockFaceVerification = MockFaceVerificationService();
     when(() => mockFaceMonitor.start()).thenAnswer((_) async {});
     when(() => mockFaceMonitor.stop()).thenAnswer((_) async {});
   });
@@ -345,6 +349,64 @@ void main() {
         expect: () => [const AuthUnlocking(), isA<AuthFailed>()],
         verify: (_) =>
             verifyNever(() => mockSnapshotService.captureAsync()),
+      );
+    });
+
+    // ── AuthFaceUnlockRequested ──────────────────────────────────────────────
+    group('AuthFaceUnlockRequested', () {
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFaceUnlockInProgress, AuthAuthenticated] when enrolled + biometric success',
+        build: () {
+          when(() => mockFaceVerification.hasEnrolledFace())
+              .thenAnswer((_) async => true);
+          when(() => mockRepo.authenticateWithBiometric())
+              .thenAnswer((_) async => BiometricResult.success());
+          return AuthBloc(
+            authRepository: mockRepo,
+            faceMonitor: mockFaceMonitor,
+            faceVerification: mockFaceVerification,
+          );
+        },
+        act: (bloc) => bloc.add(const AuthFaceUnlockRequested()),
+        expect: () => const [AuthFaceUnlockInProgress(), AuthAuthenticated()],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFaceUnlockInProgress, AuthFaceUnlockFailed] when no enrolled face',
+        build: () {
+          when(() => mockFaceVerification.hasEnrolledFace())
+              .thenAnswer((_) async => false);
+          return AuthBloc(
+            authRepository: mockRepo,
+            faceMonitor: mockFaceMonitor,
+            faceVerification: mockFaceVerification,
+          );
+        },
+        act: (bloc) => bloc.add(const AuthFaceUnlockRequested()),
+        expect: () => [
+          const AuthFaceUnlockInProgress(),
+          isA<AuthFaceUnlockFailed>(),
+        ],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthFaceUnlockInProgress, AuthFaceUnlockFailed] when biometric fails',
+        build: () {
+          when(() => mockFaceVerification.hasEnrolledFace())
+              .thenAnswer((_) async => true);
+          when(() => mockRepo.authenticateWithBiometric())
+              .thenAnswer((_) async => BiometricResult.failed('mismatch'));
+          return AuthBloc(
+            authRepository: mockRepo,
+            faceMonitor: mockFaceMonitor,
+            faceVerification: mockFaceVerification,
+          );
+        },
+        act: (bloc) => bloc.add(const AuthFaceUnlockRequested()),
+        expect: () => [
+          const AuthFaceUnlockInProgress(),
+          isA<AuthFaceUnlockFailed>(),
+        ],
       );
     });
   });

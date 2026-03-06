@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../face_track/data/services/background_face_monitor.dart';
+import '../../../face_track/data/services/face_verification_service.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/services/intruder_snapshot_service.dart';
 
@@ -11,19 +12,23 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final IntruderSnapshotService _snapshotService;
+  final FaceVerificationService _faceVerification;
   BackgroundFaceMonitor? _faceMonitor;
 
   AuthBloc({
     AuthRepository? authRepository,
     IntruderSnapshotService? snapshotService,
     BackgroundFaceMonitor? faceMonitor,
+    FaceVerificationService? faceVerification,
   })  : _authRepository = authRepository ?? AuthRepository(),
         _snapshotService = snapshotService ?? IntruderSnapshotService(),
+        _faceVerification = faceVerification ?? FaceVerificationService(),
         _faceMonitor = faceMonitor,
         super(const AuthInitial()) {
     on<AuthAppStarted>(_onAppStarted);
     on<AuthMasterPasswordSubmitted>(_onMasterPasswordSubmitted);
     on<AuthBiometricRequested>(_onBiometricRequested);
+    on<AuthFaceUnlockRequested>(_onFaceUnlockRequested);
     on<AuthFido2Requested>(_onFido2Requested);
     on<AuthDuressPasswordSet>(_onDuressPasswordSet);
     on<AuthSetupCompleted>(_onSetupCompleted);
@@ -127,6 +132,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } catch (e) {
       emit(AuthBiometricUnavailable('خطأ في البصمة: ${e.toString()}'));
+    }
+  }
+
+  // ── Face Unlock (MobileFaceNet embedding) ──────────────
+
+  Future<void> _onFaceUnlockRequested(
+    AuthFaceUnlockRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthFaceUnlockInProgress());
+
+    try {
+      final hasEnrolled = await _faceVerification.hasEnrolledFace();
+      if (!hasEnrolled) {
+        emit(const AuthFaceUnlockFailed('لم يتم تسجيل وجه بعد'));
+        return;
+      }
+
+      // Use platform biometric as a secondary confirmation, then start
+      // the continuous face monitor which verifies via embedding.
+      final result = await _authRepository.authenticateWithBiometric();
+      if (result.status == BiometricStatus.success) {
+        emit(const AuthAuthenticated());
+        _startFaceMonitor();
+      } else {
+        emit(const AuthFaceUnlockFailed('فشل التحقق من الوجه'));
+      }
+    } catch (e) {
+      emit(AuthFaceUnlockFailed('خطأ: ${e.toString()}'));
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zxcvbn/zxcvbn.dart';
 
 import 'package:cipherowl/core/constants/app_constants.dart';
 import 'package:cipherowl/src/rust/api.dart';
@@ -14,18 +13,24 @@ typedef PasswordGeneratorFn = String Function({
   required ApiGeneratorConfig config,
 });
 
+/// Signature for the strength-scoring function (returns 0-4).
+typedef StrengthScorerFn = int Function(String password);
+
 /// BLoC that drives the password generator tab.
 ///
 /// Password generation is delegated to the Rust core (ChaCha20Rng) via FFI.
 /// Strength scoring uses the zxcvbn algorithm.
 class GeneratorBloc extends Bloc<GeneratorEvent, GeneratorState> {
   static const _ambiguousChars = 'iIlLoO01';
-  final _zxcvbn = Zxcvbn();
   final PasswordGeneratorFn _generatePassword;
+  final StrengthScorerFn _strengthScorer;
 
   GeneratorBloc({
     @visibleForTesting PasswordGeneratorFn? passwordGenerator,
+    @visibleForTesting StrengthScorerFn? strengthScorer,
   })  : _generatePassword = passwordGenerator ?? apiGeneratePassword,
+        _strengthScorer = strengthScorer ??
+            ((p) => p.isEmpty ? 0 : apiEstimateStrength(password: p).score.clamp(0, 4)),
         super(const GeneratorState(
           password: '',
           strengthScore: 0,
@@ -89,10 +94,7 @@ class GeneratorBloc extends Bloc<GeneratorEvent, GeneratorState> {
     );
   }
 
-  int _score(String password) {
-    final result = _zxcvbn.evaluate(password);
-    return (result.score ?? 0).toInt().clamp(0, 4);
-  }
+  int _score(String password) => _strengthScorer(password);
 
   static String _label(int score) => switch (score) {
         0 || 1 => 'ضعيفة',

@@ -54,6 +54,8 @@ String _stubGenerator({required ApiGeneratorConfig config}) {
   return (chars * ((len ~/ chars.length) + 1)).substring(0, len);
 }
 
+int _stubScorer(String password) => password.isEmpty ? 0 : 3;
+
 // â”€â”€ Domain helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const _userId = 'local_user';
@@ -732,7 +734,7 @@ void main() {
   group('Generator config round-trip', () {
     // 7-a: initial password is non-empty after constructor's auto-refresh
     test('initial state has non-empty generated password', () async {
-      final bloc = GeneratorBloc(passwordGenerator: _stubGenerator);
+      final bloc = GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer);
       await Future.delayed(Duration.zero); // let constructor's event process
       expect(bloc.state.password, isNotEmpty);
       bloc.close();
@@ -741,7 +743,7 @@ void main() {
     // 7-b: custom length is honoured
     blocTest<GeneratorBloc, GeneratorState>(
       'length 8 config produces 8-character password',
-      build: () => GeneratorBloc(passwordGenerator: _stubGenerator),
+      build: () => GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer),
       act: (bloc) => bloc.add(const GeneratorConfigUpdated(length: 8)),
       skip: 1, // skip constructor's initial refresh
       expect: () => [
@@ -753,7 +755,7 @@ void main() {
     // 7-c: refresh generates a new password state
     blocTest<GeneratorBloc, GeneratorState>(
       'refresh: emits updated state',
-      build: () => GeneratorBloc(passwordGenerator: _stubGenerator),
+      build: () => GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer),
       skip: 1,
       act: (bloc) => bloc.add(const GeneratorRefreshRequested()),
       expect: () => [isA<GeneratorState>()],
@@ -762,7 +764,7 @@ void main() {
     // 7-d: length 32 produces 32-character password
     blocTest<GeneratorBloc, GeneratorState>(
       'length 32 config produces 32-character password',
-      build: () => GeneratorBloc(passwordGenerator: _stubGenerator),
+      build: () => GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer),
       act: (bloc) => bloc.add(const GeneratorConfigUpdated(length: 32)),
       skip: 1,
       expect: () => [
@@ -773,7 +775,7 @@ void main() {
 
     // 7-e: strength score is computed (>= 0)
     test('generated password always has a valid strength score 0-4', () {
-      final bloc = GeneratorBloc(passwordGenerator: _stubGenerator);
+      final bloc = GeneratorBloc(passwordGenerator: _stubGenerator, strengthScorer: _stubScorer);
       expect(bloc.state.strengthScore, inInclusiveRange(0, 4));
       bloc.close();
     });

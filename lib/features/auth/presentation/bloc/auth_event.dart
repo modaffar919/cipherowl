@@ -59,3 +59,8 @@ class AuthDuressPasswordSet extends AuthEvent {
   @override
   List<Object?> get props => [password];
 }
+
+/// User tapped the Face Unlock button — verify via MobileFaceNet embedding
+class AuthFaceUnlockRequested extends AuthEvent {
+  const AuthFaceUnlockRequested();
+}
