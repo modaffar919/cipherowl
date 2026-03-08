@@ -1,7 +1,7 @@
 # ADR-001: Rust for All Cryptographic Operations
 
-**Status**: Accepted  
-**Date**: 2025  
+**Status**: Accepted
+**Date**: 2025
 **Deciders**: CipherOwl Team
 
 ## Context
@@ -30,7 +30,7 @@ All cryptographic operations are implemented in Rust, accessed via flutter_rust_
 
 # ADR-002: BLoC for State Management
 
-**Status**: Accepted  
+**Status**: Accepted
 **Date**: 2025
 
 ## Context
@@ -57,7 +57,7 @@ Flutter BLoC (flutter_bloc) with strict separation: Events → BLoC → States. 
 
 # ADR-003: SQLCipher for Local Database Encryption
 
-**Status**: Accepted  
+**Status**: Accepted
 **Date**: 2025
 
 ## Context
@@ -85,7 +85,7 @@ Drift ORM + SQLCipher (via sqlcipher_flutter_libs) with a random AES-256 key sto
 
 # ADR-004: Zero-Knowledge Cloud Sync via Supabase
 
-**Status**: Accepted  
+**Status**: Accepted
 **Date**: 2025
 
 ## Context
@@ -113,7 +113,7 @@ All vault data encrypted client-side (AES-256-GCM, Rust) before upload. Supabase
 
 # ADR-005: Continuous Biometric Authentication (Face-Track)
 
-**Status**: Accepted  
+**Status**: Accepted
 **Date**: 2025
 
 ## Context
@@ -137,3 +137,60 @@ Implement continuous face verification using MobileFaceNet (TFLite, on-device). 
 - Battery impact mitigated by configurable check interval
 - Users can disable Face-Track and use traditional lock methods
 - Face embedding migration handled automatically (legacy → encrypted)
+
+---
+
+# ADR-006: CustomPaint over Rive/Lottie for Owl Mascot
+
+**Status**: Accepted
+**Date**: 2026-03
+
+## Context
+
+EPIC-9 originally specified using Rive for the animated owl mascot (6 states: idle, watching, verifying, success, failed, danger) and Lottie for page transition animations. Both `rive: ^0.14.4` and `lottie: ^3.1.2` were added to `pubspec.yaml`.
+
+## Decision
+
+Implement the owl mascot using Flutter CustomPaint instead of Rive. Use Lottie for supplementary transition animations (success checkmark, loading spinner) only.
+
+## Rationale
+
+- **Zero external assets**: CustomPaint requires no `.riv` or `.json` files — no asset loading failures, no missing file crashes
+- **Smaller APK**: No bundled binary animation assets (Rive files can be 50–200KB each)
+- **Full control**: Animation states integrate directly with BLoC state machine — no Rive state machine mapping layer needed
+- **Performance**: CustomPaint renders at native Flutter frame rate; no Rive runtime overhead
+- **Already production-ready**: OwlMascotWidget implements all 6 states with breathing animation, glow effects, and color transitions
+
+## Consequences
+
+- **Positive**: Simpler build pipeline; no designer tool dependency; 100% code-controlled animation behavior
+- **Negative**: More complex Dart code in `owl_mascot.dart` compared to importing a `.riv` asset
+- **Lottie retained**: Small Lottie JSON files used for success/loading micro-animations to complement CustomPaint mascot
+
+---
+
+# ADR-007: OIDC-First Enterprise SSO Strategy
+
+**Status**: Accepted
+**Date**: 2026-03
+
+## Context
+
+EPIC-12 requires enterprise SSO integration supporting OIDC, SAML, and LDAP. The SSO config storage layer (sso_config_service.dart, 006_sso_config.sql) supports all three providers. However, implementing all three authentication flows simultaneously is high-effort and low-value for a graduation project.
+
+## Decision
+
+Implement OIDC authorization code flow first. Defer SAML and LDAP to post-launch roadmap. Store configurations for all three providers (existing infrastructure) but only execute OIDC authentication.
+
+## Rationale
+
+- **Coverage**: OIDC covers Google Workspace, Microsoft Azure AD, Okta, Auth0 — 90%+ of enterprise IdPs
+- **Supabase compatibility**: Supabase Auth natively supports OIDC providers; SAML/LDAP would require custom auth hooks
+- **Complexity**: SAML assertion parsing and LDAP bind/search require specialized libraries and testing infrastructure
+- **Incremental**: OIDC implementation establishes the SSO auth pattern; SAML/LDAP can follow the same event/state architecture
+
+## Consequences
+
+- Admin dashboard can configure all three provider types (UI ready)
+- Only OIDC "Connect" button is active; SAML/LDAP show "Coming Soon"
+- LDAP sync and SAML assertion verification documented as future work

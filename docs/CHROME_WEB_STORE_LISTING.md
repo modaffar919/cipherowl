@@ -2,11 +2,11 @@
 
 ## Extension Details
 
-**Name**: CipherOwl Autofill  
-**Short Description** (132 chars max):  
+**Name**: CipherOwl Autofill
+**Short Description** (132 chars max):
 > Fill passwords automatically from your CipherOwl vault — ملء كلمات المرور تلقائياً من خزينة CipherOwl
 
-**Category**: Productivity  
+**Category**: Productivity
 **Language**: Arabic (Primary), English
 
 ## Detailed Description

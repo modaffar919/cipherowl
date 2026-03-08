@@ -1,7 +1,7 @@
 # CipherOwl Security Whitepaper
 
-**Version**: 1.0  
-**Date**: 2025  
+**Version**: 1.0
+**Date**: 2025
 **Classification**: Public
 
 ## 1. Executive Summary

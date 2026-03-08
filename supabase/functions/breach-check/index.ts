@@ -82,6 +82,32 @@ Deno.serve(async (req: Request): Promise<Response> => {
         return { suffix, count: parseInt(countStr ?? '0', 10) };
       });
 
+    // ── Trigger push notification if any breaches found ──────────────────
+    const totalBreached = suffixes.reduce((sum, s) => sum + s.count, 0);
+    if (totalBreached > 0 && user) {
+      try {
+        const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        const supabaseUrl = Deno.env.get('SUPABASE_URL');
+        if (serviceKey && supabaseUrl) {
+          await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${serviceKey}`,
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              type: 'breach',
+              body: `تم اكتشاف ${totalBreached} تطابق في قواعد بيانات الاختراقات. غيّر كلمات مرورك فورًا.`,
+            }),
+          });
+        }
+      } catch (notifErr) {
+        // Notification is best-effort — don't fail the breach check
+        console.error('Failed to send breach notification:', notifErr);
+      }
+    }
+
     return new Response(JSON.stringify({ suffixes }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders(ALLOWED_ORIGIN) },

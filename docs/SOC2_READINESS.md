@@ -1,6 +1,6 @@
 # SOC 2 Readiness Assessment — CipherOwl
 
-**Assessment Date**: 2025  
+**Assessment Date**: 2025
 **Scope**: CipherOwl Password Manager (mobile, desktop, web clients + Supabase cloud backend)
 
 ## Trust Service Criteria Coverage

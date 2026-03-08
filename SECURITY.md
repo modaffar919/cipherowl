@@ -27,7 +27,7 @@ We aim to acknowledge reports within **48 hours** and provide a fix within **7 d
 - **Argon2id** — Key derivation (t=3, m=64MB, p=4, OWASP recommended)
 - **X25519 ECDH** — Key exchange for encrypted sharing
 - **Ed25519** — Digital signatures for data integrity
-- **PBKDF2-SHA256** — Fallback KDF (600K iterations)
+- **PBKDF2-SHA512** — Fallback KDF (600K iterations)
 - **Secure Memory** — `mlock` to prevent swapping + `zeroize` on drop
 
 ### Data Protection

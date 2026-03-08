@@ -64,3 +64,21 @@ class AuthDuressPasswordSet extends AuthEvent {
 class AuthFaceUnlockRequested extends AuthEvent {
   const AuthFaceUnlockRequested();
 }
+
+/// User tapped the SSO login button — start OIDC flow
+class AuthSsoLoginRequested extends AuthEvent {
+  final String orgId;
+  const AuthSsoLoginRequested(this.orgId);
+
+  @override
+  List<Object?> get props => [orgId];
+}
+
+/// OIDC redirect callback received — complete SSO authentication
+class AuthSsoCallbackReceived extends AuthEvent {
+  final Uri callbackUri;
+  const AuthSsoCallbackReceived(this.callbackUri);
+
+  @override
+  List<Object?> get props => [callbackUri];
+}

@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../enterprise/data/services/oidc_auth_service.dart';
+import '../../../enterprise/data/services/sso_config_service.dart';
+import '../../../enterprise/domain/entities/sso_config.dart';
 import '../../../face_track/data/services/background_face_monitor.dart';
 import '../../../face_track/data/services/face_verification_service.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -13,16 +16,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final IntruderSnapshotService _snapshotService;
   final FaceVerificationService _faceVerification;
+  final OidcAuthService? _oidcAuthService;
+  final SsoConfigService? _ssoConfigService;
   BackgroundFaceMonitor? _faceMonitor;
+
+  // Pending OIDC state for redirect handling
+  OidcAuthPendingException? _pendingOidc;
 
   AuthBloc({
     AuthRepository? authRepository,
     IntruderSnapshotService? snapshotService,
     BackgroundFaceMonitor? faceMonitor,
     FaceVerificationService? faceVerification,
+    OidcAuthService? oidcAuthService,
+    SsoConfigService? ssoConfigService,
   })  : _authRepository = authRepository ?? AuthRepository(),
         _snapshotService = snapshotService ?? IntruderSnapshotService(),
         _faceVerification = faceVerification ?? FaceVerificationService(),
+        _oidcAuthService = oidcAuthService,
+        _ssoConfigService = ssoConfigService,
         _faceMonitor = faceMonitor,
         super(const AuthInitial()) {
     on<AuthAppStarted>(_onAppStarted);
@@ -34,6 +46,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSetupCompleted>(_onSetupCompleted);
     on<AuthVaultLocked>(_onVaultLocked);
     on<AuthErrorDismissed>(_onErrorDismissed);
+    on<AuthSsoLoginRequested>(_onSsoLoginRequested);
+    on<AuthSsoCallbackReceived>(_onSsoCallbackReceived);
   }
 
   // ── Handlers ─────────────────────────────────────────────
@@ -248,6 +262,81 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _stopFaceMonitor() async {
     await _faceMonitor?.stop();
+  }
+
+  // ── SSO / OIDC ────────────────────────────────────────
+
+  Future<void> _onSsoLoginRequested(
+    AuthSsoLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthSsoInProgress());
+
+    if (_oidcAuthService == null || _ssoConfigService == null) {
+      emit(const AuthSsoFailed('SSO service not configured'));
+      return;
+    }
+
+    try {
+      final config = await _ssoConfigService.getConfig(
+        event.orgId,
+        SsoProvider.oidc,
+      );
+
+      if (config == null || !config.isEnabled) {
+        emit(const AuthSsoFailed('SSO is not enabled for this organization'));
+        return;
+      }
+
+      await _oidcAuthService.authenticate(config);
+    } on OidcAuthPendingException catch (pending) {
+      // Browser was opened — store pending state for redirect handling
+      _pendingOidc = pending;
+      // Stay in AuthSsoInProgress until callback arrives
+    } on OidcAuthException catch (e) {
+      emit(AuthSsoFailed(e.message));
+    } catch (e) {
+      emit(AuthSsoFailed('SSO error: $e'));
+    }
+  }
+
+  Future<void> _onSsoCallbackReceived(
+    AuthSsoCallbackReceived event,
+    Emitter<AuthState> emit,
+  ) async {
+    if (_oidcAuthService == null || _pendingOidc == null) {
+      emit(const AuthSsoFailed('No pending SSO session'));
+      return;
+    }
+
+    emit(const AuthSsoInProgress());
+
+    try {
+      final pending = _pendingOidc!;
+      _pendingOidc = null;
+
+      final response = await _oidcAuthService.handleRedirect(
+        callbackUri: event.callbackUri,
+        expectedState: pending.state,
+        codeVerifier: pending.codeVerifier,
+        nonce: pending.nonce,
+        tokenEndpoint: pending.tokenEndpoint,
+        clientId: pending.clientId,
+        clientSecret: pending.clientSecret,
+        discoveryUrl: pending.discoveryUrl,
+      );
+
+      if (response.user != null) {
+        emit(AuthAuthenticated(userId: response.user!.id));
+        _startFaceMonitor();
+      } else {
+        emit(const AuthSsoFailed('SSO authentication returned no user'));
+      }
+    } on OidcAuthException catch (e) {
+      emit(AuthSsoFailed(e.message));
+    } catch (e) {
+      emit(AuthSsoFailed('SSO callback error: $e'));
+    }
   }
 
   @override

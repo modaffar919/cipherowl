@@ -112,3 +112,17 @@ class AuthFaceUnlockFailed extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+/// SSO authentication in progress (browser opened)
+class AuthSsoInProgress extends AuthState {
+  const AuthSsoInProgress();
+}
+
+/// SSO authentication failed
+class AuthSsoFailed extends AuthState {
+  final String message;
+  const AuthSsoFailed(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

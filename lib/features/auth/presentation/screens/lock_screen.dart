@@ -72,6 +72,46 @@ class _LockScreenState extends State<LockScreen>
     context.read<AuthBloc>().add(const AuthFido2Requested());
   }
 
+  void _ssoLogin() {
+    // Prompt for org ID, then dispatch SSO event
+    showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A2E),
+          title: const Text('SSO تسجيل دخول', style: TextStyle(color: Colors.white)),
+          content: TextField(
+            controller: controller,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'أدخل معرّف المؤسسة',
+              hintStyle: TextStyle(color: Colors.white38),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () {
+                final orgId = controller.text.trim();
+                Navigator.pop(ctx, orgId);
+              },
+              child: const Text('متابعة'),
+            ),
+          ],
+        );
+      },
+    ).then((orgId) {
+      if (!mounted) return;
+      if (orgId != null && orgId.isNotEmpty) {
+        context.read<AuthBloc>().add(AuthSsoLoginRequested(orgId));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
@@ -95,14 +135,17 @@ class _LockScreenState extends State<LockScreen>
           HapticFeedback.mediumImpact();
         } else if (state is AuthFaceUnlockFailed) {
           HapticFeedback.mediumImpact();
+        } else if (state is AuthSsoFailed) {
+          HapticFeedback.mediumImpact();
         }
       },
       builder: (context, state) {
         final isLoading = state is AuthUnlocking
             || state is AuthBiometricInProgress
             || state is AuthFido2InProgress
-            || state is AuthFaceUnlockInProgress;
-        final hasError = state is AuthFailed || state is AuthFido2Error || state is AuthFaceUnlockFailed;
+            || state is AuthFaceUnlockInProgress
+            || state is AuthSsoInProgress;
+        final hasError = state is AuthFailed || state is AuthFido2Error || state is AuthFaceUnlockFailed || state is AuthSsoFailed;
         final isBlocked = state is AuthBlocked;
         final errorMessage = state is AuthFailed
             ? state.message
@@ -110,7 +153,9 @@ class _LockScreenState extends State<LockScreen>
                 ? state.message
                 : state is AuthFaceUnlockFailed
                     ? state.message
-                    : null;
+                    : state is AuthSsoFailed
+                        ? state.message
+                        : null;
 
         return Scaffold(
       backgroundColor: AppConstants.backgroundDark,
@@ -369,6 +414,14 @@ class _LockScreenState extends State<LockScreen>
               labelEn: 'Link',
               color: AppConstants.accentPurple,
               onTap: () => context.push(AppConstants.routeMagicLink),
+            ),
+            // Enterprise SSO (OIDC)
+            _AuthOptionButton(
+              icon: Icons.business,
+              labelAr: 'SSO',
+              labelEn: 'SSO',
+              color: Colors.blueAccent,
+              onTap: _ssoLogin,
             ),
           ],
         ),
